@@ -16,7 +16,7 @@ const mockEvents = [
 
 const EventsListPage = () => {
   return (
-    // asdasdasdasdasdasdas
+ 
     <UserLayout>
       <div className="container mx-auto px-4 py-8 flex flex-col md:flex-row gap-8">
         
