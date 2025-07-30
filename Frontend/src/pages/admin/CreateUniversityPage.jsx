@@ -1,0 +1,66 @@
+// src/pages/admin/CreateUniversityPage.jsx
+import { Link } from 'react-router-dom';
+import { FiChevronLeft, FiHome } from 'react-icons/fi';
+
+const CreateUniversityPage = () => {
+    return (
+        <div>
+            <div className="flex justify-between items-center mb-6">
+                <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-3">
+                    <FiHome /> Add New University
+                </h1>
+                <Link
+                    to="/admin/universities"
+                    className="flex items-center gap-2 bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded-lg hover:bg-gray-300"
+                >
+                    <FiChevronLeft /> Back
+                </Link>
+            </div>
+
+            <form className="bg-white p-8 rounded-lg shadow-md space-y-6">
+                <div>
+                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">University Name</label>
+                    <input 
+                        type="text" 
+                        id="name" 
+                        placeholder="e.g., University of Example"
+                        className="w-full rounded-md shadow-sm px-2 py-2 border-1  focus:outline-teal-500 border-teal-500 "
+                    />
+                </div>
+                 <div>
+                    <label htmlFor="pathId" className="block text-sm font-medium text-gray-700 mb-1">Path ID (e.g., 'uoe', 'examplu')</label>
+                    <input 
+                        type="text" 
+                        id="pathId" 
+                        placeholder="A short, unique, lowercase ID"
+                        className="w-full  rounded-md shadow-sm px-2 py-2 border-1  focus:outline-teal-500 border-teal-500 "
+                    />
+                </div>
+                <div>
+                    <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                    <textarea 
+                        id="description" 
+                        rows={4} 
+                        placeholder="A brief description of the university..."
+                        className="w-full  rounded-md shadow-sm px-2 py-2 border-1  focus:outline-teal-500 border-teal-500 "
+                    ></textarea>
+                </div>
+                 <div>
+                    <label htmlFor="logo" className="block text-sm font-medium text-gray-700 mb-1">University Logo</label>
+                    <input 
+                        type="file" 
+                        id="logo" 
+                        className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full border-1 border-teal-500 rounded-md file:border-1 file:border-teal-500 file:text-sm file:font-semibold file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100"
+                    />
+                </div>
+                <div className="text-right">
+                    <button type="submit" className="bg-teal-600 text-white font-bold py-2 px-8 rounded-lg hover:bg-teal-700">
+                        Add University
+                    </button>
+                </div>
+            </form>
+        </div>
+    );
+};
+
+export default CreateUniversityPage;
