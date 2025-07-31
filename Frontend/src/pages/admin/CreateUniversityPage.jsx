@@ -1,8 +1,72 @@
 // src/pages/admin/CreateUniversityPage.jsx
 import { Link } from 'react-router-dom';
 import { FiChevronLeft, FiHome } from 'react-icons/fi';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const CreateUniversityPage = () => {
+    const [universityData, setUniversityData] = useState({
+        name: '',
+        description: '',
+        shortName: '',
+        logo: null,
+    });
+
+    const navigate = useNavigate();
+
+
+    // Separate handler for file input
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setUniversityData({ ...universityData, [name]: value });
+    };
+
+    const handleFileChange = (e) => {
+        setUniversityData({ ...universityData, logo: e.target.files[0] });
+    };
+
+
+    const [message, setMessage] = useState(null);
+    const [messageType, setMessageType] = useState(''); // 'success' or 'error'
+
+    const handleFormSubmit = async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData();
+        formData.append('name', universityData.name);
+        formData.append('description', universityData.description);
+        formData.append('shortName', universityData.shortName);
+        formData.append('logo', universityData.logo);
+
+        setMessage(null);
+        setMessageType('');
+
+        try {
+            const response = await fetch('http://localhost:8001/universities/addUniversity', {
+                method: 'POST',
+                credentials: 'include',
+                body: formData,
+            });
+
+            const result = await response.json();
+            if (response.ok) {
+                setMessage(result.message || 'University created successfully!');
+                setMessageType('success');
+                setTimeout(() => {
+                    navigate('/admin/universities');
+                }, 1200);
+            } else {
+                setMessage(result.message || 'Failed to create university.');
+                setMessageType('error');
+            }
+        } catch (error) {
+            console.error('Error creating university:', error);
+            setMessage('Network error. Try again.');
+            setMessageType('error');
+        }
+    };
+
+
     return (
         <div>
             <div className="flex justify-between items-center mb-6">
@@ -17,21 +81,34 @@ const CreateUniversityPage = () => {
                 </Link>
             </div>
 
-            <form className="bg-white p-8 rounded-lg shadow-md space-y-6">
+            {message && (
+                <div className={`mb-4 p-3 rounded text-center font-semibold ${messageType === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                    {message}
+                </div>
+            )}
+            <form className="bg-white p-8 rounded-lg shadow-md space-y-6" onSubmit={handleFormSubmit}>
                 <div>
                     <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">University Name</label>
                     <input 
                         type="text" 
                         id="name" 
+                        name='name'
+                        value={universityData.name}
+                        onChange={handleInputChange}
+                        required
                         placeholder="e.g., University of Example"
                         className="w-full rounded-md shadow-sm px-2 py-2 border-1  focus:outline-teal-500 border-teal-500 "
                     />
                 </div>
                  <div>
-                    <label htmlFor="pathId" className="block text-sm font-medium text-gray-700 mb-1">Path ID (e.g., 'uoe', 'examplu')</label>
+                    <label htmlFor="shortName" className="block text-sm font-medium text-gray-700 mb-1">Short Name (e.g., 'mul', 'umt')</label>
                     <input 
                         type="text" 
-                        id="pathId" 
+                        id="shortName"
+                        name='shortName'
+                        value={universityData.shortName}
+                        onChange={handleInputChange} 
+                        required
                         placeholder="A short, unique, lowercase ID"
                         className="w-full  rounded-md shadow-sm px-2 py-2 border-1  focus:outline-teal-500 border-teal-500 "
                     />
@@ -40,16 +117,23 @@ const CreateUniversityPage = () => {
                     <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">Description</label>
                     <textarea 
                         id="description" 
+                        name='description'
+                        value={universityData.description}
+                        onChange={handleInputChange}
+                        required
                         rows={4} 
                         placeholder="A brief description of the university..."
                         className="w-full  rounded-md shadow-sm px-2 py-2 border-1  focus:outline-teal-500 border-teal-500 "
                     ></textarea>
                 </div>
-                 <div>
+                <div>
                     <label htmlFor="logo" className="block text-sm font-medium text-gray-700 mb-1">University Logo</label>
-                    <input 
-                        type="file" 
-                        id="logo" 
+                    <input
+                        type="file"
+                        id="logo"
+                        name="logo"
+                        accept="image/*"
+                        onChange={handleFileChange}
                         className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full border-1 border-teal-500 rounded-md file:border-1 file:border-teal-500 file:text-sm file:font-semibold file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100"
                     />
                 </div>

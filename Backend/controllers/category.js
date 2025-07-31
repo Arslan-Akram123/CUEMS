@@ -1,3 +1,4 @@
+const { message } = require('statuses');
 const Category = require('../models/category');
 
 
@@ -5,15 +6,29 @@ async function addCategory(req, res) {
     const { name, description } = req.body;
    
     if (!name || !description) {
-        return res.status(400).json({ error: 'Name and description are required' });
+        return res.status(400).json({success: false,
+             type: "error",
+             message: 'Name and description are required' });
     }
+    const existingCategory = await Category.find();
+    if (existingCategory.some(category => category.name.toLowerCase() === name.toLowerCase())) {
+        return res.status(400).json({  success: false,
+                        type: "error",
+                        message: "Category name already exists"});
+    }
+    
     try {
         const category = new Category({ name, description });
         await category.save();
-        res.status(201).json(category);
+        res.status(201).json({success: true,
+             type: "success",
+             message: "Category added successfully"});
     } catch (err) {
        
-        res.status(500).json({ error: 'Internal server error' });
+        res.status(500).json({
+             success: false,
+             type: "error",
+             message: 'Internal server error' });
     }
 }
 

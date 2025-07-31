@@ -35,66 +35,58 @@ const LoginPage = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setFormMessage(null);
-    setFieldErrors({});
+  e.preventDefault();
+  setFormMessage(null);
+  setFieldErrors({});
 
-    try {
-      const res = await fetch('http://localhost:8001/auth/login', {
-        method: 'POST',
-        
-        headers: {
-          'Content-Type': 'application/json',
-        },
-         credentials: 'include',
-        body: JSON.stringify(formData),
-      });
+  try {
+    const res = await fetch('http://localhost:8001/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify(formData),
+    });
 
-  if (!res.ok) {
-     const errorMsg = data.error?.toLowerCase() || '';
+    const data = await res.json(); 
 
-  if (errorMsg.includes('email')) {
-    setFieldErrors({ email: data.error });
-  } else if (errorMsg.includes('password')) {
-    setFieldErrors({ password: data.error });
-  } else if (errorMsg.includes('activate')) {
-    
-    setFormMessage({ type: 'error', text: data.error });
-  } else {
-    setFormMessage({ type: 'error', text: data.error || 'Login failed' });
-  }
-  return;
-}
-     const data = await res.json();
+    if (!res.ok) {
+      const errorMsg = data.error?.toLowerCase() || '';
+
+      if (errorMsg.includes('email') || errorMsg.includes('user')) {
+        setFieldErrors({ email: data.error });
+      } else if (errorMsg.includes('password')) {
+        setFieldErrors({ password: data.error });
+      } else if (errorMsg.includes('activate')) {
+        setFormMessage({ type: 'error', text: data.error });
+      } else {
+        setFormMessage({ type: 'error', text: data.error || 'Login failed' });
+      }
+      return;
+    }
+
+   
     localStorage.setItem('token', data.token);
     setFormMessage({ type: 'success', text: data.message });
 
-try {
-  const localtoken = localStorage.getItem('token');
-  console.log('Local token:', localtoken);
-  if (!localtoken) {
-    navigate('/login');
-  }
-  const decoded = jwtDecode(localtoken);
-  console.log('Decoded token:', decoded);
+    try {
+      const localtoken = localStorage.getItem('token');
+      const decoded = jwtDecode(localtoken);
+      const redirectPath = decoded.role === 'Admin' ? '/admin/dashboard' : '/home';
 
-  const redirectPath =
-    decoded.role === 'Admin' ? '/admin/dashboard' : '/home';
-
-  setTimeout(() => navigate(redirectPath), 1500);
-
-} catch (decodeError) {
-  console.error('Token decode error:', decodeError);
-  setFormMessage({ type: 'error', text: 'Login succeeded but failed to redirect based on role.' });
-}
-
-     
-
-    } catch (err) {
-      console.error('Client error:', err);
-      setFormMessage({ type: 'error', text: 'Something went wrong. Please try again.' });
+      setTimeout(() => navigate(redirectPath), 1500);
+    } catch (decodeError) {
+      console.error('Token decode error:', decodeError);
+      setFormMessage({
+        type: 'error',
+        text: 'Login succeeded but failed to redirect based on role.',
+      });
     }
-  };
+  } catch (err) {
+    console.error('Client error:', err);
+    setFormMessage({ type: 'error', text: err.message });
+  }
+};
+
 
   return (
     <AuthLayout title="Login">

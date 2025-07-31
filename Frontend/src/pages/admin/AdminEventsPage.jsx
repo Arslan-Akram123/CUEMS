@@ -33,8 +33,8 @@ const AdminEventsPage = () => {
             </div>
             <div className="bg-white p-4 rounded-lg shadow-md mb-6">
                 <div className="flex items-center">
-                    <FiSearch className="text-gray-400 mr-3" />
-                    <input type="text" placeholder="Search events by name..." className="w-full border-0 focus:ring-0" />
+                    <FiSearch className="text-gray-400 mr-3 text-3xl" />
+                    <input type="text" placeholder="Search events by name..." className="w-full border-0 rounded-md   focus:ring-0 focus:outline-none" />
                 </div>
             </div>
             <div className="bg-white rounded-lg shadow-md overflow-x-auto">

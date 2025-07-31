@@ -2,8 +2,9 @@
 import { useParams } from 'react-router-dom';
 
 const allPrograms = {
-  iub: ["BS Biotechnology", "BS Botany", "BS Software Engineering", "BS Mathematics", "BS Public Administration", "BS Statistics"],
-  lums: ["BS Electrical Engineering", "BS Computer Science", "BSc (Honours) in Management Science", "BA (Honours) in English", "BA-LL.B (Honours)"],
+  MUL: ["BS Biotechnology", "BS Botany", "BS Software Engineering", "BS Mathematics", "BS Public Administration", "BS Statistics"],
+  UMT: ["BS Electrical Engineering", "BS Computer Science", "BSc (Honours) in Management Science", "BA (Honours) in English", "BA-LL.B (Honours)"],
+  UCP: ["BS Computer Science", "BS Mathematics", "BS Physics", "BS Chemistry", "BS Biology"]
 };
 
 const UniversityPrograms = () => {

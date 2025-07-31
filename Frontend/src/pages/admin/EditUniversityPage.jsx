@@ -1,27 +1,111 @@
 // src/pages/admin/EditUniversityPage.jsx
 import { Link, useParams } from 'react-router-dom';
 import { FiChevronLeft, FiHome } from 'react-icons/fi';
-
-const mockUniversities = [
-  { id: 1, name: 'Islamiya University Bahawalpur', description: 'The university boasts a dedicated team of faculty members...', pathId: 'iub', imageUrl: 'https://via.placeholder.com/100/0284C7/FFFFFF?Text=IUB' },
-  { id: 2, name: 'Lums University', description: 'LUMS is an extraordinary place for learning, discovery and transformation.', pathId: 'lums', imageUrl: 'https://via.placeholder.com/100/166534/FFFFFF?Text=LUMS' },
-  { id: 3, name: 'Minhaj University', description: 'MIHS offers a variety of undergraduate and postgraduate programs in...', pathId: 'minhaj', imageUrl: 'https://via.placeholder.com/100/7C3AED/FFFFFF?Text=MIHS' },
-  { id: 4, name: 'University of Central Punjab', description: 'Founded in 2002, the University of Central Punjab (UCP) is...', pathId: 'ucp', imageUrl: 'https://via.placeholder.com/100/DB2777/FFFFFF?Text=UCP' },
-];
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+// const mockUniversities = [
+//   { id: 1, name: 'Islamiya University Bahawalpur', description: 'The university boasts a dedicated team of faculty members...', pathId: 'iub', imageUrl: 'https://via.placeholder.com/100/0284C7/FFFFFF?Text=IUB' },
+//   { id: 2, name: 'Lums University', description: 'LUMS is an extraordinary place for learning, discovery and transformation.', pathId: 'lums', imageUrl: 'https://via.placeholder.com/100/166534/FFFFFF?Text=LUMS' },
+//   { id: 3, name: 'Minhaj University', description: 'MIHS offers a variety of undergraduate and postgraduate programs in...', pathId: 'minhaj', imageUrl: 'https://via.placeholder.com/100/7C3AED/FFFFFF?Text=MIHS' },
+//   { id: 4, name: 'University of Central Punjab', description: 'Founded in 2002, the University of Central Punjab (UCP) is...', pathId: 'ucp', imageUrl: 'https://via.placeholder.com/100/DB2777/FFFFFF?Text=UCP' },
+// ];
 
 const EditUniversityPage = () => {
     const { universityId } = useParams();
-    const universityToEdit = mockUniversities.find(u => u.id === parseInt(universityId));
-
-    if (!universityToEdit) {
-        return (
-            <div>
-                <h1 className="text-2xl font-bold">University not found</h1>
-                <Link to="/admin/universities" className="text-teal-600 hover:underline">Return to Universities List</Link>
-            </div>
-        );
-    }
+    const [universityToEdit, setUniversityToEdit] = useState({
+        name: '',
+        shortName: '',
+        description: '',
+        logo: null
+    });
+    const navigate = useNavigate();
     
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setUniversityToEdit({ ...universityToEdit, [name]: value });
+    };
+    const handleLogoChange = (e) => {
+        setUniversityToEdit({ ...universityToEdit, logo: e.target.files[0] });
+    };
+    useEffect(() => {
+        fetch(`http://localhost:8001/universities/getUniversity/${universityId}`,{credentials: 'include'})
+            .then((response) => response.json())
+            .then((data) => {
+                setUniversityToEdit(data);
+            })
+            .catch((error) => {
+                console.error('Error fetching university data:', error);
+            });
+    }, [universityId]);
+
+
+
+    const [message, setMessage] = useState(null);
+    const [messageType, setMessageType] = useState(''); // 'success' or 'error'
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        const formData = new FormData();
+        formData.append('name', universityToEdit.name);
+        formData.append('shortName', universityToEdit.shortName);
+        formData.append('description', universityToEdit.description);
+        formData.append('logo', universityToEdit.logo);
+
+        setMessage(null);
+        setMessageType('');
+
+        try {
+            const response = await fetch(`http://localhost:8001/universities/updateUniversity/${universityId}`, {
+                method: 'PUT',
+                credentials: 'include',
+                body: formData
+            });
+            const result = await response.json();
+            if (response.ok) {
+                setMessage(result.message || 'University updated successfully!');
+                setMessageType('success');
+                setTimeout(() => {
+                    navigate('/admin/universities');
+                }, 1200);
+            } else {
+                setMessage(result.message || 'Failed to update university.');
+                setMessageType('error');
+            }
+        } catch (error) {
+            setMessage('Network error. Try again.');
+            setMessageType('error');
+        }
+    };
+
+    const handleDelete = async () => {
+        setMessage(null);
+        setMessageType('');
+        try {
+            const response = await fetch(`http://localhost:8001/universities/deleteUniversity/${universityId}`, {
+                method: 'DELETE',
+                credentials: 'include'
+            });
+            const result = await response.json();
+            if (response.ok) {
+                setMessage(result.message || 'University deleted successfully!');
+                setMessageType('success');
+                setTimeout(() => {
+                    navigate('/admin/universities');
+                }, 1200);
+            } else {
+                setMessage(result.message || 'Failed to delete university.');
+                setMessageType('error');
+            }
+        } catch (error) {
+            setMessage('Network error. Try again.');
+            setMessageType('error');
+        }
+    };
+
+
+
+
     return (
         <div>
             <div className="flex justify-between items-center mb-6">
@@ -36,30 +120,47 @@ const EditUniversityPage = () => {
                 </Link>
             </div>
 
-            <form className="bg-white p-8 rounded-lg shadow-md space-y-6">
+            {message && (
+                <div className={`mb-4 p-3 rounded text-center font-semibold ${messageType === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                    {message}
+                </div>
+            )}
+
+            <form className="bg-white p-8 rounded-lg shadow-md space-y-6" onSubmit={handleSubmit}>
                 <div>
                     <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">University Name</label>
-                    <input type="text" id="name" defaultValue={universityToEdit.name} className="w-full px-2 py-2 border-1  focus:outline-teal-500 border-teal-500 rounded-md shadow-sm"/>
+                    <input type="text" id="name"
+                    name='name'
+                     value={universityToEdit.name}
+                     onChange={handleInputChange}
+                      className="w-full px-2 py-2 border-1  focus:outline-teal-500 border-teal-500 rounded-md shadow-sm"/>
                 </div>
                  <div>
-                    <label htmlFor="pathId" className="block text-sm font-medium text-gray-700 mb-1">Path ID (e.g., 'iub', 'lums')</label>
-                    <input type="text" id="pathId" defaultValue={universityToEdit.pathId} className="w-full px-2 py-2 border-1  focus:outline-teal-500 border-teal-500 rounded-md shadow-sm"/>
+                    <label htmlFor="shortName" className="block text-sm font-medium text-gray-700 mb-1">Short Name (e.g., 'mul', 'umt')</label>
+                    <input type="text" id="shortName"
+                    name='shortName'
+                     value={universityToEdit.shortName}
+                     onChange={handleInputChange}
+                      className="w-full px-2 py-2 border-1  focus:outline-teal-500 border-teal-500 rounded-md shadow-sm"/>
                 </div>
                 <div>
                     <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                    <textarea id="description" rows={4} defaultValue={universityToEdit.description} className="w-full px-2 py-2 border-1  focus:outline-teal-500 border-teal-500 rounded-md shadow-sm"></textarea>
+                    <textarea id="description" name='description' rows={4} value={universityToEdit.description}
+                     onChange={handleInputChange} className="w-full px-2 py-2 border-1  focus:outline-teal-500 border-teal-500 rounded-md shadow-sm"></textarea>
                 </div>
                  <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Current Logo</label>
-                    <img src={universityToEdit.imageUrl} alt="Current Logo" className="h-20 w-20 object-contain rounded-md bg-gray-100 p-1"/>
+                    <img src={`/uploads/universities/${universityToEdit.logo}`} alt="Current Logo" className="h-20 w-20 object-contain rounded-md bg-gray-100 p-1"/>
                     <label htmlFor="logo" className="block text-sm font-medium text-gray-700 mt-4">Upload New Logo</label>
-                    <input type="file" id="logo" className="mt-1 border-1 border-teal-500 rounded-2xl block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-teal-50 file:text-teal-700  focus:outline-teal-500 hover:file:bg-teal-100"/>
+                    <input type="file" id="logo" name='logo'
+                     onChange={handleLogoChange}
+                     className="mt-1 border-1 border-teal-500 rounded-2xl block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-teal-50 file:text-teal-700  focus:outline-teal-500 hover:file:bg-teal-100"/>
                 </div>
                 <div className="flex justify-end gap-3">
                     <button type="submit" className="bg-teal-600 text-white font-bold py-2 px-8 rounded-lg hover:bg-teal-700">
                         Update University
                     </button>
-                     <button type="submit" className="bg-red-600 text-white font-bold py-2 px-8 rounded-lg hover:bg-red-700">
+                     <button type="button" onClick={handleDelete} className="bg-red-600 text-white font-bold py-2 px-8 rounded-lg hover:bg-red-700">
                         Delete University
                     </button>
                 </div>

@@ -1,6 +1,6 @@
 // src/pages/admin/DashboardPage.jsx
 import { Link } from 'react-router-dom';
-import { FiUsers, FiCalendar, FiBookmark, FiMessageCircle, FiGrid, FiUserPlus, FiEye } from 'react-icons/fi';
+import { FiUsers, FiCalendar, FiBook ,FiBookmark, FiMessageCircle, FiGrid, FiEye,FiAward  } from 'react-icons/fi';
 
 // Helper component for the statistic cards
 const StatCard = ({ icon, title, value, color }) => {
@@ -33,12 +33,12 @@ const newBookings = [
 
 const DashboardPage = () => {
     const stats = [
-        { icon: <FiUsers size={32}/>, title: 'User', value: 5, color: 'orange' },
-        { icon: <FiCalendar size={32}/>, title: 'Events', value: 10, color: 'blue' },
-        { icon: <FiBookmark size={32}/>, title: 'Bookings', value: 8, color: 'red' },
-        { icon: <FiMessageCircle size={32}/>, title: 'Comments', value: 3, color: 'teal' },
-        { icon: <FiGrid size={32}/>, title: 'Categories', value: 7, color: 'indigo' },
-        { icon: <FiUserPlus size={32}/>, title: 'Sponsors', value: 12, color: 'purple' },
+        { icon: <FiUsers size={32}/>, title: 'Total Users', value: 5, color: 'orange' },
+        { icon: <FiCalendar size={32}/>, title: 'Total Events', value: 10, color: 'blue' },
+        { icon: <FiBookmark size={32}/>, title: 'Total Bookings', value: 8, color: 'red' },
+        { icon: <FiMessageCircle size={32}/>, title: 'Total Comments', value: 3, color: 'teal' },
+        { icon: <FiGrid size={32}/>, title: 'Total Categories', value: 7, color: 'indigo' },
+        { icon: <FiAward  size={32}/>, title: 'Total Universities', value: 12, color: 'purple' },
     ];
 
     return (
@@ -51,7 +51,7 @@ const DashboardPage = () => {
             </div>
             {/* === NEW BOOKINGS SECTION === */}
             {newBookings.length > 0 ? (
-                <div className="mt-8">
+                <div className="mt-10">
                     <h2 className="text-2xl font-bold text-gray-800 mb-4">New Bookings</h2>
                     <div className="bg-white p-6 rounded-lg shadow-md">
                         <div className="overflow-x-auto">

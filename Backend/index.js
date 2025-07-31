@@ -11,7 +11,8 @@ const connectDB = require('./utils/connection');
 const userRoutes = require('./routes/user');
 const settingRoutes = require('./routes/setting');
 const categoryRoutes = require('./routes/category');
-
+const universityRoutes = require('./routes/universities');
+const noticeRoutes = require('./routes/notice');
 // Connect to the database
 connectDB();
 
@@ -31,8 +32,8 @@ app.use(cors({
 app.use('/auth', userRoutes);
 app.use('/settings',auth, settingRoutes);
 app.use('/category',auth, categoryRoutes);
-
-
+app.use('/universities',auth, universityRoutes);
+app.use('/notices',auth, noticeRoutes);
 
 
 

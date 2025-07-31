@@ -1,7 +1,7 @@
 // src/components/admin/Sidebar.jsx
 import { Link, useLocation } from 'react-router-dom';
 // Import the X icon
-import { FiHome, FiCalendar, FiMessageSquare, FiUser, FiCheckSquare, FiGrid, FiUsers, FiBell, FiSettings, FiPlusCircle, FiX } from 'react-icons/fi';
+import { FiHome, FiCalendar, FiMessageSquare, FiUser, FiCheckSquare, FiGrid, FiUsers, FiAward , FiSettings, FiPlusCircle, FiX } from 'react-icons/fi';
 import Logo from '../Logo';
 
 // Accept a new prop to handle closing the sidebar
@@ -17,7 +17,7 @@ const Sidebar = ({ isSidebarOpen, onSidebarClose }) => {
         { icon: <FiGrid />, text: 'Categories', path: '/admin/categories' },
         { icon: <FiUsers />, text: 'Users', path: '/admin/users' },
         { icon: <FiPlusCircle />, text: 'Notices', path: '/admin/notices' },
-        { icon: <FiBell />, text: 'Universities', path: '/admin/universities' },
+        { icon: <FiAward  />, text: 'Universities', path: '/admin/universities' },
         { icon: <FiSettings />, text: 'Setting', path: '/admin/setting' },
     ];
     const getLinkClass = (path) => {

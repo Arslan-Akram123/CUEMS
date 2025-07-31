@@ -49,9 +49,10 @@ const userSchema = new Schema({
     default: ''
   },
   postalCode: {
-    type: String,
+    type: String, 
     default: ''
   },
+  
 }, {
   timestamps: true,
 });

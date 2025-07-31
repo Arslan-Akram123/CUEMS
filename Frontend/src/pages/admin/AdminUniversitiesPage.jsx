@@ -1,15 +1,17 @@
 // src/pages/admin/AdminUniversitiesPage.jsx
 import { Link } from 'react-router-dom';
 import { FiPlus, FiEdit } from 'react-icons/fi';
-
-const mockUniversities = [
-  { id: 1, name: 'Islamiya University Bahawalpur', description: 'The university boasts a dedicated team of faculty members...', pathId: 'iub', imageUrl: 'https://via.placeholder.com/100/0284C7/FFFFFF?Text=IUB' },
-  { id: 2, name: 'Lums University', description: 'LUMS is an extraordinary place for learning, discovery and transformation.', pathId: 'lums', imageUrl: 'https://via.placeholder.com/100/166534/FFFFFF?Text=LUMS' },
-  { id: 3, name: 'Minhaj University', description: 'MIHS offers a variety of undergraduate and postgraduate programs in...', pathId: 'minhaj', imageUrl: 'https://via.placeholder.com/100/7C3AED/FFFFFF?Text=MIHS' },
-  { id: 4, name: 'University of Central Punjab', description: 'Founded in 2002, the University of Central Punjab (UCP) is...', pathId: 'ucp', imageUrl: 'https://via.placeholder.com/100/DB2777/FFFFFF?Text=UCP' },
-];
+import { useState, useEffect } from 'react';
 
 const AdminUniversitiesPage = () => {
+    const [mockUniversities, setMockUniversities] = useState([]);
+
+    useEffect(() => {
+        fetch('http://localhost:8001/universities/getUniversities',{credentials: 'include'})
+            .then(response => response.json())
+            .then(data => setMockUniversities(data))
+            .catch(error => console.error('Error fetching universities:', error));
+    }, []);
     return (
         <div>
             <div className="flex justify-between items-center mb-6">
@@ -23,7 +25,7 @@ const AdminUniversitiesPage = () => {
             </div>
       
             <div className="bg-white p-6 rounded-lg shadow-md">
-                <h2 className="text-xl font-semibold text-gray-700 mb-4">Information Universities</h2>
+                <h2 className="text-xl font-semibold text-gray-700 mb-4"> Universities Information</h2>
                 <div className="overflow-x-auto">
                     <table className="min-w-full">
                         <thead className="bg-gray-50">
@@ -31,30 +33,30 @@ const AdminUniversitiesPage = () => {
                                 <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase">#</th>
                                 <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
                                 <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase">Descriptions</th>
-                                <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase">Path ID</th>
+                                <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase">Short Name</th>
                                 <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase">Image</th>
                                 <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase">Manage</th>
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200 text-sm">
-                            {mockUniversities.map((uni, index) => (
-                                <tr key={uni.id}>
+                            {mockUniversities.length > 0 ? mockUniversities.map((uni, index) => (
+                                <tr key={uni._id}>
                                     <td className="py-4 px-4">{index + 1}</td>
                                     <td className="py-4 px-4 font-semibold">{uni.name}</td>
                                     <td className="py-4 px-4 max-w-sm truncate">{uni.description}</td>
-                                    <td className="py-4 px-4 font-mono">{uni.pathId}</td>
+                                    <td className="py-4 px-4 font-mono">{uni.shortName}</td>
                                     <td className="py-4 px-4">
-                                        <img src={uni.imageUrl} alt={uni.name} className="h-12 w-12 object-contain rounded-md" />
+                                        <img src={`/uploads/universities/${uni.logo}`} alt={uni.name} className="h-12 w-12 object-contain rounded-md" />
                                     </td>
                                    <td className="py-4 px-4">
                                     <Link 
-                                        to={`/admin/universities/edit/${uni.id}`}
+                                        to={`/admin/universities/edit/${uni._id}`}
                                         className="bg-teal-600 text-white flex items-center gap-2 py-1 px-3 rounded-md hover:bg-teal-700">
                                         <FiEdit size={14} /> Manage
                                      </Link>
                                     </td>
                                 </tr>
-                            ))}
+                            )) : <tr><td colSpan="6" className="py-4 px-4 text-center">No Universities found.</td></tr>}
                         </tbody>
                     </table>
                 </div>

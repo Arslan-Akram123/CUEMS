@@ -2,12 +2,16 @@
 import { useParams } from 'react-router-dom';
 
 const allFees = {
-  iub: [
+  MUL: [
     { program: 'BS - Artificial Intelligence', duration: '4 Years', fee: '47800', date: '25-12-2023' },
     { program: 'BS - Chemistry', duration: '4 Years', fee: '63800', date: '25-12-2023' },
     { program: 'B.Sc. [Engg.] - Civil', duration: '4 Years', fee: '56800', date: '15-08-2023' },
   ],
-  lums: [
+  UMT: [
+     { program: 'BS - Computer Science', duration: '4 Years', fee: '95000', date: '01-09-2023' },
+     { program: 'MS - Finance & Investment', duration: '2 Years', fee: '120000', date: '12-01-2024' },
+  ],
+  UCP: [
      { program: 'BS - Computer Science', duration: '4 Years', fee: '95000', date: '01-09-2023' },
      { program: 'MS - Finance & Investment', duration: '2 Years', fee: '120000', date: '12-01-2024' },
   ]

@@ -5,9 +5,9 @@ import UserLayout from '../components/UserLayout';
 
 // In a real app, this would be a single API call: /api/universities/:pathId
 const mockUniversities = [
-  { pathId: 'iub', name: 'Iub University' },
-  { pathId: 'lums', name: 'Lums University' },
-  { pathId: 'bzu', name: 'Bzu University' }
+  { pathId: 'MUL', name: 'MUL University' },
+  { pathId: 'UMT', name: 'UMT University' },
+  { pathId: 'UCP', name: 'UCP University' }
 ];
 
 const UniversityDetailPage = () => {

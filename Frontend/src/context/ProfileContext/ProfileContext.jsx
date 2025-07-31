@@ -35,7 +35,6 @@ function fetchProfileData() {
       return response.json();
     })
     .then(data => {
-        console.log('Profile data fetched:', data);
       setFormData({
         fullName: data.fullName || '',
         street: data.address || '',

@@ -3,15 +3,19 @@ import { useParams } from 'react-router-dom';
 
 // In a real app, you'd fetch this data based on the universityId
 const allUniversityEvents = {
-  iub: [
+  MUL: [
     { id: 101, title: 'International Workshop on "Droughts over Pakistan"', date: '2025-02-26', imageUrl: 'https://via.placeholder.com/400x200.png/16A34A/FFFFFF?Text=IUB+Event' },
     { id: 102, title: 'International Webinar on "CLIMATE CHANGE AND HEALTH"', date: '2025-07-04', imageUrl: 'https://via.placeholder.com/400x200.png/16A34A/FFFFFF?Text=IUB+Event' },
     { id: 103, title: '3rd National Webinar under the Umbrella of "RAPID Technology..."', date: '2025-01-17', imageUrl: 'https://via.placeholder.com/400x200.png/16A34A/FFFFFF?Text=IUB+Event' },
   ],
-  lums: [
-    { id: 201, title: 'LUMS Live Session 61: Pakistani Music', date: '2021-04-08', imageUrl: 'https://via.placeholder.com/400x200.png/059669/FFFFFF?Text=LUMS+Event' },
+  UMT: [
+    { id: 201, title: 'UMT Live Session 61: Pakistani Music', date: '2021-04-08', imageUrl: 'https://via.placeholder.com/400x200.png/059669/FFFFFF?Text=LUMS+Event' },
     { id: 202, title: 'CSS Mentorship Session: Paper Solving Techniques', date: '2025-03-28', imageUrl: 'https://via.placeholder.com/400x200.png/059669/FFFFFF?Text=LUMS+Event' },
   ],
+  UCP :[
+    { id: 301, title: 'UCP Live Session 62: Pakistani Music', date: '2021-04-08', imageUrl: 'https://via.placeholder.com/400x200.png/DB2777/FFFFFF?Text=UCP+Event' },
+    { id: 302, title: 'CSS Mentorship Session: Paper Solving Techniques', date: '2025-03-28', imageUrl: 'https://via.placeholder.com/400x200.png/DB2777/FFFFFF?Text=UCP+Event' }
+  ]
   // Add more university events as needed
 };
 

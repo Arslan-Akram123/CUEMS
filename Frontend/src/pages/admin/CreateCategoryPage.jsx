@@ -75,6 +75,7 @@ const CreateCategoryPage = () => {
                     <input type="text" id="name" name="name"
                         value={formData.name}
                         onChange={handleChange}
+                        required
                      placeholder="Enter Category Name" className="w-full border-1 py-2 px-2 border-teal-500 rounded-md  focus:outline-teal-500 shadow-sm focus:border-teal-500 focus:ring-teal-500" />
                 </div>
                 <div>
@@ -82,6 +83,7 @@ const CreateCategoryPage = () => {
                     <textarea id="description" name="description"
                         value={formData.description}
                         onChange={handleChange}
+                        required
                      rows={4} placeholder="Enter your Description here..." className="w-full border-1 py-2 px-2 border-teal-500  focus:outline-teal-500 rounded-md shadow-sm focus:border-teal-500 focus:ring-teal-500"></textarea>
                 </div>
                 <div className="text-right">
