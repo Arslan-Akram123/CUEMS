@@ -1,9 +1,10 @@
 // src/components/Footer.jsx
-import Logo from './Logo';
+// import Logo from './Logo';
 import { Link } from 'react-router-dom';
 import { FiInstagram, FiFacebook, FiTwitter } from 'react-icons/fi';
-
+import { useProfile } from '../context/ProfileContext/ProfileContext';
 const Footer = () => {
+     const { siteSetting } = useProfile();
     // Helper component for footer links
     const FooterLink = ({ to, children }) => (
         <Link to={to} className="text-gray-400 hover:text-teal-500 transition-colors text-sm md:text-base">
@@ -54,23 +55,24 @@ const Footer = () => {
 
                     {/* Column 5: Logo */}
                     <div className="max-w-[200px] md:min-w-[150px]   flex items-center justify-center bg-white p-4 rounded-lg shadow-md">
-                        <Logo className="h-12 w-16" />
+                        {/* <Logo className="h-12 w-16" /> */}
+                        <img src={`/uploads/siteSettings/${siteSetting.siteLogo}`} alt="Site Logo" className="h-16 w-28 object-contain" />
                     </div>
                 </div>
 
                 {/* Bottom Section */}
                 <div className="mt-12 border-t border-gray-700 pt-8 flex flex-col sm:flex-row items-center justify-between">
                     <p className="text-gray-400 text-sm text-center sm:text-left order-2 sm:order-1 mt-4 sm:mt-0">
-                        Copyright © 2025 CUEMS.net, Inc. All Rights Reserved.
+                        {siteSetting.footerText}
                     </p>
                     <div className="flex gap-6 order-1 sm:order-2">
-                        <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="text-gray-400 hover:text-pink-500 transition-colors text-xl">
+                        <a href={siteSetting.instagramLink} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="text-gray-400 hover:text-pink-500 transition-colors text-xl">
                             <FiInstagram />
                         </a>
-                        <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="text-gray-400 hover:text-blue-600 transition-colors text-xl">
+                        <a href={siteSetting.facebookLink} target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="text-gray-400 hover:text-blue-600 transition-colors text-xl">
                             <FiFacebook />
                         </a>
-                        <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" aria-label="Twitter" className="text-gray-400 hover:text-sky-400 transition-colors text-xl">
+                        <a href={siteSetting.tiwitterLink} target="_blank" rel="noopener noreferrer" aria-label="Twitter" className="text-gray-400 hover:text-sky-400 transition-colors text-xl">
                             <FiTwitter />
                         </a>
                     </div>

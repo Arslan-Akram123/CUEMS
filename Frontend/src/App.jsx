@@ -1,15 +1,17 @@
 // src/App.jsx
 
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { ProfileProvider } from './context/ProfileContext/ProfileContext';
-import { jwtDecode } from 'jwt-decode';
 
+import { jwtDecode } from 'jwt-decode';
+import {  useEffect } from 'react';
+import { useProfile } from './context/ProfileContext/ProfileContext';
 // --- Page Imports ---
 // Auth Pages
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import PublicHomePage from './pages/PublicHomePage';
+import MaintenancePage from './pages/MaintenancePage';
 // User-Facing Pages
 import LandingPage from './pages/LandingPage';
 import EventsListPage from './pages/EventsListPage';
@@ -97,8 +99,17 @@ const PublicOnlyRoute = ({ children }) => {
 
 // --- Main App Component ---
 function App() {
+   const { siteSetting,fetchSiteSettingData } = useProfile();
+console.log(siteSetting);
+  useEffect(() => {
+    fetchSiteSettingData();
+  }, []);
+  if(siteSetting.siteCloseMessage){
+    return <MaintenancePage settings={siteSetting} />;
+    
+  }
   return (
-    <ProfileProvider>
+    
       <BrowserRouter>
         <Routes>
           {/* === AUTHENTICATION ROUTES === */}
@@ -153,7 +164,7 @@ function App() {
            <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </BrowserRouter>
-    </ProfileProvider>
+   
   );
 }
 

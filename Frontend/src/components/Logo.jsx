@@ -1,30 +1,12 @@
 // src/components/Logo.jsx
-
-// We don't need to import React anymore in modern setups.
-// The component is a function that returns JSX.
-
+import React from 'react';
+import { useProfile } from '../context/ProfileContext/ProfileContext';
 const Logo = () => {
-  return (
-    // Main container using flexbox to align items
-    <div className="flex items-center gap-3">
-      
-      {/* The teal square icon */}
-      <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-teal-500">
-        <span className="text-3xl font-bold text-white">E</span>
-      </div>
-
-      {/* The text part of the logo */}
-      <div className="flex flex-col justify-center">
-        <span className="text-xl font-bold tracking-wider text-gray-800">
-          EVENTOPS
-        </span>
-        <span className="text-lg text-center font-medium text-teal-500">
-          HUB
-        </span>
-      </div>
-      
-    </div>
-  );
+  const { siteSetting } = useProfile();
+  if (siteSetting.siteLogo) {
+    return <img src={`/uploads/siteSettings/${siteSetting.siteLogo}`} alt="Site Logo" className="h-28 w-48 object-contain" />;
+  }
+  return <img src={`/uploads/SiteLogo.png`} alt="CUEMS Logo" className="h-28 w-48 object-contain" />;
 };
 
 export default Logo;

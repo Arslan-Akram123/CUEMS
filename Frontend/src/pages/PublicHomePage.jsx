@@ -1,18 +1,23 @@
 // src/pages/PublicHomePage.jsx
 import { Link } from 'react-router-dom';
-import Logo from '../components/Logo'; // We'll reuse our existing Logo component
+import Logo from '../components/Logo'; 
 import homePageImage from '../assets/homelogo.jpeg'; // We'll need to add this image
-
+import { useProfile } from '../context/ProfileContext/ProfileContext';
 // A simple header for this page
-const PublicHeader = () => (
+const PublicHeader = () => {
+     const { siteSetting } = useProfile();
+    return (
+     
     <header className="absolute top-0 left-0 w-full p-6 ">
         <div className="container mx-auto ">
-            <Logo />
+            {/* <Logo /> */}
+            <img src={`/uploads/siteSettings/${siteSetting.siteLogo}`} alt="Site Logo" className="h-28 w-48 object-contain" />
         </div>
     </header>
-);
+)};
 
 const PublicHomePage = () => {
+     const { siteSetting } = useProfile();
     return (
         <div className="bg-white min-h-screen flex flex-col justify-center">
             <PublicHeader />
@@ -20,15 +25,15 @@ const PublicHomePage = () => {
                 <div className="flex flex-col md:grid md:grid-cols-2 gap-12 items-center">
                     {/* Left Side: Text Content */}
                     <div className="text-center md:text-left order-1">
-                        <h1 className="text-3xl md:text-4xl font-bold text-teal-500 tracking-wider">
+                        <h1 className="text-2xl mt-8 md:text-3xl font-bold text-teal-500 tracking-wider">
                             EVENTOPS HUB
                         </h1>
-                        <p className="mt-4  text-gray-600 ">
-                            Welcome to [EVENTOPS HUB]. It is a centralized platform or system that serves as the central hub for all event-related operations and logistics, your all-in-one solution for flawless event planning and execution. Whether you're organizing conferences, corporate meetings, weddings, or any other type of event, our Event Management System is here to simplify the process and ensure your events are a resounding success.
+                        <p className="mt-4 text-md  text-gray-600 ">
+                           {siteSetting.description}
                         </p>
                         <Link
                             to="/login"
-                            className="mt-8 inline-block bg-teal-500 text-white  text-lg py-1 px-2 rounded-lg shadow-lg hover:bg-teal-600 transition-transform transform hover:scale-105"
+                            className="mt-8 inline-block bg-teal-500 text-white  text-md py-1 px-2  rounded-lg shadow-lg hover:bg-teal-600 transition-transform transform hover:scale-105"
                         >
                             Login / Demo User
                         </Link>
@@ -37,7 +42,7 @@ const PublicHomePage = () => {
                     {/* Right Side: Image */}
                     <div className="w-full order-2 mt-10 md:mt-0">
                         <img 
-                            src={homePageImage} 
+                            src={`/uploads/siteSettings/${siteSetting.siteMainImage}`} 
                             alt="Event management illustration" 
                             className="w-3/4 h-auto mx-auto"
                         />

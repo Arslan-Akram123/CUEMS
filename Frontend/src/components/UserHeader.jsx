@@ -1,6 +1,6 @@
 // src/components/UserHeader.jsx
 import { useEffect, useState, useRef } from 'react';
-import Logo from './Logo';
+// import Logo from './Logo';
 import { Link } from 'react-router-dom';
 import { FiSearch, FiUser, FiBell, FiBookOpen, FiLogOut  } from 'react-icons/fi';
 import { useProfile } from '../context/ProfileContext/ProfileContext';
@@ -9,7 +9,7 @@ const UserHeader = () => {
     const [isNotificationOpen, setIsNotificationOpen] = useState(false);
     const userMenuRef = useRef(null);
     const notificationRef = useRef(null);
-    const { formData, setFormData, fetchProfileData } = useProfile();
+    const { formData, setFormData, fetchProfileData,siteSetting } = useProfile();
     const [categories, setCategories] = useState([]);
     
     useEffect(() => {
@@ -80,7 +80,10 @@ const UserHeader = () => {
                 <div className="flex items-center justify-between gap-3 h-20 md:h-auto md:py-4">
                     
                     {/* LOGO */}
-                    <Link to="/home"><Logo /></Link>
+                    <Link to="/home">
+                    {/* <Logo /> */}
+                    <img src={`/uploads/siteSettings/${siteSetting.siteLogo}`} alt="Site Logo" className="h-24 w-44 object-contain" />
+                    </Link>
 
                     {/* SEARCH BAR - This is the biggest change */}
                     {/* It's hidden on small screens in this row, but visible in the row below */}

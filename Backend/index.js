@@ -13,6 +13,7 @@ const settingRoutes = require('./routes/setting');
 const categoryRoutes = require('./routes/category');
 const universityRoutes = require('./routes/universities');
 const noticeRoutes = require('./routes/notice');
+const siteSettingRoutes = require('./routes/sitesetting');
 // Connect to the database
 connectDB();
 
@@ -34,6 +35,7 @@ app.use('/settings',auth, settingRoutes);
 app.use('/category',auth, categoryRoutes);
 app.use('/universities',auth, universityRoutes);
 app.use('/notices',auth, noticeRoutes);
+app.use('/siteSettings', siteSettingRoutes);
 
 
 

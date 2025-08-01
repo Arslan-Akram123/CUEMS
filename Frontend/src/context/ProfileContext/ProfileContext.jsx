@@ -4,11 +4,12 @@ import { createContext, useState, useEffect, useContext } from 'react';
 
 const ProfileContext = createContext({
    fetchProfileData: () => {},
+   fetchSiteSettingData: () => {}
 });
 
-
+  
 export const ProfileProvider = ({ children }) => {
-   const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState({
     fullName: '',
     street: '',
     country: '',
@@ -20,6 +21,20 @@ export const ProfileProvider = ({ children }) => {
     profileImage: ''
   });
 
+  // Site Setting State (fields from siteSettingSchema)
+  const [siteSetting, setSiteSetting] = useState({
+    siteEmail: '',
+    sitePhone: '',
+    siteAddress: '',
+    tiwitterLink: '',
+    facebookLink: '',
+    instagramLink: '',
+    siteMainImage: '',
+    siteLogo: '',
+    description: '',
+    siteCloseMessage: '',
+    footerText: ''
+  });
 
 
 function fetchProfileData() {
@@ -31,7 +46,6 @@ function fetchProfileData() {
         const text = await response.text();
         throw new Error(text);
       }
-     
       return response.json();
     })
     .then(data => {
@@ -53,9 +67,42 @@ function fetchProfileData() {
     });
 }
 
+// Function to fetch site setting data from DB and set into siteSetting
+function fetchSiteSettingData() {
+  fetch('http://localhost:8001/siteSettings/getSiteSetting', {
+    credentials: 'include',
+  })
+    .then(async response => {
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(text);
+      }
+      return response.json();
+    })
+    .then(data => {
+      setSiteSetting({
+        siteEmail: data.siteEmail || '',
+        sitePhone: data.sitePhone || '',
+        siteAddress: data.siteAddress || '',
+        tiwitterLink: data.tiwitterLink || '',
+        facebookLink: data.facebookLink || '',
+        instagramLink: data.instagramLink || '',
+        siteMainImage: data.siteMainImage || '',
+        siteLogo: data.siteLogo || '',
+        description: data.description || '',
+        siteCloseMessage: data.siteCloseMessage || '',
+        footerText: data.footerText || ''
+      });
+    })
+    .catch(error => {
+      console.error('Error fetching site setting data:', error.message);
+      // Optionally handle error state here
+    });
+}
+
 
   return (
-    <ProfileContext.Provider value={{ formData, setFormData, fetchProfileData}}>
+    <ProfileContext.Provider value={{ formData, setFormData, fetchProfileData, siteSetting, setSiteSetting, fetchSiteSettingData }}>
       {children}
     </ProfileContext.Provider>
   );

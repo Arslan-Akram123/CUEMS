@@ -1,6 +1,6 @@
 const express = require('express');
 const multer = require('multer');
-const { addProfileData,getProfileData,ChangePassword } = require('../controllers/setting');
+const { addProfileData,getProfileData,ChangePassword,updateProfileStatus,getAllUsers } = require('../controllers/setting');
 const Router = express.Router();
 
 
@@ -18,6 +18,8 @@ const upload = multer({ storage: storage });
   Router.post('/addProfileData',upload.single('profileImage'),addProfileData);
 Router.get('/getProfileData',getProfileData);
 Router.post('/change-password',ChangePassword); 
+Router.get('/getAllUsers',getAllUsers);
+Router.put('/updateProfileData',updateProfileStatus);
 
 
 module.exports = Router;

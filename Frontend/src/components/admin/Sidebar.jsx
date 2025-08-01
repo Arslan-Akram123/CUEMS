@@ -2,10 +2,11 @@
 import { Link, useLocation } from 'react-router-dom';
 // Import the X icon
 import { FiHome, FiCalendar, FiMessageSquare, FiUser, FiCheckSquare, FiGrid, FiUsers, FiAward , FiSettings, FiPlusCircle, FiX } from 'react-icons/fi';
-import Logo from '../Logo';
-
+// import Logo from '../Logo';
+import { useProfile } from '../../context/ProfileContext/ProfileContext';
 // Accept a new prop to handle closing the sidebar
 const Sidebar = ({ isSidebarOpen, onSidebarClose }) => {
+     const { siteSetting } = useProfile();
     const location = useLocation();
 
     const navLinks = [
@@ -48,8 +49,9 @@ const Sidebar = ({ isSidebarOpen, onSidebarClose }) => {
                 `}
             >
                 {/* --- HEADER OF THE SIDEBAR --- */}
-                <div className="h-20 flex items-center justify-between px-4 border-b border-gray-200 flex-shrink-0">
-                    <Logo />
+                <div className="h-20 flex items-center justify-between px-4  flex-shrink-0">
+                    {/* <Logo/> */}
+                    <img src={`/uploads/siteSettings/${siteSetting.siteLogo}`} alt="Site Logo" className="h-28 w-48 object-contain" />
                     {/* --- THE NEW CLOSE BUTTON --- */}
                     {/* It's only visible on small screens (lg:hidden) */}
                     <button onClick={onSidebarClose} className="lg:hidden text-gray-500 hover:text-gray-800">

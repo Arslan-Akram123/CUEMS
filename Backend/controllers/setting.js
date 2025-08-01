@@ -33,6 +33,7 @@ async function addProfileData(req, res) {
 }
 
 async function getProfileData(req, res) {
+    
     try {
         const user = await userModel.findById(req.user.id);
         if (!user) {
@@ -75,8 +76,40 @@ async function ChangePassword(req, res) {
         return res.status(500).json({ error: 'Internal server error' });
     }
 }
+
+  async function updateProfileStatus(req, res) {
+     const {userId,  role } = req.body;
+    
+    console.log('Update profile status request received for user ID:', userId);
+    console.log('Role:', role);
+   
+    try {
+        const user = await userModel.findById(userId);
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+        user.role = role;
+        await user.save();
+        return res.status(200).json({ message: 'Profile status updated successfully!' });
+    } catch (err) {
+        console.error('Update profile status error:', err);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+}
+ async function getAllUsers(req, res) {
+    console.log('Get all users request received');
+    try {
+        const users = await userModel.find();
+        res.status(200).json(users);
+    } catch (err) {
+        console.error('Error fetching users:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+}
 module.exports={
     addProfileData,
     getProfileData,
-    ChangePassword
+    ChangePassword,
+    updateProfileStatus,
+    getAllUsers
 }

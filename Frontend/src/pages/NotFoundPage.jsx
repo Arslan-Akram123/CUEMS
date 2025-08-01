@@ -1,13 +1,15 @@
 // src/pages/NotFoundPage.jsx
 import { Link } from 'react-router-dom';
 import { FiHome, FiAlertTriangle } from 'react-icons/fi';
-import Logo from '../components/Logo'; // Reuse our logo for brand consistency
-
+// import Logo from '../components/Logo'; 
+import { useProfile } from '../context/ProfileContext/ProfileContext';
 const NotFoundPage = () => {
+    const { siteSetting } = useProfile();
     return (
         <div className="bg-gray-100 min-h-screen flex flex-col items-center justify-center">
             <div className="absolute top-8 left-8">
-                <Logo />
+                {/* <Logo /> */}
+                <img src={`/uploads/siteSettings/${siteSetting.siteLogo}`} alt="Site Logo" className="h-28 w-48 object-contain" />
             </div>
             <div className="text-center">
                 <FiAlertTriangle className="text-yellow-400 mx-auto h-24 w-24" />
