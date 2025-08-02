@@ -1,7 +1,7 @@
 // src/pages/admin/AdminCommentsPage.jsx
 import { FiSearch, FiStar } from 'react-icons/fi';
 import ToggleSwitch from '../../components/admin/ToggleSwitch';
-
+import { useState, useEffect, use } from 'react';
 const mockComments = [
     { id: 1, comment: "Super Excellent Event", member: "test", event: "Become a Web Developer", rating: 5, status: true, date: "23 days ago", managed: true },
     { id: 2, comment: "A bit disorganized but informative.", member: "jane.doe", event: "LUMS Live Session", rating: 3, status: true, date: "32 days ago", managed: false }, 
@@ -20,6 +20,16 @@ const renderStars = (rating) => {
 };
 
 const AdminCommentsPage = () => {
+    const [comments, setComments] = useState([]);
+useEffect(() => {
+    fetch('http://localhost:8001/comments/getAllComments', { credentials: 'include' })
+      .then(res => res.json())
+      .then(data => {
+        setComments(Array.isArray(data) ? data : []);
+      })
+      .catch(() => setComments([]));
+})
+
   return (
     <div>
         <h1 className="text-3xl font-bold text-gray-800 mb-6">New Comments</h1>
@@ -47,26 +57,26 @@ const AdminCommentsPage = () => {
                             <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase">Member</th>
                             <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase">Events</th>
                             <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase">Ratings-5/5</th>
-                            <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                            {/* <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase">Status</th> */}
                             <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                            <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase">Manage</th>
+                            {/* <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase">Manage</th> */}
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200 text-sm">
-                        {mockComments.map((item, index) => (
-                            <tr key={item.id}>
+                        {comments.map((item, index) => (
+                            <tr key={item._id}>
                                 <td className="py-4 px-4">{index + 1}</td>
                                 <td className="py-4 px-4 max-w-xs truncate">{item.comment}</td>
-                                <td className="py-4 px-4">{item.member}</td>
-                                <td className="py-4 px-4">{item.event}</td>
+                                <td className="py-4 px-4">{item.user.fullName}</td>
+                                <td className="py-4 px-4">{item.event.name}</td>
                                 <td className="py-4 px-4">{renderStars(item.rating)}</td>
-                                <td className="py-4 px-4">
+                                {/* <td className="py-4 px-4">
                                     <ToggleSwitch initialState={item.status} />
-                                </td>
-                                <td className="py-4 px-4">{item.date}</td>
-                                <td className="py-4 px-4">
+                                </td> */}
+                                <td className="py-4 px-4">{item.createdAt ? new Date(item.createdAt).toLocaleDateString() : ''}</td>
+                                {/* <td className="py-4 px-4">
                                     <ToggleSwitch initialState={item.managed} />
-                                </td>
+                                </td> */}
                             </tr>
                         ))}
                     </tbody>
@@ -74,14 +84,14 @@ const AdminCommentsPage = () => {
             </div>
             
             {/* Pagination */}
-            <div className="flex justify-between items-center mt-4 text-sm">
-                <p className="text-gray-600">Showing 1 to {mockComments.length} of {mockComments.length} entries</p>
+            {/* <div className="flex justify-between items-center mt-4 text-sm">
+                <p className="text-gray-600">Showing 1 to {comments.length} of {comments.length} entries</p>
                 <div className="flex items-center">
                     <button className="px-3 py-1 border rounded-md bg-white hover:bg-gray-50">«</button>
                     <button className="px-3 py-1 border rounded-md bg-teal-500 text-white mx-1">1</button>
                     <button className="px-3 py-1 border rounded-md bg-white hover:bg-gray-50">»</button>
                 </div>
-            </div>
+            </div> */}
         </div>
     </div>
   );

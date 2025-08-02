@@ -34,7 +34,7 @@ const BookingsTable = ({ bookings, showSearch = true }) => {
                             <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase">Booking No</th>
                             <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase">Member</th>
                             <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase">Events</th>
-                            <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase">Total Subscribers</th>
+                            {/* <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase">Total Subscribers</th> */}
                             <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                             <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
                             <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase">Manage</th>
@@ -47,7 +47,7 @@ const BookingsTable = ({ bookings, showSearch = true }) => {
                                 <td className="py-4 px-4 font-mono">{booking.bookingNo}</td>
                                 <td className="py-4 px-4">{booking.member}</td>
                                 <td className="py-4 px-4">{booking.event}</td>
-                                <td className="py-4 px-4 text-center">{booking.subscribers}</td>
+                                {/* <td className="py-4 px-4 text-center">{booking.subscribers}</td> */}
                                 <td className="py-4 px-4">
                                     <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusClass(booking.status)}`}>
                                         {booking.status}

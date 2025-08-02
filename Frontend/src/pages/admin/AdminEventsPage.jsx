@@ -1,24 +1,33 @@
-// src/pages/admin/AdminEventsPage.jsx
-import { Link } from 'react-router-dom'; // Make sure Link is imported
+import { Link } from 'react-router-dom';
 import { FiPlus, FiEdit, FiTrash2, FiSearch } from 'react-icons/fi';
-
-const mockAdminEvents = [
-    { id: 1, name: "International Workshop", category: "Technology", date: "2025-02-26", status: "Active" },
-    { id: 2, name: "LUMS Live Session", category: "Music", date: "2025-04-08", status: "Active" },
-    { id: 3, name: "CSS Mentorship", category: "Education", date: "2025-03-28", status: "Inactive" },
-    { id: 4, name: "Annual Sports Week", category: "Sports", date: "2025-03-16", status: "Active" },
-    { id: 5, name: "Fintech Event Award", category: "Technology", date: "2024-12-03", status: "Completed" },
-];
+import { useState, useEffect } from 'react';
 
 const AdminEventsPage = () => {
+    const [events, setEvents] = useState([]);
+    const [loading, setLoading] = useState(true);
+
     const getStatusClass = (status) => {
         switch (status) {
-            case 'Active': return 'bg-green-100 text-green-800';
-            case 'Inactive': return 'bg-yellow-100 text-yellow-800';
-            case 'Completed': return 'bg-blue-100 text-blue-800';
+            case 'upcoming': return 'bg-green-100 text-green-800';
+            case 'ongoing': return 'bg-yellow-100 text-yellow-800';
+            case 'completed': return 'bg-blue-100 text-blue-800';
             default: return 'bg-gray-100 text-gray-800';
         }
     };
+
+    useEffect(() => {
+        fetch('http://localhost:8001/events/getAllEvents', { credentials: 'include' })
+            .then(res => res.json())
+            .then(data => {
+                setEvents(data.events || []);
+                setLoading(false);
+            })
+            .catch(err => {
+                console.error('Failed to fetch events:', err);
+                setEvents([]);
+                setLoading(false);
+            });
+    }, []);
 
     return (
         <div>
@@ -50,23 +59,35 @@ const AdminEventsPage = () => {
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                        {mockAdminEvents.map((event, index) => (
-                            <tr key={event.id}>
-                                <td className="py-4 px-6 whitespace-nowrap">{index + 1}</td>
-                                <td className="py-4 px-6 whitespace-nowrap font-medium text-gray-900">{event.name}</td>
-                                <td className="py-4 px-6 whitespace-nowrap">{event.category}</td>
-                                <td className="py-4 px-6 whitespace-nowrap">{event.date}</td>
-                                <td className="py-4 px-6 whitespace-nowrap">
-                                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusClass(event.status)}`}>
-                                        {event.status}
-                                    </span>
-                                </td>
-                                <td className="py-4 px-6 whitespace-nowrap flex items-center gap-4">
-                                    <Link to={`/admin/events/edit/${event.id}`} className="text-blue-600 hover:text-blue-900"><FiEdit size={18} /></Link>
-                                    {/* <button className="text-red-600 hover:text-red-900"><FiTrash2 size={18} /></button> */}
-                                </td>
+                        {loading ? (
+                            <tr>
+                                <td colSpan="6" className="text-center py-6 text-gray-500">Loading events...</td>
                             </tr>
-                        ))}
+                        ) : events.length === 0 ? (
+                            <tr>
+                                <td colSpan="6" className="text-center py-6 text-gray-500">No events found.</td>
+                            </tr>
+                        ) : (
+                            events.map((event, index) => (
+                                <tr key={event._id}>
+                                    <td className="py-4 px-6 whitespace-nowrap">{index + 1}</td>
+                                    <td className="py-4 px-6 whitespace-nowrap font-medium text-gray-900">{event.name}</td>
+                                    <td className="py-4 px-6 whitespace-nowrap">{event.category}</td>
+                                    <td className="py-4 px-6 whitespace-nowrap">
+                                        {event.startDate ? new Date(event.startDate).toLocaleDateString() : 'N/A'}
+                                    </td>
+                                    <td className="py-4 px-6 whitespace-nowrap">
+                                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusClass(event.status)}`}>
+                                            {event.status}
+                                        </span>
+                                    </td>
+                                    <td className="py-4 px-6 whitespace-nowrap flex items-center gap-4">
+                                        <Link to={`/admin/events/edit/${event._id}`} className="text-blue-600 hover:text-blue-900"><FiEdit size={18} /></Link>
+                                        {/* <button className="text-red-600 hover:text-red-900"><FiTrash2 size={18} /></button> */}
+                                    </td>
+                                </tr>
+                            ))
+                        )}
                     </tbody>
                 </table>
             </div>

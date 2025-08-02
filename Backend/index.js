@@ -14,6 +14,9 @@ const categoryRoutes = require('./routes/category');
 const universityRoutes = require('./routes/universities');
 const noticeRoutes = require('./routes/notice');
 const siteSettingRoutes = require('./routes/sitesetting');
+const eventsRoutes = require('./routes/events');
+const commentRoutes = require('./routes/comment');
+const dashboardRoutes = require('./routes/dashboard');
 // Connect to the database
 connectDB();
 
@@ -36,6 +39,9 @@ app.use('/category',auth, categoryRoutes);
 app.use('/universities',auth, universityRoutes);
 app.use('/notices',auth, noticeRoutes);
 app.use('/siteSettings', siteSettingRoutes);
+app.use('/events',auth, eventsRoutes);
+app.use('/comments',auth, commentRoutes);
+app.use('/dashboard',auth, dashboardRoutes);
 
 
 

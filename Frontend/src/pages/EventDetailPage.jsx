@@ -1,35 +1,106 @@
 // src/pages/EventDetailPage.jsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import UserLayout from '../components/UserLayout';
 import ReviewCard from '../components/ReviewCard';
 import { FiStar, FiCalendar, FiClock, FiMapPin, FiUsers, FiTag } from 'react-icons/fi';
 
-// In a real app, this data would come from an API. We'll use it to find the event by ID.
-const mockEvents = [
-  { id: 1, title: "Baxter Spears", price: 522, category: "Sports", startDate: "1979-10-21", endDate: "1993-06-23", startTime: "16:49", endTime: "20:02", imageUrl: "https://via.placeholder.com/1200x600.png/008080/FFFFFF?Text=Event+Banner", description: "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.", location: "Lorem labore et dolo", sponsor: "Global Tech", maxSubscribers: 60, createdBy: "Muhammad Arslan" },
-  { id: 2, title: "Roth Mcdowell", price: 150, category: "Human Development", startDate: "1970-03-19", endDate: "1970-03-20", startTime: "09:44", endTime: "17:00", imageUrl: "https://via.placeholder.com/1200x600.png/3B82F6/FFFFFF?Text=Event+Banner", description: "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium.", location: "Doloribus minima err", sponsor: "Innovate Corp", maxSubscribers: 100, createdBy: "Jane Doe" },
-  // Add other events to match EventsListPage.jsx for complete linking
-];
-
-// Mock reviews for the event
-const mockReviews = [
-  { id: 1, user: "test", time: "21 seconds ago", rating: 4, comment: "ardfdg btrth b" }
-];
-
-
 const EventDetailPage = () => {
-  // Get the 'eventId' from the URL (e.g., '/events/1' -> eventId will be '1')
   const { eventId } = useParams();
-  
-  // Find the event from our mock data. In a real app, you'd make an API call here.
-  const event = mockEvents.find(e => e.id === parseInt(eventId));
-  
-  // State for the comment form
+  const [event, setEvent] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState(null);
   const [newComment, setNewComment] = useState("");
   const [newRating, setNewRating] = useState(0);
+  const [showCommentBox, setShowCommentBox] = useState(false);
+  const [comments, setComments] = useState([]);
+  const [commentMsg, setCommentMsg] = useState({ type: '', text: '' });
 
-  // If the event is not found, show a message
+  useEffect(() => {
+    const formatDate = (dateStr) => {
+      if (!dateStr) return '';
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return '';
+      return d.toISOString().slice(0, 10);
+    };
+    fetch(`http://localhost:8001/events/getEvent/${eventId}`, { credentials: 'include' })
+      .then(res => res.json())
+      .then(data => {
+        setEvent({
+          title: data.name || '',
+          price: data.price || '',
+          category: data.category || '',
+          startDate: formatDate(data.startDate),
+          endDate: formatDate(data.endDate),
+          startTime: data.startTime || '',
+          endTime: data.endTime || '',
+          imageUrl: data.image ? `/uploads/events/${data.image}` : '',
+          description: data.description || '',
+          location: data.location || '',
+          bookings: data.bookings || '0',
+          maxSubscribers: data.totalSubscribers || '',
+          createdAt: data.createdAt || '',
+        });
+        setLoading(false);
+      })
+      .catch(err => {
+        setMessage('Event not found!');
+        setLoading(false);
+      });
+    // Fetch comments for this event
+    fetch(`http://localhost:8001/comments/getComment/${eventId}`, { credentials: 'include' })
+      .then(res => res.json())
+      .then(data => {
+        setComments(Array.isArray(data) ? data : []);
+      })
+      .catch(() => setComments([]));
+  }, [eventId]);
+
+  const handleCommentSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch('http://localhost:8001/comments/addComment', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          eventId,
+          comment: newComment,
+          rating: newRating,
+        }),
+      });
+      if (response.ok) {
+        setCommentMsg({ type: 'success', text: 'Comment posted successfully!' });
+        setShowCommentBox(false);
+        setNewComment("");
+        setNewRating(0);
+        fetch(`http://localhost:8001/comments/getComment/${eventId}`, { credentials: 'include' })
+          .then(res => res.json())
+          .then(data => {
+            setComments(Array.isArray(data) ? data : []);
+          })
+          .catch(() => setComments([]));
+      } else {
+        setCommentMsg({ type: 'error', text: 'Failed to post comment.' });
+      }
+    } catch (err) {
+      setCommentMsg({ type: 'error', text: 'Network error.' });
+    }
+    setTimeout(() => setCommentMsg({ type: '', text: '' }), 3000);
+  };
+
+  if (loading) {
+    return (
+      <UserLayout>
+        <div className="text-center py-20">
+          <h1 className="text-3xl font-bold">Loading event...</h1>
+        </div>
+      </UserLayout>
+    );
+  }
+
   if (!event) {
     return (
       <UserLayout>
@@ -42,16 +113,9 @@ const EventDetailPage = () => {
       </UserLayout>
     );
   }
+ 
 
-  const handleCommentSubmit = (e) => {
-    e.preventDefault();
-    // In a real app, you would send this data to your backend API
-    console.log({ comment: newComment, rating: newRating });
-    alert(`Comment Submitted!\nRating: ${newRating}\nComment: ${newComment}`);
-    // Clear the form
-    setNewComment("");
-    setNewRating(0);
-  }
+
 
   return (
     <UserLayout>
@@ -62,7 +126,7 @@ const EventDetailPage = () => {
           <div className="flex flex-col md:flex-row justify-between items-start mb-4">
             <div>
               <h1 className="text-4xl font-bold text-gray-900">{event.title}</h1>
-              <p className="text-md text-gray-500 mt-1">Created By: {event.createdBy}</p>
+              <p className="text-md text-gray-500 mt-1">Created At: {event.createdAt ? new Date(event.createdAt).toLocaleDateString() : ''}</p>
             </div>
             <p className="text-4xl font-bold text-teal-600 mt-4 md:mt-0">
               ${event.price}
@@ -74,7 +138,9 @@ const EventDetailPage = () => {
           {/* Main Content: Image and Details */}
           <div className="grid md:grid-cols-3 gap-8">
             <div className="md:col-span-2">
-              <img src={event.imageUrl} alt={event.title} className="w-full h-auto object-cover rounded-lg" />
+              {event.imageUrl && (
+                <img src={event.imageUrl} alt={event.title} className="w-full h-auto object-cover rounded-lg" />
+              )}
             </div>
             
             {/* Details Sidebar */}
@@ -85,7 +151,7 @@ const EventDetailPage = () => {
               <div className="flex items-center gap-3"><FiMapPin className="h-5 w-5 text-teal-600" /><p><span className="font-semibold">Location:</span> {event.location}</p></div>
               <div className="flex items-center gap-3"><FiCalendar className="h-5 w-5 text-teal-600" /><p><span className="font-semibold">Start Date:</span> {event.startDate}</p></div>
               <div className="flex items-center gap-3"><FiCalendar className="h-5 w-5 text-teal-600" /><p><span className="font-semibold">End Date:</span> {event.endDate}</p></div>
-              <div className="flex items-center gap-3"><FiUsers className="h-5 w-5 text-teal-600" /><p><span className="font-semibold">Sponsor:</span> {event.sponsor}</p></div>
+              {/* <div className="flex items-center gap-3"><FiUsers className="h-5 w-5 text-teal-600" /><p><span className="font-semibold">Sponsor:</span> {event.sponsor}</p></div> */}
               <p className="text-lg font-bold text-teal-600">Maximum Subscribers: {event.maxSubscribers}</p>
               
               <button className="w-full bg-teal-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-teal-600 transition-colors text-lg">
@@ -105,24 +171,75 @@ const EventDetailPage = () => {
           {/* Booking & Comments Section */}
           <div className="text-center">
              <div className="text-xl">
-              <span>Members Already Booking: <span className="font-bold text-red-500">0</span></span>
+              <span>Members Already Booking: <span className="font-bold text-red-500">{event.bookings}</span></span>
               <span className="mx-4">|</span>
               <span>Remaining Number: <span className="font-bold text-red-500">{event.maxSubscribers}</span></span>
             </div>
             <button
-                onClick={handleCommentSubmit}
+                onClick={() => setShowCommentBox(true)}
                 className="mt-4 bg-teal-500 text-white font-bold py-2 px-6 rounded-full hover:bg-teal-600 transition-colors"
             >
                 Add Comment
             </button>
+
+            {showCommentBox && (
+              <>
+                <form
+                  onSubmit={handleCommentSubmit}
+                  className="mt-6 p-6 border-2 border-teal-200 rounded-xl bg-gradient-to-br from-teal-50 to-white shadow-lg flex flex-col items-start gap-5 w-full max-w-lg mx-auto"
+                >
+                  <label className="font-semibold text-lg mb-1">Your Comment:</label>
+                  <textarea
+                    value={newComment}
+                    onChange={e => setNewComment(e.target.value)}
+                    rows={3}
+                    className="w-full border-2 border-teal-200 rounded-lg px-3 py-2 focus:outline-none focus:border-teal-500 transition"
+                    placeholder="Write your comment..."
+                    required
+                  />
+                  <label className="font-semibold text-lg mt-2 mb-1">Your Rating:</label>
+                  <div className="flex items-center gap-2">
+                    {[1,2,3,4,5].map(star => (
+                      <span
+                        key={star}
+                        className={`cursor-pointer text-3xl transition-colors ${newRating >= star ? 'text-yellow-400' : 'text-gray-300'}`}
+                        onClick={() => setNewRating(star)}
+                      >
+                        &#9733;
+                      </span>
+                    ))}
+                    <span className="ml-2 text-teal-600 font-bold">{newRating > 0 ? `${newRating} Star${newRating > 1 ? 's' : ''}` : ''}</span>
+                  </div>
+                  <div className="flex gap-3 mt-4 self-end">
+                    <button type="submit" className="bg-gradient-to-r from-teal-500 to-teal-700 text-white font-bold py-2 px-6 rounded-lg shadow hover:scale-105 transition-transform">Post</button>
+                    <button type="button" className="bg-gray-200 text-gray-800 font-bold py-2 px-6 rounded-lg shadow hover:bg-gray-300 transition-colors" onClick={() => setShowCommentBox(false)}>Cancel</button>
+                  </div>
+                </form>
+                {commentMsg.text && (
+                  <div className={`mt-4 px-4 py-2 rounded text-center font-semibold ${commentMsg.type === 'success' ? 'bg-green-100 text-green-700 border border-green-300' : 'bg-red-100 text-red-700 border border-red-300'}`}>
+                    {commentMsg.text}
+                  </div>
+                )}
+              </>
+            )}
           </div>
           
           {/* Reviews Section */}
           <div className="mt-12">
-            <h2 className="text-2xl font-bold mb-2">Reviews</h2>
-            {mockReviews.length > 0 ? (
+            <h2 className="text-2xl font-bold mb-2">Reviews ({comments.length})</h2>
+            {comments.length > 0 ? (
               <div className="divide-y divide-gray-200">
-                {mockReviews.map(review => <ReviewCard key={review.id} review={review} />)}
+                {comments.map(review => (
+                  <ReviewCard
+                    key={review._id || review.id}
+                    review={{
+                      user: review.user?.fullName || review.user || 'Anonymous',
+                      time: review.createdAt ? new Date(review.createdAt).toLocaleString() : '',
+                      rating: review.rating,
+                      comment: review.comment
+                    }}
+                  />
+                ))}
               </div>
             ) : (
               <p className="text-gray-500">No Reviews Found.</p>

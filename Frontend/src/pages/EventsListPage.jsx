@@ -3,18 +3,24 @@
 import UserLayout from '../components/UserLayout';
 import EventCard from '../components/EventCard';
 import { Link } from 'react-router-dom';
-
-// In a real application, this data would come from an API call
-const mockEvents = [
-  { id: 1, title: "Baxter Spears", price: 522, category: "Sports", startDate: "1979-10-21", startTime: "16:49", imageUrl: "https://via.placeholder.com/400x200.png/008080/FFFFFF?Text=Event+1" },
-  { id: 2, title: "Roth Mcdowell", price: 150, category: "Human Development", startDate: "1970-03-19", startTime: "09:44", imageUrl: "https://via.placeholder.com/400x200.png/3B82F6/FFFFFF?Text=Event+2" },
-  { id: 3, title: "Imogene Gillespie", price: 509, category: "Sports", startDate: "2012-10-26", startTime: "00:21", imageUrl: "https://via.placeholder.com/400x200.png/EF4444/FFFFFF?Text=Event+3" },
-  { id: 4, title: "Colby Nolan", price: 354, category: "Sports", startDate: "2017-06-25", startTime: "15:14", imageUrl: "https://via.placeholder.com/400x200.png/F97316/FFFFFF?Text=Event+4" },
-  // Add more mock events if you like
-];
+import { useState, useEffect } from 'react';
 
 
 const EventsListPage = () => {
+  const [Events, setEvents] = useState([]);
+   useEffect(() => {
+        fetch('http://localhost:8001/events/getAllEvents', { credentials: 'include' })
+            .then(res => res.json())
+            .then(data => {
+                setEvents(data.events || []);
+                
+            })
+            .catch(err => {
+                console.error('Failed to fetch events:', err);
+                setEvents([]);
+               
+            });
+    }, []);
   return (
  
     <UserLayout>
@@ -46,8 +52,11 @@ const EventsListPage = () => {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-            {mockEvents.map(event => (
-              <EventCard key={event.id} event={event} />
+            {/* {Events.filter(event => event.status !== 'ongining').map(event => (
+              <EventCard key={event._id} event={event} />
+            ))} */}
+              {Events.map(event => (
+              <EventCard key={event._id} event={event} />
             ))}
           </div>
         </main>
