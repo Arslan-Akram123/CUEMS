@@ -17,6 +17,7 @@ const siteSettingRoutes = require('./routes/sitesetting');
 const eventsRoutes = require('./routes/events');
 const commentRoutes = require('./routes/comment');
 const dashboardRoutes = require('./routes/dashboard');
+const bookEventRoutes = require('./routes/bookevent');
 // Connect to the database
 connectDB();
 
@@ -42,7 +43,7 @@ app.use('/siteSettings', siteSettingRoutes);
 app.use('/events',auth, eventsRoutes);
 app.use('/comments',auth, commentRoutes);
 app.use('/dashboard',auth, dashboardRoutes);
-
+app.use('/eventsbook',auth, bookEventRoutes);
 
 
 

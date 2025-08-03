@@ -3,8 +3,8 @@ const commentSchema = require("../models/comment");
 
 const getAllComments = async (req, res) => {
     try {
-        const comments = await commentSchema.find().populate('user').populate('event');
-        console.log(comments);
+        const comments = await commentSchema.find().populate('user').populate('event').sort({ createdAt: -1 });
+        // console.log(comments);
         res.status(200).json(comments);
     } catch (error) {
         console.error(error);
@@ -32,7 +32,7 @@ const getCommentById = async (req, res) => {
         const comments = await commentSchema.find({ event: eventId })
             .populate('user')
             .populate('event');
-            console.log(comments);
+            // console.log(comments);
         res.status(200).json(comments);
     } catch (error) {
         console.error(error);

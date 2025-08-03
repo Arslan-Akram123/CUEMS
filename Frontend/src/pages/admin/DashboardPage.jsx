@@ -26,15 +26,14 @@ const StatCard = ({ icon, title, value, color }) => {
     );
 };
 
-// Mock data for the new pending booking
-const newBookings = [
-    { id: 7, bookingNo: '7813537050113551', member: 'test', event: 'Baxter Spears', subscribers: 3, status: 'pending', date: '1 days ago' }
-];
+
 
 const DashboardPage = () => {
+    const [newBookings, setNewBookings] = useState([]);
    const [dashboardData, setDashboardData] = useState([]);
     useEffect(() => {
         fetch('http://localhost:8001/dashboard/getDashboardData', { credentials: 'include' }).then(res => res.json()).then(data => setDashboardData(data)).catch(err => console.error(err));
+        fetch('http://localhost:8001/eventsbook/getNewBookings', { credentials: 'include' }).then(res => res.json()).then(data => setNewBookings(data)).catch(err => console.error(err));
     }, []);
 
     const stats = [
@@ -55,7 +54,7 @@ const DashboardPage = () => {
                 ))}
             </div>
             {/* === NEW BOOKINGS SECTION === */}
-            {newBookings.length > 0 ? (
+            {newBookings.filter(b => b.adminRead === true && b.status === 'pending').length > 0 ? (
                 <div className="mt-10">
                     <h2 className="text-2xl font-bold text-gray-800 mb-4">New Bookings</h2>
                     <div className="bg-white p-6 rounded-lg shadow-md">
@@ -72,19 +71,19 @@ const DashboardPage = () => {
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white divide-y divide-gray-200 text-sm">
-                                    {newBookings.map((booking, index) => (
-                                        <tr key={booking.id}>
+                                    {newBookings.filter(b => b.adminRead === true && b.status === 'pending').map((booking, index) => (
+                                        <tr key={booking._id}>
                                             <td className="py-4 px-4">{index + 1}</td>
-                                            <td className="py-4 px-4 font-mono">{booking.bookingNo}</td>
-                                            <td className="py-4 px-4">{booking.member}</td>
-                                            <td className="py-4 px-4">{booking.event}</td>
+                                            <td className="py-4 px-4 font-mono">{booking._id}</td>
+                                            <td className="py-4 px-4">{booking.user.fullName}</td>
+                                            <td className="py-4 px-4">{booking.event.name}</td>
                                             <td className="py-4 px-4">
                                                 <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
                                                     {booking.status}
                                                 </span>
                                             </td>
                                             <td className="py-4 px-4">
-                                                <Link to={`/admin/bookings/show/${booking.id}`} className="bg-teal-500 text-white flex items-center gap-2 py-1 px-3 rounded-md hover:bg-teal-600">
+                                                <Link to={`/admin/bookings/show/${booking._id}`} className="bg-teal-500 text-white flex items-center gap-2 py-1 px-3 rounded-md hover:bg-teal-600">
                                                     <FiEye /> Show
                                                 </Link>
                                             </td>

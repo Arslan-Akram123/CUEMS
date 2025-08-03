@@ -3,8 +3,8 @@ import UserLayout from '../components/UserLayout';
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 // We can reuse a similar card structure, but create it locally for this page.
-const LatestEventCard = ({ event }) => (
-    <div className="relative pl-8 ">
+const UpcommingEventCard = ({ event }) => (
+    <div className="relative pl-8">
         <div className="absolute left-0 top-0 -translate-x-1/2 bg-white rounded-full h-8 w-8 flex items-center justify-center overflow-hidden">
             <img src={event.imageUrl} alt={event.title} className="h-full w-full object-cover" />
         </div>
@@ -25,8 +25,8 @@ const LatestEventCard = ({ event }) => (
             </div>
             {/* <div className='flex justify-center items-center'>
                 <img src={`/uploads/events/${event.image}`} alt={event.title} className=' rounded-2xl' />
-            </div>
-           </div> */}
+            </div> */}
+           {/* </div> */}
             <Link to={`/events/${event.id}`} className="text-teal-600 hover:underline font-semibold mt-2 inline-block">
                 More Info
             </Link>
@@ -35,15 +35,15 @@ const LatestEventCard = ({ event }) => (
 );
 
 
-const LatestEventsPage = () => {
+const UpcommingEvent = () => {
     const [events, setEvents] = useState([]);
 
     useEffect(() => {
         fetch('http://localhost:8001/events/getAllEvents', { credentials: 'include' })
             .then(res => res.json())
             .then(data => {
-                // Only show events with status 'ongoing' or 'completed'
-                const filtered = (data.events || []).filter(ev => ev.status === 'ongoing' || ev.status === 'completed');
+                // Only show events with status 'upcoming'
+                const filtered = (data.events || []).filter(ev => ev.status === 'upcoming');
                 setEvents(filtered);
             })
             .catch(err => {
@@ -56,13 +56,13 @@ const LatestEventsPage = () => {
         <UserLayout>
             <div className="container mx-auto px-4 py-8">
                 <div className="bg-white p-6 rounded-lg shadow-md mb-8">
-                    <h1 className="text-3xl font-bold text-gray-800">Recent Events</h1>
-                    <p className="text-gray-500"><Link to="/home">Dashboard</Link> / Recent-Events</p>
+                    <h1 className="text-3xl font-bold text-gray-800">Upcomming Events</h1>
+                    <p className="text-gray-500"><Link to="/home">Dashboard</Link> / upcoming-Events</p>
                 </div>
 
                 <div className="space-y-8">
                     {events.map(event => (
-                        <LatestEventCard key={event._id} event={{
+                        <UpcommingEventCard key={event._id} event={{
                             ...event,
                             id: event._id,
                             imageUrl: event.image ? `/uploads/events/${event.image}` : 'https://via.placeholder.com/50/E0E7FF/4338CA?text=E',
@@ -75,4 +75,4 @@ const LatestEventsPage = () => {
     );
 };
 
-export default LatestEventsPage;
+export default UpcommingEvent;

@@ -65,7 +65,7 @@ const EditEventPage = () => {
                 setMessage('Failed to fetch event data.');
                 setMessageType('error');
             });
-    }, [eventId]);
+    }, [evntId]);
 
     useEffect(() => {
         fetch('http://localhost:8001/category/getCategories', {

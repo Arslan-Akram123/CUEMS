@@ -89,7 +89,7 @@ const AdminNoticesPage = () => {
                                 return (
                                     <tr
                                         key={notice._id}
-                                        className={`cursor-pointer hover:bg-gray-50 transition-all duration-150 
+                                        className={`cursor-pointer   
   ${!notice.isRead ? 'bg-green-100 font-semibold text-gray-900' : 'bg-white text-gray-600'}`}
                                         onClick={() => {
                                             if (!notice.isRead && activeTab === 'unread') {

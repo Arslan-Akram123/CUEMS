@@ -21,7 +21,7 @@ const LandingPage = () => {
                     <div className="flex-grow">
                         <h2 className=" text-[22px] sm:text-3xl font-bold text-yellow-900">Event and Announcement</h2>
                         <div className="mt-4 space-y-3">
-                            <Link to="/events/upcoming" className="flex items-center gap-3 bg-white rounded-lg p-3 hover:bg-gray-100 transition-colors">
+                            <Link to="/events/upcomingevents" className="flex items-center gap-3 bg-white rounded-lg p-3 hover:bg-gray-100 transition-colors">
                                 <FiCalendar className="h-6 w-6 text-teal-600" />
                                 <span className="font-semibold">Upcoming Events</span>
                             </Link>
@@ -70,9 +70,9 @@ const LandingPage = () => {
                         <div className='flex-1'>
                             <span className="inline-block bg-teal-500 text-white text-sm font-semibold px-3 py-1 rounded-full mb-2">Hybrid Info</span>
                             <div className="mt-2 gap-2 flex flex-col">
-                               <Link to="/events/latest" className="w-full border border-teal-500 text-teal-600 text-center font-semibold py-2 px-4 rounded-lg hover:bg-teal-50 transition-colors">Latest Events</Link>
+                               <Link to="/events/latest" className="w-full border border-teal-500 text-teal-600 text-center font-semibold py-2 px-4 rounded-lg hover:bg-teal-50 transition-colors">Recent Events</Link>
                                <Link to="/testimonials" className="w-full border border-teal-500 text-teal-600 text-center font-semibold py-2 px-4 rounded-lg hover:bg-teal-50 transition-colors">Testimonials</Link>
-                               <Link to="/bookings/latest" className="w-full border border-teal-500 text-teal-600 text-center font-semibold py-2 px-4 rounded-lg hover:bg-teal-50 transition-colors">Latest Booking</Link>
+                               <Link to="/bookings/latest" className="w-full border border-teal-500 text-teal-600 text-center font-semibold py-2 px-4 rounded-lg hover:bg-teal-50 transition-colors">Recent Bookings</Link>
                             </div>
                         </div>
                     </div>

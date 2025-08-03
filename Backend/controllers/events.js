@@ -43,42 +43,43 @@ const createEvent = async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 };
+function calculateEventStatus(event) {
+    let status = 'upcoming';
+    const now = new Date();
+    const startDate = event.startDate ? new Date(event.startDate) : null;
+    const endDate = event.endDate ? new Date(event.endDate) : null;
+    let start = startDate;
+    let end = endDate;
+    if (startDate && event.startTime) {
+        const [h, m] = event.startTime.split(':');
+        start = new Date(startDate);
+        start.setHours(Number(h), Number(m || 0), 0, 0);
+    }
+    if (endDate && event.endTime) {
+        const [h, m] = event.endTime.split(':');
+        end = new Date(endDate);
+        end.setHours(Number(h), Number(m || 0), 59, 999);
+    }
+    if (start && end) {
+        if (now < start) {
+            status = 'upcoming';
+        } else if (now >= start && now <= end) {
+            status = 'ongoing';
+        } else {
+            status = 'completed';
+        }
+    } else {
+        status = 'upcoming';
+    }
+    return status;
+}
+
 const getAllEvents = async (req, res) => {
     try {
         const events = await eventSchema.find().sort({ createdAt: -1 });
-        const now = new Date();
-        // Add status to each event (date + time logic)
         const eventsWithStatus = events.map(event => {
-            let status = 'upcoming';
-            const startDate = event.startDate ? new Date(event.startDate) : null;
-            const endDate = event.endDate ? new Date(event.endDate) : null;
-            // Combine date and time for more precise status
-            let start = startDate;
-            let end = endDate;
-            if (startDate && event.startTime) {
-                const [h, m] = event.startTime.split(':');
-                start = new Date(startDate);
-                start.setHours(Number(h), Number(m || 0), 0, 0);
-            }
-            if (endDate && event.endTime) {
-                const [h, m] = event.endTime.split(':');
-                end = new Date(endDate);
-                end.setHours(Number(h), Number(m || 0), 59, 999);
-            }
-            if (start && end) {
-                if (now < start) {
-                    status = 'upcoming';
-                } else if (now >= start && now <= end) {
-                    status = 'ongoing';
-                } else {
-                    status = 'completed';
-                }
-            } else {
-                status = 'upcoming';
-            }
-            // Convert to plain object and add status
             const obj = event.toObject();
-            obj.status = status;
+            obj.status = calculateEventStatus(event);
             return obj;
         });
         res.status(200).json({
@@ -97,7 +98,9 @@ const getAllEvents = async (req, res) => {
         if (!event) {
             return res.status(404).json({ error: 'Event not found' });
         }
-        res.status(200).json(event);
+        const obj = event.toObject();
+        obj.status = calculateEventStatus(event);
+        res.status(200).json(obj);
     } catch (error) {
         console.error('Error fetching event:', error);
         res.status(500).json({ error: 'Internal server error' });
@@ -161,10 +164,31 @@ const getAllEvents = async (req, res) => {
     }
  }
 
+ async function getSpecificEventbyCategory(req, res) {
+    try {
+        const category = req.params.id;
+        const events = await eventSchema.find({ category: category });
+        // Add status to each event
+        const eventsWithStatus = events.map(event => {
+            const obj = event.toObject();
+            obj.status = calculateEventStatus(event);
+            return obj;
+        });
+        res.status(200).json({
+            success: true,
+            count: eventsWithStatus.length,
+            events: eventsWithStatus,
+        });
+    } catch (error) {
+        console.error('Error fetching events by category:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+ }
 module.exports = {
     createEvent,
     getAllEvents,
     getSpecificEvent,
     deleteEvent,
-    updateEvent
+    updateEvent,
+    getSpecificEventbyCategory
 };

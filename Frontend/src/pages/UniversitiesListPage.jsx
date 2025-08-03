@@ -28,18 +28,37 @@ import { useState, useEffect } from 'react';
 
 const UniversitiesListPage = () => {
   const [universities, setUniversities] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredUniversities, setFilteredUniversities] = useState([]);
 
   useEffect(() => {
-    // Fetch universities from the API
     fetch('http://localhost:8001/universities/getUniversities', { credentials: 'include' })
       .then(response => response.json())
       .then(data => {
         setUniversities(data);
+        setFilteredUniversities(data);
       })
       .catch(error => {
         console.error('Error fetching universities:', error);
+        setUniversities([]);
+        setFilteredUniversities([]);
       });
   }, []);
+
+  useEffect(() => {
+    if (!searchTerm.trim()) {
+      setFilteredUniversities(universities);
+    } else {
+      const term = searchTerm.toLowerCase();
+      setFilteredUniversities(
+        universities.filter(uni =>
+          uni.shortName?.toLowerCase().includes(term) ||
+          uni.name?.toLowerCase().includes(term)
+        )
+      );
+    }
+  }, [searchTerm, universities]);
+
   return (
     <UserLayout>
       <div className="container mx-auto px-4 py-8 flex flex-col md:flex-row gap-8">
@@ -50,8 +69,10 @@ const UniversitiesListPage = () => {
             <h2 className="text-xl font-bold mb-4">Campus Discovery</h2>
             <input
               type="text"
-              placeholder="Search for universities..."
-              className="w-full border-gray-300 rounded-md py-2 px-2 shadow-sm focus:border-teal-500 focus:ring-teal-500"
+              placeholder="Search for universities by name..."
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+              className="w-full border-gray-300 rounded-md py-2 px-2 shadow-sm focus:border-teal-500 focus:ring-teal-500 focus:outline-teal-500"
             />
             <Link to="/home" className="mt-6 w-full block text-center bg-teal-600 text-white  py-2 px-4 rounded-lg hover:bg-teal-700 transition-colors">
               ← Back to Dashboard
@@ -72,7 +93,7 @@ const UniversitiesListPage = () => {
           </div>
 
           <div className="space-y-6">
-            {universities.map(uni => (
+            {filteredUniversities.map(uni => (
               <UniversityCard key={uni._id} university={uni} />
             ))}
           </div>

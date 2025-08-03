@@ -14,6 +14,7 @@ import PublicHomePage from './pages/PublicHomePage';
 import MaintenancePage from './pages/MaintenancePage';
 // User-Facing Pages
 import LandingPage from './pages/LandingPage';
+import CategoryEventPage from './pages/CategoryEventPage';
 import EventsListPage from './pages/EventsListPage';
 import EventDetailPage from './pages/EventDetailPage';
 import UniversitiesListPage from './pages/UniversitiesListPage';
@@ -23,6 +24,7 @@ import MyBookingsPage from './pages/MyBookingsPage';
 import UserProfilePage from './pages/UserProfilePage';
 import TestimonialsPage from './pages/TestimonialsPage';
 import LatestEventsPage from './pages/LatestEventsPage';
+import UpcommingEvent from './pages/UpcommingEvent';
 import LatestBookingsPage from './pages/LatestBookingsPage';
 import AdminNoticesPages from './pages/AdminNoticesPage';
 import UniversityComparativeDataPage from './pages/UniversityComparativeDataPage';
@@ -150,8 +152,10 @@ console.log(siteSetting);
           <Route path="/compare-data" element={<PrivateRoute> <UniversityComparativeDataPage /> </PrivateRoute>} />
           <Route path="/events" element={<PrivateRoute> <EventsListPage /> </PrivateRoute>} />
           <Route path="/events/:eventId" element={<PrivateRoute> <EventDetailPage /> </PrivateRoute>} />
+          <Route path="/categories/:category" element={<PrivateRoute> <CategoryEventPage /> </PrivateRoute>} />
           <Route path="/testimonials" element={<PrivateRoute> <TestimonialsPage /> </PrivateRoute>} />
           <Route path="/events/latest" element={<PrivateRoute> <LatestEventsPage /> </PrivateRoute>} />
+          <Route path="/events/upcomingevents" element={<PrivateRoute> <UpcommingEvent /> </PrivateRoute>} />
           <Route path="/bookings/latest" element={<PrivateRoute> <LatestBookingsPage /> </PrivateRoute>} />
           <Route path="/universities" element={<PrivateRoute> <UniversitiesListPage /> </PrivateRoute>} />
           <Route path="/universities/:universityId" element={<PrivateRoute><UniversityDetailPage /></PrivateRoute>}>

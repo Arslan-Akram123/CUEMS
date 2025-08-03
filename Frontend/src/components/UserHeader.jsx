@@ -4,16 +4,48 @@ import { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { FiSearch, FiUser, FiBell, FiBookOpen, FiLogOut  } from 'react-icons/fi';
 import { useProfile } from '../context/ProfileContext/ProfileContext';
+import { useNavigate } from 'react-router-dom';
 const UserHeader = () => {
+    // Notification click handler
+    const handleNotificationClick = async (notif_id) => {
+        setLoadingNotif(true);
+        try {
+            const response = await fetch('http://localhost:8001/eventsbook/UpdateUserRead', {
+                method: 'PUT',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ notif_id }),
+            });
+            await response.json();
+            fetch('http://localhost:8001/eventsbook/getAllUserBookings', { credentials: 'include' })
+                .then(res => res.json())
+                .then(data =>{
+                    setNotifications(data)
+                    navigate('/my-bookings');
+                })
+                .catch(err => console.error(err));
+        } catch (error) {
+            console.error(error);
+        }
+        setLoadingNotif(false);
+    };
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
     const [isNotificationOpen, setIsNotificationOpen] = useState(false);
     const userMenuRef = useRef(null);
     const notificationRef = useRef(null);
     const { formData, setFormData, fetchProfileData,siteSetting } = useProfile();
     const [categories, setCategories] = useState([]);
-    
+    const [notifications, setNotifications] = useState([]);
+    const [loadingNotif, setLoadingNotif] = useState(false);
+    const navigate=useNavigate();
     useEffect(() => {
         fetchProfileData();
+        fetch('http://localhost:8001/eventsbook/getAllUserBookings', { credentials: 'include' })
+            .then(res => res.json())
+            .then(data => setNotifications(data))
+            .catch(err => console.error(err));
     },[]);
 
     useEffect(() => {
@@ -63,7 +95,7 @@ const UserHeader = () => {
             email: '',
             profileImage: ''
         });
-            window.location.href = '/login';
+            navigate('/login');
         })
         .catch(error => {
             console.error('Error logging out:', error);
@@ -97,17 +129,31 @@ const UserHeader = () => {
                         <div className="relative" ref={notificationRef}>
                             <button onClick={() => setIsNotificationOpen(prev => !prev)} className="relative">
                                 <FiBell className="h-8 mt-2 w-8 text-gray-600 hover:text-teal-600 cursor-pointer" />
-                                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-xs text-white">1</span>
+                                {notifications.filter(n => n.userRead === false && n.status !== 'pending').length > 0 && (
+                                    <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-xs text-white">
+                                        {notifications.filter(n => n.userRead === false && n.status !== 'pending').length}
+                                    </span>
+                                )}
                             </button>
                             {isNotificationOpen && (
                                 <div className="absolute right-0 mt-2 w-72 bg-white rounded-md shadow-lg z-50 border border-gray-200">
                                     <div className="p-4 border-b">
-                                        <h4 className="font-semibold">You have 1 notification</h4>
+                                        <h4 className="font-semibold">You have {notifications.filter(n => n.userRead === false && n.status !== 'pending').length || '0'} notification(s)</h4>
                                     </div>
-                                    <div className="py-2">
-                                        <div className="flex justify-between items-center px-4 py-2 hover:bg-gray-100">
-                                            <p className="text-sm text-gray-700">1) your booking is confirmed!</p>
-                                        </div>
+                                    <div className="py-2 px-2">
+                                        {loadingNotif ? (
+                                            <p className="text-sm text-gray-700">Updating...</p>
+                                        ) : notifications.filter(n => n.userRead === false && n.status !== 'pending').length > 0 ? (
+                                            notifications.filter(n => n.userRead === false && n.status !== 'pending').map((notif, index) => (
+                                                <div key={notif._id}
+                                                    onClick={() => handleNotificationClick(notif._id)}
+                                                    className="flex justify-between items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                                                    <p className="text-sm text-gray-700">{index + 1}) {notif.event.name} - {notif.status}</p>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <p className="text-sm text-gray-700">No new notifications</p>
+                                        )}
                                     </div>
                                 </div>
                             )}
@@ -174,7 +220,7 @@ const UserHeader = () => {
                         {categories.length > 0 ? categories.map((category) => (
                             <Link
                                 key={category._id}
-                                to={`/category/${category.name}`}
+                                to={`/categories/${category.name}`}
                                 className="py-2 px-3 whitespace-nowrap hover:bg-teal-700 rounded-md transition-colors"
                                 tabIndex={0}
                             >

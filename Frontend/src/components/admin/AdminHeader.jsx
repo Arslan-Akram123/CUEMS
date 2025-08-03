@@ -3,23 +3,22 @@ import { FiBell, FiUser, FiLogOut, FiMenu, FiTrash2, FiClock } from 'react-icons
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useProfile } from '../../context/ProfileContext/ProfileContext';
-
+import { useNavigate } from 'react-router-dom';
 
 const AdminHeader = ({ onMenuButtonClick }) => {
+    const [notifications, setNotifications] = useState([]);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     // New state for the notification dropdown
     const [isNotificationOpen, setIsNotificationOpen] = useState(false);
     const { formData, fetchProfileData, setFormData } = useProfile();
     const notificationRef = useRef(null);
     const profileRef = useRef(null);
-    // Mock notification data
-    const notifications = [
-        { id: 1, user: 'testuser@gmail.com' }
-    ];
+   const navigate = useNavigate();
 
 
     useEffect(() => {
         fetchProfileData();
+          fetch('http://localhost:8001/eventsbook/getNewBookings', { credentials: 'include' }).then(res => res.json()).then(data => setNotifications(data)).catch(err => console.error(err));
     }, []);
 
     // Close dropdowns when clicking outside
@@ -75,6 +74,31 @@ const AdminHeader = ({ onMenuButtonClick }) => {
         }) 
     }
 
+    async function handlenotification(notif_id) {
+        console.log(notif_id);
+        try {
+            const response = await fetch('http://localhost:8001/eventsbook/UpdateAdminRead', {
+                method: 'PUT',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ notif_id }),
+            });
+            const data = await response.json();
+            console.log(data);
+            fetch('http://localhost:8001/eventsbook/getNewBookings', { credentials: 'include' })
+                .then(res => res.json())
+                .then(data => {setNotifications(data)
+                navigate('/');
+            }
+            )
+                .catch(err => console.error(err));
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
     return (
         <header className="h-20 bg-white border-b border-gray-200 flex items-center justify-between lg:justify-end px-6">
             
@@ -87,9 +111,9 @@ const AdminHeader = ({ onMenuButtonClick }) => {
                 <div className="relative" ref={notificationRef}>
                     <button onClick={() => setIsNotificationOpen(prevState => !prevState)} className="relative">
                         <FiBell className="h-8 mt-2 w-8 text-gray-500" />
-                        {notifications.length > 0 && (
+                        {notifications.filter(n => n.adminRead === false).length > 0 && (
                             <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-xs text-white">
-                                {notifications.length}
+                                {notifications.filter(n => n.adminRead === false).length > 0 ? notifications.filter(n => n.adminRead === false).length : '0'}
                             </span>
                         )}
                     </button>
@@ -97,18 +121,20 @@ const AdminHeader = ({ onMenuButtonClick }) => {
                     {isNotificationOpen && (
                         <div className="absolute right-0 mt-2 w-72 bg-white rounded-md shadow-lg z-50 border border-gray-200">
                             <div className="p-4 border-b">
-                                <h4 className="font-semibold">You have {notifications.length} booking</h4>
+                                <h4 className="font-semibold">You have {notifications.filter(n => n.adminRead === false).length || '0'} booking</h4>
                             </div>
-                            <div className="py-2">
-                                {notifications.map(notif => (
-                                    <div key={notif.id} className="flex justify-between items-center px-4 py-2 hover:bg-gray-100">
-                                        <p className="text-sm text-gray-700">{notif.id})-{notif.user}</p>
-                                        <div className="flex gap-3 text-gray-400">
-                                            <FiTrash2 className="cursor-pointer hover:text-red-500"/>
-                                            <FiClock className="cursor-pointer hover:text-blue-500"/>
+                            <div className="py-2 px-2">
+                                {notifications.filter(n => n.adminRead === false).length > 0 ? (
+                                    notifications.filter(n => n.adminRead === false).map((notif, index) => (
+                                        <div key={notif._id}
+                                            onClick={() => handlenotification(notif._id)}
+                                            className="flex justify-between items-center px-4 py-2 hover:bg-gray-100">
+                                            <p className="text-sm text-gray-700">{index + 1})-{notif.user.email}</p>
                                         </div>
-                                    </div>
-                                ))}
+                                    ))
+                                ) : (
+                                    <p className="text-sm text-gray-700">No new notifications</p>
+                                )}
                             </div>
                         </div>
                     )}

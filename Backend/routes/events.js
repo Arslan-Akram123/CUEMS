@@ -1,6 +1,6 @@
 const express =require('express');
 const multer = require('multer');
-const {createEvent,getAllEvents,getSpecificEvent,deleteEvent,updateEvent}=require('../controllers/events');
+const {createEvent,getAllEvents,getSpecificEvent,deleteEvent,updateEvent,getSpecificEventbyCategory}=require('../controllers/events');
 
 const Router=express.Router();
 const storage = multer.diskStorage({
@@ -18,6 +18,7 @@ const upload = multer({ storage: storage });
 Router.post('/createEvent',upload.single('image'),createEvent);
 Router.get('/getAllEvents',getAllEvents);
 Router.get('/getEvent/:id',getSpecificEvent);
+Router.get('/getEventsByCategory/:id',getSpecificEventbyCategory);
 Router.put('/updateEvent/:id',upload.single('image'),updateEvent);
 Router.delete('/deleteEvent/:id',deleteEvent);
 

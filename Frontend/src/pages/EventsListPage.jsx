@@ -8,19 +8,37 @@ import { useState, useEffect } from 'react';
 
 const EventsListPage = () => {
   const [Events, setEvents] = useState([]);
-   useEffect(() => {
-        fetch('http://localhost:8001/events/getAllEvents', { credentials: 'include' })
-            .then(res => res.json())
-            .then(data => {
-                setEvents(data.events || []);
-                
-            })
-            .catch(err => {
-                console.error('Failed to fetch events:', err);
-                setEvents([]);
-               
-            });
-    }, []);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredEvents, setFilteredEvents] = useState([]);
+
+  useEffect(() => {
+    fetch('http://localhost:8001/events/getAllEvents', { credentials: 'include' })
+      .then(res => res.json())
+      .then(data => {
+        setEvents(data.events || []);
+        setFilteredEvents(data.events || []);
+      })
+      .catch(err => {
+        console.error('Failed to fetch events:', err);
+        setEvents([]);
+        setFilteredEvents([]);
+      });
+  }, []);
+
+  useEffect(() => {
+    if (!searchTerm.trim()) {
+      setFilteredEvents(Events);
+    } else {
+      const term = searchTerm.toLowerCase();
+      setFilteredEvents(
+        Events.filter(event =>
+          event.name?.toLowerCase().includes(term) ||
+          event.category?.toLowerCase().includes(term)
+        )
+      );
+    }
+  }, [searchTerm, Events]);
+
   return (
  
     <UserLayout>
@@ -33,7 +51,14 @@ const EventsListPage = () => {
             
             <div className="mb-6">
               <label htmlFor="search" className="sr-only">Search</label>
-              <input type="text" id="search" placeholder="Search events..." className="w-full px-2 py-2 border border-teal-500 rounded-md shadow-sm focus:border-teal-500 focus:ring-teal-500 focus:outline-teal-500" />
+              <input
+                type="text"
+                id="search"
+                placeholder="Search by name or category..."
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+                className="w-full px-2 py-2 border border-teal-500 rounded-md shadow-sm focus:border-teal-500 focus:ring-teal-500 focus:outline-teal-500"
+              />
             </div>
 
           
@@ -52,12 +77,12 @@ const EventsListPage = () => {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-            {/* {Events.filter(event => event.status !== 'ongining').map(event => (
+            {/* {filteredEvents.filter(event => event.status !== 'ongining' && event.status !== 'completed').map(event => (
               <EventCard key={event._id} event={event} />
             ))} */}
-              {Events.map(event => (
-              <EventCard key={event._id} event={event} />
-            ))}
+              {filteredEvents.map(event => (
+                <EventCard key={event._id} event={event} />
+              ))}
           </div>
         </main>
 

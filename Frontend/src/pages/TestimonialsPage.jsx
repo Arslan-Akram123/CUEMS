@@ -2,14 +2,23 @@
 import UserLayout from '../components/UserLayout';
 import { Link } from 'react-router-dom';
 import TestimonialCard from '../components/TestimonialCard';
-
-const mockTestimonials = [
-    { id: 1, user: 'test', rating: 5, comment: 'Super Excellent Event', eventName: 'Become a Web Developer', eventId: 5 },
-    { id: 2, user: 'test', rating: 4, comment: 'ardfdg btrth b', eventName: 'Baxter Spears', eventId: 1 },
-    { id: 3, user: 'test', rating: 4, comment: 'i am very excited to join this event', eventName: 'ali birthday event', eventId: 6 },
-];
-
+import { useState, useEffect } from 'react';
 const TestimonialsPage = () => {
+    const [testimonials, setTestimonials] = useState([]);
+
+    useEffect(() => {
+        fetch('http://localhost:8001/comments/getAllComments', { credentials: 'include' })
+            .then(res => res.json())
+            .then(data => {
+                // Only show comments with rating 5
+                // const filtered = (Array.isArray(data) ? data : []).filter(c => c.rating === 5);
+                setTestimonials(data);
+            })
+            .catch(() => {
+                setTestimonials([]);
+            });
+    }, []);
+
     return (
         <UserLayout>
             <div className="container mx-auto px-4 py-8">
@@ -19,8 +28,8 @@ const TestimonialsPage = () => {
                 </div>
 
                 <div className="space-y-8">
-                    {mockTestimonials.map(testimonial => (
-                        <TestimonialCard key={testimonial.id} testimonial={testimonial} />
+                    {testimonials.map(testimonial => (
+                        <TestimonialCard key={testimonial._id} testimonial={testimonial} />
                     ))}
                 </div>
             </div>

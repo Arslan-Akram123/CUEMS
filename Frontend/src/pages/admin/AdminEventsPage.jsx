@@ -5,6 +5,8 @@ import { useState, useEffect } from 'react';
 const AdminEventsPage = () => {
     const [events, setEvents] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [filteredEvents, setFilteredEvents] = useState([]);
 
     const getStatusClass = (status) => {
         switch (status) {
@@ -20,14 +22,30 @@ const AdminEventsPage = () => {
             .then(res => res.json())
             .then(data => {
                 setEvents(data.events || []);
+                setFilteredEvents(data.events || []);
                 setLoading(false);
             })
             .catch(err => {
                 console.error('Failed to fetch events:', err);
                 setEvents([]);
+                setFilteredEvents([]);
                 setLoading(false);
             });
     }, []);
+
+    useEffect(() => {
+        if (!searchTerm.trim()) {
+            setFilteredEvents(events);
+        } else {
+            const term = searchTerm.toLowerCase();
+            setFilteredEvents(
+                events.filter(event =>
+                    event.name?.toLowerCase().includes(term) ||
+                    event.category?.toLowerCase().includes(term)
+                )
+            );
+        }
+    }, [searchTerm, events]);
 
     return (
         <div>
@@ -43,7 +61,13 @@ const AdminEventsPage = () => {
             <div className="bg-white p-4 rounded-lg shadow-md mb-6">
                 <div className="flex items-center">
                     <FiSearch className="text-gray-400 mr-3 text-3xl" />
-                    <input type="text" placeholder="Search events by name..." className="w-full border-0 rounded-md   focus:ring-0 focus:outline-none" />
+                    <input
+                        type="text"
+                        placeholder="Search events by name or category..."
+                        value={searchTerm}
+                        onChange={e => setSearchTerm(e.target.value)}
+                        className="w-full border-0 rounded-md focus:ring-0 focus:outline-none"
+                    />
                 </div>
             </div>
             <div className="bg-white rounded-lg shadow-md overflow-x-auto">
@@ -68,7 +92,7 @@ const AdminEventsPage = () => {
                                 <td colSpan="6" className="text-center py-6 text-gray-500">No events found.</td>
                             </tr>
                         ) : (
-                            events.map((event, index) => (
+                            filteredEvents.map((event, index) => (
                                 <tr key={event._id}>
                                     <td className="py-4 px-6 whitespace-nowrap">{index + 1}</td>
                                     <td className="py-4 px-6 whitespace-nowrap font-medium text-gray-900">{event.name}</td>

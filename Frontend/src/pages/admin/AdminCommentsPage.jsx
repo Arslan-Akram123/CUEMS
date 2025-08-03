@@ -1,13 +1,6 @@
 // src/pages/admin/AdminCommentsPage.jsx
 import { FiSearch, FiStar } from 'react-icons/fi';
-import ToggleSwitch from '../../components/admin/ToggleSwitch';
 import { useState, useEffect, use } from 'react';
-const mockComments = [
-    { id: 1, comment: "Super Excellent Event", member: "test", event: "Become a Web Developer", rating: 5, status: true, date: "23 days ago", managed: true },
-    { id: 2, comment: "A bit disorganized but informative.", member: "jane.doe", event: "LUMS Live Session", rating: 3, status: true, date: "32 days ago", managed: false }, 
-];
-
-// Helper to render star ratings
 const renderStars = (rating) => {
     return Array.from({ length: 5 }, (_, index) => (
         <FiStar
@@ -21,14 +14,35 @@ const renderStars = (rating) => {
 
 const AdminCommentsPage = () => {
     const [comments, setComments] = useState([]);
-useEffect(() => {
-    fetch('http://localhost:8001/comments/getAllComments', { credentials: 'include' })
-      .then(res => res.json())
-      .then(data => {
-        setComments(Array.isArray(data) ? data : []);
-      })
-      .catch(() => setComments([]));
-})
+    const [searchTerm, setSearchTerm] = useState("");
+    const [filteredComments, setFilteredComments] = useState([]);
+
+    useEffect(() => {
+        fetch('http://localhost:8001/comments/getAllComments', { credentials: 'include' })
+          .then(res => res.json())
+          .then(data => {
+            setComments(Array.isArray(data) ? data : []);
+            setFilteredComments(Array.isArray(data) ? data : []);
+          })
+          .catch(() => {
+            setComments([]);
+            setFilteredComments([]);
+          });
+    }, []);
+
+    useEffect(() => {
+        if (!searchTerm.trim()) {
+            setFilteredComments(comments);
+        } else {
+            const term = searchTerm.toLowerCase();
+            setFilteredComments(
+                comments.filter(item =>
+                    (item.event?.name?.toLowerCase().includes(term) || "") ||
+                    (item.user?.fullName?.toLowerCase().includes(term) || "")
+                )
+            );
+        }
+    }, [searchTerm, comments]);
 
   return (
     <div>
@@ -41,7 +55,9 @@ useEffect(() => {
                     <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                     <input 
                         type="text" 
-                        placeholder="Search..."
+                        placeholder="Search by event or user..."
+                        value={searchTerm}
+                        onChange={e => setSearchTerm(e.target.value)}
                         className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
                     />
                 </div>
@@ -54,29 +70,21 @@ useEffect(() => {
                         <tr>
                             <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase">#</th>
                             <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase">Comment</th>
-                            <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase">Member</th>
+                            <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase">User</th>
                             <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase">Events</th>
                             <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase">Ratings-5/5</th>
-                            {/* <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase">Status</th> */}
                             <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                            {/* <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase">Manage</th> */}
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200 text-sm">
-                        {comments.map((item, index) => (
+                        {filteredComments.map((item, index) => (
                             <tr key={item._id}>
                                 <td className="py-4 px-4">{index + 1}</td>
                                 <td className="py-4 px-4 max-w-xs truncate">{item.comment}</td>
                                 <td className="py-4 px-4">{item.user.fullName}</td>
                                 <td className="py-4 px-4">{item.event.name}</td>
                                 <td className="py-4 px-4">{renderStars(item.rating)}</td>
-                                {/* <td className="py-4 px-4">
-                                    <ToggleSwitch initialState={item.status} />
-                                </td> */}
                                 <td className="py-4 px-4">{item.createdAt ? new Date(item.createdAt).toLocaleDateString() : ''}</td>
-                                {/* <td className="py-4 px-4">
-                                    <ToggleSwitch initialState={item.managed} />
-                                </td> */}
                             </tr>
                         ))}
                     </tbody>

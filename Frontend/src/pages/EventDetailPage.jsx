@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import UserLayout from '../components/UserLayout';
 import ReviewCard from '../components/ReviewCard';
+import BookingModal from '../components/BookingModal';
 import { FiStar, FiCalendar, FiClock, FiMapPin, FiUsers, FiTag } from 'react-icons/fi';
 
 const EventDetailPage = () => {
@@ -15,7 +16,8 @@ const EventDetailPage = () => {
   const [showCommentBox, setShowCommentBox] = useState(false);
   const [comments, setComments] = useState([]);
   const [commentMsg, setCommentMsg] = useState({ type: '', text: '' });
-
+  const [bookingMsg, setBookingMsg] = useState({ type: '', text: '' });
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   useEffect(() => {
     const formatDate = (dateStr) => {
       if (!dateStr) return '';
@@ -37,6 +39,7 @@ const EventDetailPage = () => {
           imageUrl: data.image ? `/uploads/events/${data.image}` : '',
           description: data.description || '',
           location: data.location || '',
+          status: data.status || '',
           bookings: data.bookings || '0',
           maxSubscribers: data.totalSubscribers || '',
           createdAt: data.createdAt || '',
@@ -55,6 +58,39 @@ const EventDetailPage = () => {
       })
       .catch(() => setComments([]));
   }, [eventId]);
+
+
+  const handleBookingSubmit = async (bookingData) => {
+    const { notes } = bookingData;
+    const payload = { notes, eventId };
+    fetch('http://localhost:8001/eventsbook/bookingEventrequest', {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    })
+      .then(async (response) => {
+        const data = await response.json();
+        if (response.ok) {
+          setBookingMsg({ type: 'success', text: 'Booking successful!' });
+          setIsBookingModalOpen(false);
+        } else {
+          // Show specific error if already booked
+          if (data && data.error === 'You have already booked this event') {
+            setBookingMsg({ type: 'error', text: 'You have already booked this event.' });
+          } else {
+            setBookingMsg({ type: 'error', text: 'Booking failed.' });
+          }
+        }
+      })
+      .catch((error) => {
+        setBookingMsg({ type: 'error', text: 'Error booking event.' });
+      });
+    setTimeout(() => setBookingMsg({ type: '', text: '' }), 2500);
+  };
+
 
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
@@ -88,7 +124,7 @@ const EventDetailPage = () => {
     } catch (err) {
       setCommentMsg({ type: 'error', text: 'Network error.' });
     }
-    setTimeout(() => setCommentMsg({ type: '', text: '' }), 3000);
+    setTimeout(() => setCommentMsg({ type: '', text: '' }), 2500);
   };
 
   if (loading) {
@@ -113,15 +149,30 @@ const EventDetailPage = () => {
       </UserLayout>
     );
   }
- 
+
 
 
 
   return (
     <UserLayout>
       <div className="container mx-auto px-4 py-8">
+        {/* Success/Error Message at Top */}
+        {(bookingMsg.text || commentMsg.text) && (
+          <div className="mb-6">
+            {bookingMsg.text && (
+              <div className={`px-4 py-2 rounded text-center font-semibold ${bookingMsg.type === 'success' ? 'bg-green-100 text-green-700 border border-green-300' : 'bg-red-100 text-red-700 border border-red-300'}`}>
+                {bookingMsg.text}
+              </div>
+            )}
+            {commentMsg.text && (
+              <div className={`px-4 py-2 rounded text-center font-semibold ${commentMsg.type === 'success' ? 'bg-green-100 text-green-700 border border-green-300' : 'bg-red-100 text-red-700 border border-red-300'}`}>
+                {commentMsg.text}
+              </div>
+            )}
+          </div>
+        )}
         <div className="bg-white p-6 rounded-lg shadow-md">
-          
+
           {/* Top Section: Title and Price */}
           <div className="flex flex-col md:flex-row justify-between items-start mb-4">
             <div>
@@ -142,24 +193,29 @@ const EventDetailPage = () => {
                 <img src={event.imageUrl} alt={event.title} className="w-full h-auto object-cover rounded-lg" />
               )}
             </div>
-            
+
             {/* Details Sidebar */}
             <div className="md:col-span-1 space-y-4">
               <div className="flex items-center gap-3"><FiTag className="h-5 w-5 text-teal-600" /><p><span className="font-semibold">Category:</span> {event.category}</p></div>
               <div className="flex items-center gap-3"><FiClock className="h-5 w-5 text-teal-600" /><p><span className="font-semibold">Start Time:</span> {event.startTime}</p></div>
+
               <div className="flex items-center gap-3"><FiClock className="h-5 w-5 text-teal-600" /><p><span className="font-semibold">End Time:</span> {event.endTime}</p></div>
               <div className="flex items-center gap-3"><FiMapPin className="h-5 w-5 text-teal-600" /><p><span className="font-semibold">Location:</span> {event.location}</p></div>
               <div className="flex items-center gap-3"><FiCalendar className="h-5 w-5 text-teal-600" /><p><span className="font-semibold">Start Date:</span> {event.startDate}</p></div>
               <div className="flex items-center gap-3"><FiCalendar className="h-5 w-5 text-teal-600" /><p><span className="font-semibold">End Date:</span> {event.endDate}</p></div>
               {/* <div className="flex items-center gap-3"><FiUsers className="h-5 w-5 text-teal-600" /><p><span className="font-semibold">Sponsor:</span> {event.sponsor}</p></div> */}
               <p className="text-lg font-bold text-teal-600">Maximum Subscribers: {event.maxSubscribers}</p>
-              
-              <button className="w-full bg-teal-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-teal-600 transition-colors text-lg">
+
+              <button
+                onClick={() => setIsBookingModalOpen(true)}
+                className={`w-full font-bold py-3 px-4 rounded-lg text-lg transition-colors ${['completed', 'ongoing'].includes(event.status) ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-teal-500 text-white hover:bg-teal-600'}`}
+                disabled={['completed', 'ongoing'].includes(event.status)}
+              >
                 Book Now
               </button>
             </div>
           </div>
-          
+
           {/* Description Section */}
           <div className="mt-8">
             <h2 className="text-2xl font-bold mb-2">Description</h2>
@@ -170,16 +226,16 @@ const EventDetailPage = () => {
 
           {/* Booking & Comments Section */}
           <div className="text-center">
-             <div className="text-xl">
+            <div className="text-xl">
               <span>Members Already Booking: <span className="font-bold text-red-500">{event.bookings}</span></span>
               <span className="mx-4">|</span>
               <span>Remaining Number: <span className="font-bold text-red-500">{event.maxSubscribers}</span></span>
             </div>
             <button
-                onClick={() => setShowCommentBox(true)}
-                className="mt-4 bg-teal-500 text-white font-bold py-2 px-6 rounded-full hover:bg-teal-600 transition-colors"
+              onClick={() => setShowCommentBox(true)}
+              className="mt-4 bg-teal-500 text-white font-bold py-2 px-6 rounded-full hover:bg-teal-600 transition-colors"
             >
-                Add Comment
+              Add Comment
             </button>
 
             {showCommentBox && (
@@ -199,7 +255,7 @@ const EventDetailPage = () => {
                   />
                   <label className="font-semibold text-lg mt-2 mb-1">Your Rating:</label>
                   <div className="flex items-center gap-2">
-                    {[1,2,3,4,5].map(star => (
+                    {[1, 2, 3, 4, 5].map(star => (
                       <span
                         key={star}
                         className={`cursor-pointer text-3xl transition-colors ${newRating >= star ? 'text-yellow-400' : 'text-gray-300'}`}
@@ -223,7 +279,7 @@ const EventDetailPage = () => {
               </>
             )}
           </div>
-          
+
           {/* Reviews Section */}
           <div className="mt-12">
             <h2 className="text-2xl font-bold mb-2">Reviews ({comments.length})</h2>
@@ -247,6 +303,14 @@ const EventDetailPage = () => {
           </div>
         </div>
       </div>
+      <BookingModal
+        eventName={event.title}
+        isOpen={isBookingModalOpen}
+        onClose={() => setIsBookingModalOpen(false)}
+        onSubmit={handleBookingSubmit}
+        bookingMsg={bookingMsg}
+        setBookingMsg={setBookingMsg}
+      />
     </UserLayout>
   );
 };
