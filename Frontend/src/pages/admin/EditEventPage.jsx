@@ -13,6 +13,7 @@ const FormInput = ({ label, id, type = "text", placeholder, value, onChange }) =
 
 const EditEventPage = () => {
     const { eventId } = useParams();
+    console.log(eventId);
     const navigate = useNavigate();
     const [eventData, setEventData] = useState({
         name: '',
@@ -65,7 +66,7 @@ const EditEventPage = () => {
                 setMessage('Failed to fetch event data.');
                 setMessageType('error');
             });
-    }, [evntId]);
+    }, []);
 
     useEffect(() => {
         fetch('http://localhost:8001/category/getCategories', {

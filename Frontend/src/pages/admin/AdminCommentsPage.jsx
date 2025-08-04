@@ -77,16 +77,22 @@ const AdminCommentsPage = () => {
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200 text-sm">
-                        {filteredComments.map((item, index) => (
-                            <tr key={item._id}>
-                                <td className="py-4 px-4">{index + 1}</td>
-                                <td className="py-4 px-4 max-w-xs truncate">{item.comment}</td>
-                                <td className="py-4 px-4">{item.user.fullName}</td>
-                                <td className="py-4 px-4">{item.event.name}</td>
-                                <td className="py-4 px-4">{renderStars(item.rating)}</td>
-                                <td className="py-4 px-4">{item.createdAt ? new Date(item.createdAt).toLocaleDateString() : ''}</td>
+                        {filteredComments.length > 0 ? (
+                            filteredComments.map((item, index) => (
+                                <tr key={item._id}>
+                                    <td className="py-4 px-4">{index + 1}</td>
+                                    <td className="py-4 px-4 max-w-xs truncate">{item.comment}</td>
+                                    <td className="py-4 px-4">{item.user.fullName}</td>
+                                    <td className="py-4 px-4">{item.event.name}</td>
+                                    <td className="py-4 px-4">{renderStars(item.rating)}</td>
+                                    <td className="py-4 px-4">{item.createdAt ? new Date(item.createdAt).toLocaleDateString() : ''}</td>
+                                </tr>
+                            ))
+                        ) : (
+                            <tr>
+                                <td colSpan="6" className="py-8 px-4 text-center text-red-500 font-semibold">No comment found</td>
                             </tr>
-                        ))}
+                        )}
                     </tbody>
                 </table>
             </div>

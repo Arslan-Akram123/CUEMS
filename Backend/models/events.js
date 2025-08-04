@@ -16,6 +16,10 @@ const eventSchema = new mongoose.Schema({
         type:Number,
         default:0
     },
+    reservedSeats: {
+        type: Number,
+        default: 0,
+    },
     status: {
         type: String,
         enum: ['upcoming', 'ongoing', 'completed'],

@@ -22,7 +22,7 @@ const EditCategoryPage = () => {
             .catch(error => {
                 console.error('Error fetching category:', error);
             });
-    }, [categoryId]); 
+    }, []); 
 
     const HandleSubmit = (e) => {
         e.preventDefault();

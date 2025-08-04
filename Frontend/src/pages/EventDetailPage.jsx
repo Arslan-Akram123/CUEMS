@@ -41,6 +41,7 @@ const EventDetailPage = () => {
           location: data.location || '',
           status: data.status || '',
           bookings: data.bookings || '0',
+          reservedSeats: data.reservedSeats || '0',
           maxSubscribers: data.totalSubscribers || '',
           createdAt: data.createdAt || '',
         });
@@ -227,7 +228,9 @@ const EventDetailPage = () => {
           {/* Booking & Comments Section */}
           <div className="text-center">
             <div className="text-xl">
-              <span>Members Already Booking: <span className="font-bold text-red-500">{event.bookings}</span></span>
+              <span>Confirmed Bookings: <span className="font-bold text-red-500">{event.bookings}</span></span>
+               <span className="mx-4">|</span>
+              <span>Reserved Bookings: <span className="font-bold text-red-500">{event.reservedSeats}</span></span>
               <span className="mx-4">|</span>
               <span>Remaining Number: <span className="font-bold text-red-500">{event.maxSubscribers}</span></span>
             </div>

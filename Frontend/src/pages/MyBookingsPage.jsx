@@ -1,5 +1,5 @@
 // src/pages/MyBookingsPage.jsx
-import { Link } from 'react-router-dom';
+import { Link,useLocation } from 'react-router-dom';
 import UserLayout from '../components/UserLayout';
 import { FiChevronLeft, FiSearch, FiBookOpen } from 'react-icons/fi';
 import { useState, useEffect } from 'react';
@@ -8,7 +8,19 @@ import { useState, useEffect } from 'react';
 const MyBookingsPage = () => {
     const [userBookings, setUserBookings] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
-    
+    const location = useLocation();
+    const { bookingid } = location.state || {};
+    const [highlightedId, setHighlightedId] = useState(bookingid || null);
+
+    // Remove highlight when clicking anywhere on the page
+    useEffect(() => {
+        if (!highlightedId) return;
+        const handleClick = () => setHighlightedId(null);
+        document.addEventListener('mousedown', handleClick);
+        return () => {
+            document.removeEventListener('mousedown', handleClick);
+        };
+    }, [highlightedId]);
 
     useEffect(()=>{
         fetch('http://localhost:8001/eventsbook/getAllUserBookings', { credentials: 'include' })
@@ -70,7 +82,9 @@ const MyBookingsPage = () => {
                                         </thead>
                                         <tbody className="bg-white divide-y divide-gray-200 text-sm">
                                             {filtered.map((booking) => (
-                                                <tr key={booking._id}>
+                                                <tr key={booking._id}
+                                                    className={highlightedId === booking._id ? 'bg-yellow-100 transition-colors' : ''}
+                                                >
                                                     <td className="py-4 px-4 font-semibold">
                                                         <Link to={`/events/${booking.event._id}`} className="text-teal-600 hover:underline">
                                                             {booking.event.name}

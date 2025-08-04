@@ -23,7 +23,7 @@ const UserHeader = () => {
                 .then(res => res.json())
                 .then(data =>{
                     setNotifications(data)
-                    navigate('/my-bookings');
+                    navigate('/my-bookings',{ state: { bookingid: notif_id } });
                 })
                 .catch(err => console.error(err));
         } catch (error) {

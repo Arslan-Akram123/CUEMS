@@ -3,12 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { FiChevronLeft, FiHome } from 'react-icons/fi';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-// const mockUniversities = [
-//   { id: 1, name: 'Islamiya University Bahawalpur', description: 'The university boasts a dedicated team of faculty members...', pathId: 'iub', imageUrl: 'https://via.placeholder.com/100/0284C7/FFFFFF?Text=IUB' },
-//   { id: 2, name: 'Lums University', description: 'LUMS is an extraordinary place for learning, discovery and transformation.', pathId: 'lums', imageUrl: 'https://via.placeholder.com/100/166534/FFFFFF?Text=LUMS' },
-//   { id: 3, name: 'Minhaj University', description: 'MIHS offers a variety of undergraduate and postgraduate programs in...', pathId: 'minhaj', imageUrl: 'https://via.placeholder.com/100/7C3AED/FFFFFF?Text=MIHS' },
-//   { id: 4, name: 'University of Central Punjab', description: 'Founded in 2002, the University of Central Punjab (UCP) is...', pathId: 'ucp', imageUrl: 'https://via.placeholder.com/100/DB2777/FFFFFF?Text=UCP' },
-// ];
+
 
 const EditUniversityPage = () => {
     const { universityId } = useParams();
@@ -37,7 +32,7 @@ const EditUniversityPage = () => {
             .catch((error) => {
                 console.error('Error fetching university data:', error);
             });
-    }, [universityId]);
+    }, []);
 
 
 

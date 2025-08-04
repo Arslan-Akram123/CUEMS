@@ -1,5 +1,5 @@
 const bookingEventSchema = require('../models/bookevent');
-
+const eventSchema = require('../models/events');
 
 const bookEvent = async (req, res) => {
     console.log(req.body);
@@ -65,10 +65,17 @@ async function getSpecificBooking(req, res) {
 async function UpdateConfirmBooking(req, res) {
     const {id} = req.params;
     try {
-        const updatedBooking = await bookingEventSchema.findByIdAndUpdate(id, { status: 'confirmed' }, { new: true });
+        const updatedBooking = await bookingEventSchema.findByIdAndUpdate(id, { status: 'confirmed',userRead:'false' }, { new: true }).populate('user').populate('event');
         if (!updatedBooking) {
             return res.status(404).json({ error: 'Booking not found' });
         }
+        const event = await eventSchema.findById(updatedBooking.event._id);
+        if (!event) {
+            return res.status(404).json({ error: 'Event not found' });
+        }
+        event.reservedSeats += 1;
+        event.totalSubscribers -= 1;
+        await event.save();
         res.status(200).json(updatedBooking);
     } catch (error) {
         console.error(error);
@@ -79,10 +86,17 @@ async function UpdateConfirmBooking(req, res) {
 async function UpdateCancelBooking(req, res) {
     const {id} = req.params;
     try {
-        const updatedBooking = await bookingEventSchema.findByIdAndUpdate(id, { status: 'cancelled' }, { new: true });
+        const updatedBooking = await bookingEventSchema.findByIdAndUpdate(id, { status: 'cancelled',userRead:'false' }, { new: true }).populate('user').populate('event');
         if (!updatedBooking) {
             return res.status(404).json({ error: 'Booking not found' });
         }
+        const event = await eventSchema.findById(updatedBooking.event._id);
+        if (!event) {
+            return res.status(404).json({ error: 'Event not found' });
+        }
+        event.reservedSeats -= 1;
+        event.totalSubscribers += 1;
+        await event.save();
         res.status(200).json(updatedBooking);
     } catch (error) {
         console.error(error);

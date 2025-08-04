@@ -12,7 +12,7 @@ const bookingEventSchema = new Schema({
     },
     status: {
         type: String,
-        enum: ['pending', 'confirmed', 'cancelled'],
+        enum: ['pending', 'confirmed', 'cancelled','paid'],
         default: 'pending'
     },
     bookingNotes: {
