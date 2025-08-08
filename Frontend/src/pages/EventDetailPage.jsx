@@ -205,12 +205,16 @@ const EventDetailPage = () => {
               <div className="flex items-center gap-3"><FiCalendar className="h-5 w-5 text-teal-600" /><p><span className="font-semibold">Start Date:</span> {event.startDate}</p></div>
               <div className="flex items-center gap-3"><FiCalendar className="h-5 w-5 text-teal-600" /><p><span className="font-semibold">End Date:</span> {event.endDate}</p></div>
               {/* <div className="flex items-center gap-3"><FiUsers className="h-5 w-5 text-teal-600" /><p><span className="font-semibold">Sponsor:</span> {event.sponsor}</p></div> */}
-              <p className="text-lg font-bold text-teal-600">Maximum Subscribers: {event.maxSubscribers}</p>
+              <p className="text-lg font-bold text-teal-600">Maximum Subscribers: {
+                [event.maxSubscribers, event.bookings, event.reservedSeats]
+                  .map(x => Number(x) || 0)
+                  .reduce((a, b) => a + b, 0)
+              }</p>
 
               <button
                 onClick={() => setIsBookingModalOpen(true)}
-                className={`w-full font-bold py-3 px-4 rounded-lg text-lg transition-colors ${['completed', 'ongoing'].includes(event.status) ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-teal-500 text-white hover:bg-teal-600'}`}
-                disabled={['completed', 'ongoing'].includes(event.status)}
+                className={`w-full font-bold py-3 px-4 rounded-lg text-lg transition-colors ${(['completed', 'ongoing'].includes(event.status) || Number(event.maxSubscribers) === 0) ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-teal-500 text-white hover:bg-teal-600'}`}
+                disabled={['completed', 'ongoing'].includes(event.status) || Number(event.maxSubscribers) === 0}
               >
                 Book Now
               </button>
@@ -232,7 +236,7 @@ const EventDetailPage = () => {
                <span className="mx-4">|</span>
               <span>Reserved Bookings: <span className="font-bold text-red-500">{event.reservedSeats}</span></span>
               <span className="mx-4">|</span>
-              <span>Remaining Number: <span className="font-bold text-red-500">{event.maxSubscribers}</span></span>
+              <span>Remaining Number: <span className="font-bold text-red-500">{event.maxSubscribers || 0}</span></span>
             </div>
             <button
               onClick={() => setShowCommentBox(true)}

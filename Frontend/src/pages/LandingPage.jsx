@@ -6,9 +6,10 @@ import { FiCalendar, FiBell, FiBriefcase, FiGrid, FiMessageSquare, FiTrendingUp 
 
 // Placeholder images - in a real app, these would come from an API
 import eventAnnouncementImg from '../assets/event-announcement.JPG'; // We'll need to create this placeholder
-import universityImg from '../assets/university.JPG'; // And this one
-import eventsListingImg from '../assets/events-listing.JPG'; // And this one
-import hybridInfoImg from '../assets/hybrid-info.JPG'; // And this one
+import warningimage from '../assets/warning-sign.webp'
+import exploreUniversities from '../assets/exploreUniversities.JPG'; // And this one
+import eventListening from '../assets/eventListening.JPG'; // And this one
+import hybridInfo from '../assets/hybridInfo.JPG'; // And this one
 
 const LandingPage = () => {
     return (
@@ -17,7 +18,7 @@ const LandingPage = () => {
                 
                 {/* Section 1: Event and Announcement */}
             <div className="bg-yellow-400 rounded-lg p-8 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-8 shadow-lg">
-                    <img src={eventAnnouncementImg} alt="Warning cone" className="h-24 w-24 object-contain " />
+                    <img src={warningimage} alt="Warning cone" className="h-32 w-32 object-contain " />
                     <div className="flex-grow">
                         <h2 className=" text-[22px] sm:text-3xl font-bold text-yellow-900">Event and Announcement</h2>
                         <div className="mt-4 space-y-3">
@@ -35,7 +36,7 @@ const LandingPage = () => {
 
                 {/* Section 2: Exploring Universities */}
                 <div className="bg-white rounded-lg p-8 border border-gray-200 flex flex-col sm:flex-row sm:items-center gap-8">
-                    <img src={universityImg} alt="Campus" className="h-24 w-24 object-contain" />
+                    <img src={exploreUniversities} alt="Campus" className="h-32 w-32 object-contain" />
                     <div className="flex-grow">
                         <span className="inline-block bg-teal-500 text-white text-sm font-semibold px-3 py-1 rounded-full mb-2">Campus</span>
                         <h2 className="text-xl sm:text-2xl font-bold mb-2">Exploring Universities</h2>
@@ -52,7 +53,7 @@ const LandingPage = () => {
                 <div className="grid md:grid-cols-2 gap-8">
                     {/* Event Listing Card */}
                     <div className="bg-white rounded-lg p-6 border border-gray-200 flex flex-col sm:flex-row sm:items-center gap-6">
-                        <img src={eventsListingImg} alt="Events" className="h-20 w-20 object-contain" />
+                        <img src={eventListening} alt="Events" className="h-28 w-28 object-contain" />
                         <div>
                             
                             <span className="inline-block bg-teal-500 text-white text-sm font-semibold px-3 py-1 rounded-full mb-2">Event Info</span>
@@ -66,7 +67,7 @@ const LandingPage = () => {
 
                     {/* Hybrid Info Card */}
                     <div className="bg-white rounded-lg p-6 border border-gray-200 flex flex-col sm:flex-row sm:items-center gap-6">
-                         <img src={hybridInfoImg} alt="Hybrid" className="h-20 w-20 object-contain" />
+                         <img src={hybridInfo} alt="Hybrid" className="h-28 w-28 object-contain" />
                         <div className='flex-1'>
                             <span className="inline-block bg-teal-500 text-white text-sm font-semibold px-3 py-1 rounded-full mb-2">Hybrid Info</span>
                             <div className="mt-2 gap-2 flex flex-col">

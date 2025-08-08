@@ -1,17 +1,42 @@
 const autuser=require('../models/user');
 const { generateToken } = require('../services/user');
 const  sendEmail  = require('../services/sendEmail');
-const validator = require('validator');
-
+// const validator = require('validator');
+const validator = require('deep-email-validator');
 
 async function registerUser(req, res) {
     const { fullName, email, password } = req.body;
 
-    if (!validator.isEmail(email)) {
-        return res.status(400).json({ error: 'Invalid email address' });
+    const allowedDomains = ['mul.edu.pk'];
+    const emailDomain = email.split('@')[1].toLowerCase();
+    if (allowedDomains.includes(emailDomain)) { 
+    } else {
+        const result = await validator.validate(email, {
+            validateSMTP: false 
+        });
+        if (!result.valid) {
+            return res.status(400).json({
+                error: "Invalid email address"
+            });
+        }
     }
 
+
+
+
     const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/;
+    if (password.includes(' ')) {
+        return res.status(400).json({
+            error: 'Password cannot contain white spaces.'
+        });
+    }
+    // Disallow problematic special punctuation for extra security
+    const forbiddenPunct = /[,';"<>\\/%]/;
+    if (forbiddenPunct.test(password)) {
+        return res.status(400).json({
+            error: 'Password cannot contain any of the following characters: , ; " \' < > \\ / %'
+        });
+    }
     if (!passwordRegex.test(password)) {
         return res.status(400).json({
             error: 'Password must be at least 8 characters long and include an uppercase letter, a number, and a special character.'

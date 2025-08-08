@@ -1,6 +1,6 @@
 // Load environment variables
 require('dotenv').config();
-
+require("./cronjob");
 // Import necessary modules
 const express = require('express');
 const cors = require('cors');
@@ -18,6 +18,7 @@ const eventsRoutes = require('./routes/events');
 const commentRoutes = require('./routes/comment');
 const dashboardRoutes = require('./routes/dashboard');
 const bookEventRoutes = require('./routes/bookevent');
+const scrapingRoutes = require('./routes/scraping');
 // Connect to the database
 connectDB();
 
@@ -44,7 +45,7 @@ app.use('/events',auth, eventsRoutes);
 app.use('/comments',auth, commentRoutes);
 app.use('/dashboard',auth, dashboardRoutes);
 app.use('/eventsbook',auth, bookEventRoutes);
-
+app.use('/scraping',auth, scrapingRoutes);
 
 
 app.listen(PORT, (err) => {

@@ -18,7 +18,15 @@ const AdminHeader = ({ onMenuButtonClick }) => {
 
     useEffect(() => {
         fetchProfileData();
-          fetch('http://localhost:8001/eventsbook/getNewBookings', { credentials: 'include' }).then(res => res.json()).then(data => setNotifications(data)).catch(err => console.error(err));
+        const fetchNotifications = () => {
+            fetch('http://localhost:8001/eventsbook/getNewBookings', { credentials: 'include' })
+                .then(res => res.json())
+                .then(data => setNotifications(data))
+                .catch(err => console.error(err));
+        };
+        fetchNotifications(); // initial fetch
+        const intervalId = setInterval(fetchNotifications, 10000); // fetch every 5 seconds
+        return () => clearInterval(intervalId); // cleanup on unmount
     }, []);
 
     // Close dropdowns when clicking outside

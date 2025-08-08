@@ -33,7 +33,7 @@ const PublicHomePage = () => {
                         </p>
                         <Link
                             to="/login"
-                            className="mt-8 inline-block bg-teal-500 text-white  text-md py-1 px-2  rounded-lg shadow-lg hover:bg-teal-600 transition-transform transform hover:scale-105"
+                            className="mt-8 inline-block bg-teal-500 text-white  text-sm py-2 px-2  rounded-lg shadow-lg hover:bg-teal-600 transition-transform transform hover:scale-100"
                         >
                             Login / Demo User
                         </Link>

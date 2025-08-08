@@ -9,7 +9,7 @@ const NotFoundPage = () => {
         <div className="bg-gray-100 min-h-screen flex flex-col items-center justify-center">
             <div className="absolute top-8 left-8">
                 {/* <Logo /> */}
-                <img src={`/uploads/siteSettings/${siteSetting.siteLogo}`} alt="Site Logo" className="h-28 w-48 object-contain" />
+                {/* <img src={`/uploads/siteSettings/${siteSetting.siteLogo}`} alt="Site Logo" className="h-28 w-48 object-contain" /> */}
             </div>
             <div className="text-center">
                 <FiAlertTriangle className="text-yellow-400 mx-auto h-24 w-24" />

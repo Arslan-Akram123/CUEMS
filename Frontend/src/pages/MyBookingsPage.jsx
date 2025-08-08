@@ -91,19 +91,50 @@ const MyBookingsPage = () => {
                                                         </Link>
                                                     </td>
                                                     <td className="py-4 px-4">{booking.user.fullName}</td>
-                                                    <td className="py-4 px-4">{booking.event.endDate ? new Date(booking.event.endDate).toLocaleDateString() : 'N/A'}</td>
+                                                    <td className="py-4 px-4">{
+                                                        booking.event.endDate && !isNaN(new Date(booking.event.endDate).getTime())
+                                                            ? new Date(booking.event.endDate).toLocaleDateString()
+                                                            : ''
+                                                    }</td>
                                                     <td className="py-4 px-4">
                                                         <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${booking.status === 'confirmed' ? 'bg-green-100 text-green-800' : booking.status === 'cancelled' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800'}`}>
                                                             {booking.status}
                                                         </span>
                                                     </td>
                                                     <td className="py-4 px-4">
-                                                        <button
-                                                            className={`px-2 py-2 inline-flex text-xs leading-5 font-semibold rounded-md bg-green-100 text-green-800 ${booking.status === 'cancelled' || booking.status === 'pending' ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                                            disabled={booking.status === 'cancelled' || booking.status === 'pending'}
-                                                        >
-                                                            Add Payment
-                                                        </button>
+                                                        {(() => {
+                                                            // Disable if status is cancelled or pending
+                                                            // OR if event endDate and endTime are both in the past
+                                                            let isPast = false;
+                                                            if (booking.event.endDate && booking.event.endTime) {
+                                                                const endDate = new Date(booking.event.endDate);
+                                                                const [endHour = '00', endMinute = '00'] = (booking.event.endTime || '').split(':');
+                                                                endDate.setHours(Number(endHour), Number(endMinute), 0, 0);
+                                                                isPast = endDate.getTime() < Date.now();
+                                                            }
+                                                            const disabled = booking.status === 'cancelled' || booking.status === 'pending' || isPast;
+                                                            // return (
+                                                            //     <button
+                                                            //         className={`px-2 py-2 inline-flex text-xs leading-5 font-semibold rounded-md bg-green-100 text-green-800 ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                            //         disabled={disabled}
+                                                            //     >
+                                                            //         Add Payment
+                                                            //     </button>
+                                                            // );
+                                                               return (
+                                                            <Link
+                                                                to="/checkout"
+                                                                // Pass the entire booking object in the link's state
+                                                                state={{ booking: booking }}
+                                                                // Apply disabled styles and prevent navigation if disabled
+                                                                className={`px-2 py-2 inline-flex text-xs leading-5 font-semibold rounded-md bg-green-100 text-green-800 ${disabled ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'hover:bg-green-200'}`}
+                                                                // Prevent click event if disabled
+                                                                onClick={(e) => disabled && e.preventDefault()}
+                                                            >
+                                                                Add Payment
+                                                            </Link>
+                                                        );
+                                                        })()}
                                                     </td>
                                                 </tr>
                                             ))}
@@ -118,15 +149,7 @@ const MyBookingsPage = () => {
                         }
                     </div>
 
-                    {/* Pagination */}
-                    {/* <div className="flex justify-between items-center mt-4 text-sm">
-                        <p className="text-gray-600">Showing 1 to {userBookings.length} of {userBookings.length} entries</p>
-                        <div className="flex items-center">
-                            <button className="px-3 py-1 border rounded-l-md bg-white hover:bg-gray-50">«</button>
-                            <button className="px-3 py-1 border-t border-b bg-teal-500 text-white">1</button>
-                            <button className="px-3 py-1 border rounded-r-md bg-white hover:bg-gray-50">»</button>
-                        </div>
-                    </div> */}
+                   
                 </div>
             </div>
         </UserLayout>

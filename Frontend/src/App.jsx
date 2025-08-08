@@ -58,7 +58,7 @@ import UniversityFeeStructure from './components/UniversityFeeStructure';
 
 // Admin Components
 import AdminLayout from './components/admin/AdminLayout';
-
+import CheckoutPage from './pages/CheckoutPage'; // Import the new checkout page
 
 
 // --- Authentication & Routing Logic ---
@@ -148,6 +148,7 @@ console.log(siteSetting);
           <Route path="/home" element={<PrivateRoute> <LandingPage /> </PrivateRoute>} />
           <Route path="/profile" element={<PrivateRoute> <UserProfilePage /> </PrivateRoute>} />
           <Route path="/my-bookings" element={<PrivateRoute> <MyBookingsPage /> </PrivateRoute>} />
+           <Route path="/checkout" element={<PrivateRoute><CheckoutPage /></PrivateRoute>} />
           <Route path="/notifications" element={<PrivateRoute> <AdminNoticesPages /> </PrivateRoute>} />
           <Route path="/compare-data" element={<PrivateRoute> <UniversityComparativeDataPage /> </PrivateRoute>} />
           <Route path="/events" element={<PrivateRoute> <EventsListPage /> </PrivateRoute>} />

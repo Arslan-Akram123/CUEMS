@@ -2,20 +2,33 @@
 
 import { useParams, Link, useLocation, Outlet } from 'react-router-dom';
 import UserLayout from '../components/UserLayout';
-
-// In a real app, this would be a single API call: /api/universities/:pathId
-const mockUniversities = [
-  { pathId: 'MUL', name: 'MUL University' },
-  { pathId: 'UMT', name: 'UMT University' },
-  { pathId: 'UCP', name: 'UCP University' }
-];
+import { useState, useEffect } from 'react';
+// In a real app, this would be a single API call: /api/universities/:shortName
+// const mockUniversities = [
+//   { shortName: 'MUL', name: 'MUL University' },
+//   { shortName: 'FAST', name: 'FAST University' },
+//   { shortName: 'UCP', name: 'UCP University' }
+// ];
 
 const UniversityDetailPage = () => {
   const { universityId } = useParams();
   const location = useLocation(); // To check the current path
-
+   const [universityData, setUniversityData] = useState([]);
+    useEffect(() => {
+    fetch('http://localhost:8001/universities/getUniversities', { credentials: 'include' })
+      .then(response => response.json())
+      .then(data => {
+        setUniversityData(data);
+       
+      })
+      .catch(error => {
+        console.error('Error fetching universities:', error);
+        setUniversities([]);
+        
+      });
+  }, []);
   // Find the university data
-  const university = mockUniversities.find(uni => uni.pathId === universityId);
+  const university = universityData.find(uni => uni.shortName === universityId);
 
   if (!university) {
     return (
@@ -40,44 +53,25 @@ const UniversityDetailPage = () => {
 
   return (
     <UserLayout>
-      <div className="container mx-auto px-4 py-8 flex flex-col md:flex-row gap-8">
+      <div className="container mx-auto px-4 py-8 flex  justify-center">
         
-        {/* Left Menu Sidebar */}
-        <aside className="w-full md:w-1/4">
-          <div className="bg-white p-6 rounded-lg shadow-md sticky top-24">
-            <h2 className="text-xl font-bold mb-4">Menu</h2>
-            <ul className="space-y-2">
-              <li>1. <Link to={`/universities/${universityId}/events`} className="hover:text-teal-600">Events-List</Link></li>
-              <li>2. <Link to={`/universities/${universityId}/programs`} className="hover:text-teal-600">Programs</Link></li>
-              <li>3. <Link to={`/universities/${universityId}/fees`} className="hover:text-teal-600">FeeStructure</Link></li>
-            </ul>
-            <Link to="/home" className="mt-6 w-full block text-center bg-teal-600 text-white  py-2 px-4 rounded-lg hover:bg-teal-700 transition-colors">
-              ← Back to Dashboard
-            </Link>
-          </div>
-        </aside>
-
+       
         {/* Right Main Content */}
         <main className="w-full md:w-3/4">
           <div className="bg-white p-6 rounded-lg shadow-md">
             <div className="mb-6">
               <h1 className="text-3xl font-bold text-gray-800">{university.name}</h1>
-              <p className="text-gray-500"><Link to='/home'>Dashboard</Link> / <Link to="/universities">Campuses</Link> / {university.pathId}</p>
+              <p className="text-gray-500"><Link to='/home'>Dashboard</Link> / <Link to="/universities">Campuses</Link> / {university.shortName}</p>
             </div>
             <div className="flex flex-col gap-4 sm:gap-2 sm:flex-row sm:items-center sm:space-x-4">
               <Link to={`/universities/${universityId}/events`} className={`font-semibold py-2 px-6 rounded-lg transition-colors ${getLinkClass('events')}`}>
                 Events-List
               </Link>
-              <Link to={`/universities/${universityId}/programs`} className={`font-semibold py-2 px-6 rounded-lg transition-colors ${getLinkClass('programs')}`}>
-                Programs
-              </Link>
-              <Link to={`/universities/${universityId}/fees`} className={`font-semibold py-2 px-6 rounded-lg transition-colors ${getLinkClass('fees')}`}>
-                FeeStructure
-              </Link>
+              
             </div>
 
             <div className="mt-8">
-              {/* React Router will render the matching child route component here */}
+            
               <Outlet />
             </div>
 

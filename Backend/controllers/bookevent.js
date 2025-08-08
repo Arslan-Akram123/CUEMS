@@ -21,6 +21,7 @@ const bookEvent = async (req, res) => {
 };
 
 async function getNewBookings(req, res) {
+    console.log("get new bookings called");
     try {
         const newBookings = await bookingEventSchema.find().populate('user').populate('event').sort({ createdAt: -1 });
         const filterbookings = newBookings.filter(booking => booking.status === 'pending');

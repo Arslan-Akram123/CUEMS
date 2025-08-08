@@ -229,6 +229,7 @@ const InputField = ({ label, name, type = "text", value, onChange }) => (
             id={name}
             name={name}
             value={value}
+            required
             onChange={onChange}
             className="w-full border-teal-500 focus:outline-teal-500 px-2 py-2 border-1 rounded-md shadow-sm focus:border-teal-500 focus:ring-teal-500"
         />

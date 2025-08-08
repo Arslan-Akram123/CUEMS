@@ -42,10 +42,15 @@ const UserHeader = () => {
     const navigate=useNavigate();
     useEffect(() => {
         fetchProfileData();
-        fetch('http://localhost:8001/eventsbook/getAllUserBookings', { credentials: 'include' })
-            .then(res => res.json())
-            .then(data => setNotifications(data))
-            .catch(err => console.error(err));
+        const fetchNotifications = () => {
+            fetch('http://localhost:8001/eventsbook/getAllUserBookings', { credentials: 'include' })
+                .then(res => res.json())
+                .then(data => setNotifications(data))
+                .catch(err => console.error(err));
+        };
+        fetchNotifications(); // initial fetch
+        const intervalId = setInterval(fetchNotifications, 10000); // fetch every 10 seconds
+        return () => clearInterval(intervalId); // cleanup on unmount
     },[]);
 
     useEffect(() => {

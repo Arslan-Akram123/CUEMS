@@ -7,7 +7,7 @@ import { useState, useEffect } from 'react';
 const FormInput = ({ label, id, type = "text", placeholder, value, onChange }) => (
     <div>
         <label htmlFor={id} className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
-        <input type={type} id={id} name={id} placeholder={placeholder} value={value} onChange={onChange} className="w-full border-teal-500 rounded-md shadow-sm focus:border-teal-500 py-2 px-2 border-1  focus:outline-teal-500 focus:ring-teal-500" />
+        <input type={type} id={id} name={id} placeholder={placeholder} value={value} onChange={onChange} required className="w-full border-teal-500 rounded-md shadow-sm focus:border-teal-500 py-2 px-2 border-1  focus:outline-teal-500 focus:ring-teal-500" />
     </div>
 );
 
