@@ -50,7 +50,7 @@ const BookingsTable = ({ bookings, showSearch = true }) => {
                                     .filter(b => b.status !== 'pending')
                                     .filter(b => {
                                         const idMatch = b._id.toLowerCase().includes(searchTerm.toLowerCase());
-                                        const userMatch = b.user.fullName.toLowerCase().includes(searchTerm.toLowerCase());
+                                        const userMatch = b.user?.fullName.toLowerCase().includes(searchTerm.toLowerCase());
                                         const eventMatch = b.event.name.toLowerCase().includes(searchTerm.toLowerCase());
                                         return (
                                             searchTerm === '' || idMatch || userMatch || eventMatch
@@ -61,8 +61,8 @@ const BookingsTable = ({ bookings, showSearch = true }) => {
                                         <tr key={booking._id}>
                                             <td className="py-4 px-4">{index + 1}</td>
                                             <td className="py-4 px-4 font-mono">{booking._id}</td>
-                                            <td className="py-4 px-4">{booking.user.fullName}</td>
-                                            <td className="py-4 px-4">{booking.event.name}</td>
+                                            <td className="py-4 px-4">{booking.user?.fullName}</td>
+                                            <td className="py-4 px-4">{booking.event?.name}</td>
                                             {/* <td className="py-4 px-4 text-center">{booking.subscribers}</td> */}
                                             <td className="py-4 px-4">
                                                 <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusClass(booking.status)}`}>

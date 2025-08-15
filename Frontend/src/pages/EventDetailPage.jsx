@@ -76,7 +76,10 @@ const EventDetailPage = () => {
         const data = await response.json();
         if (response.ok) {
           setBookingMsg({ type: 'success', text: 'Booking successful!' });
-          setIsBookingModalOpen(false);
+          setTimeout(() => {
+            setBookingMsg({ type: '', text: '' });
+            setIsBookingModalOpen(false);
+          }, 2500);
         } else {
           // Show specific error if already booked
           if (data && data.error === 'You have already booked this event') {
@@ -181,7 +184,7 @@ const EventDetailPage = () => {
               <p className="text-md text-gray-500 mt-1">Created At: {event.createdAt ? new Date(event.createdAt).toLocaleDateString() : ''}</p>
             </div>
             <p className="text-4xl font-bold text-teal-600 mt-4 md:mt-0">
-              ${event.price}
+              Rs.{event.price}
             </p>
           </div>
 

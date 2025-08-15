@@ -5,7 +5,16 @@ const  sendEmail  = require('../services/sendEmail');
 const validator = require('deep-email-validator');
 
 async function registerUser(req, res) {
+
     const { fullName, email, password } = req.body;
+
+    // Full name validation: required, at least 3 chars, only letters and spaces
+    if (!fullName || typeof fullName !== 'string' || fullName.trim().length < 3) {
+        return res.status(400).json({ error: 'Full name is required and must be at least 3 characters.' });
+    }
+    if (!/^[a-zA-Z\s]+$/.test(fullName.trim())) {
+        return res.status(400).json({ error: 'Full name can only contain letters and spaces.' });
+    }
 
     const allowedDomains = ['mul.edu.pk'];
     const emailDomain = email.split('@')[1].toLowerCase();

@@ -50,7 +50,7 @@ const CheckoutPage = () => {
                             <h2 className="text-xl font-semibold mb-4">Booking Summary</h2>
                             <div className="flex justify-between items-center text-gray-600">
                                 <p>Event: <span className="font-medium text-gray-800">{booking.event.name}</span></p>
-                                <p className="font-bold text-xl text-gray-800">${booking.event.price}</p>
+                                <p className="font-bold text-xl text-gray-800">Rs.{booking.event.price}</p>
                             </div>
                         </div>
 
@@ -104,7 +104,7 @@ const CheckoutPage = () => {
                             <div className="mt-8">
                                 <button type="submit" className="w-full flex items-center justify-center gap-3 bg-teal-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-teal-700">
                                     <FiLock />
-                                    Pay ${booking.event.price}
+                                    Pay Rs.{booking.event.price}
                                 </button>
                             </div>
                         </form>

@@ -56,7 +56,10 @@ const RegisterPage = () => {
           setFieldErrors({ email: errorText });
         } else if (lowerError.includes('password')) {
           setFieldErrors({ password: errorText });
-        } else {
+        } else if (lowerError.includes('full name')) {
+          setFieldErrors({ fullName: errorText });
+        } 
+        else {
           setFormMessage({ type: 'error', text: errorText });
         }
 
@@ -95,6 +98,9 @@ const RegisterPage = () => {
               className="w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500 sm:text-sm"
               placeholder="Full Name"
             />
+             {fieldErrors.fullName && (
+              <p className="text-sm text-red-600">{fieldErrors.fullName}</p>
+            )}
           </div>
 
           <div className="flex flex-col gap-1 mt-4">

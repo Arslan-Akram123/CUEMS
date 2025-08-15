@@ -60,6 +60,14 @@ import UniversityFeeStructure from './components/UniversityFeeStructure';
 import AdminLayout from './components/admin/AdminLayout';
 import CheckoutPage from './pages/CheckoutPage'; // Import the new checkout page
 
+// static pages
+// ... (imports)
+import FaqPage from './pages/FaqPage';
+import SupportPage from './pages/SupportPage';
+import AboutPage from './pages/AboutPage';
+import TermsPage from './pages/TermsPage';
+import ContactPage from './pages/ContactPage';
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 
 // --- Authentication & Routing Logic ---
 const getAuth = () => {
@@ -166,6 +174,13 @@ console.log(siteSetting);
             <Route path="fees" element={<UniversityFeeStructure />} />
           </Route>
           <Route path="/compare-data" element={<PrivateRoute><CompareDataPage /></PrivateRoute>} />
+           {/* Footer Routes */}
+        <Route path="/faq/general" element={<PrivateRoute><FaqPage /></PrivateRoute>}/>
+        <Route path="/support" element={<PrivateRoute><SupportPage /></PrivateRoute>} />
+        <Route path="/about" element={<PrivateRoute><AboutPage /></PrivateRoute>} />
+        <Route path="/terms" element={<PrivateRoute><TermsPage /></PrivateRoute>} />
+        <Route path="/contact" element={<PrivateRoute><ContactPage /></PrivateRoute>} />
+        <Route path="/privacy" element={<PrivateRoute><PrivacyPolicyPage /></PrivateRoute>} />
            <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </BrowserRouter>
