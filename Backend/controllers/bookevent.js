@@ -143,4 +143,26 @@ async function UpdateUserRead(req, res) {
     }
 }
 
-module.exports = { bookEvent,getNewBookings,UpdateAdminRead,getSpecificBooking,UpdateConfirmBooking,UpdateCancelBooking,getAllBookings,getAllUserBookings,UpdateUserRead };
+async function completeBooking(req, res) {
+    const { bookingId, eventId } = req.body;
+    // console.log("bookingId", bookingId);
+    // console.log("event id", eventId);
+    try {
+        const updatedBooking = await bookingEventSchema.findByIdAndUpdate(bookingId, { status: 'paid' }, { new: true }).populate('user').populate('event');
+        if (!updatedBooking) {
+            return res.status(404).json({ error: 'Booking not found' });
+        }
+        const event = await eventSchema.findById(eventId);
+        if (!event) {
+            return res.status(404).json({ error: 'Event not found' });
+        }
+        event.reservedSeats -= 1;
+        event.bookings += 1;
+        await event.save();
+        res.status(200).json(updatedBooking);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+}
+module.exports = { bookEvent,getNewBookings,UpdateAdminRead,getSpecificBooking,UpdateConfirmBooking,UpdateCancelBooking,getAllBookings,getAllUserBookings,UpdateUserRead,completeBooking };

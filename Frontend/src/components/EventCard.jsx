@@ -31,7 +31,7 @@ const EventCard = ({ event }) => {
         </div>
         <h3 className="text-xl font-bold text-gray-800 truncate">{name}</h3>
         <div className="mt-2 space-y-1 text-sm text-gray-600 flex-grow">
-          <p><span className="font-semibold">Price:</span>Rs.{price}</p>
+          <p><span className="font-semibold">Price:</span>${price}</p>
           <p><span className="font-semibold">Category:</span> {category}</p>
           <p><span className="font-semibold">Start Date:</span> {formattedStartDate}</p>
           <p><span className="font-semibold">Start Time:</span> {startTime}</p>

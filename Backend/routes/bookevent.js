@@ -1,6 +1,7 @@
 const express = require('express');
 
-const { bookEvent,getNewBookings,UpdateAdminRead,getSpecificBooking,UpdateConfirmBooking,UpdateCancelBooking,getAllBookings,getAllUserBookings,UpdateUserRead } = require('../controllers/bookevent');
+const { bookEvent,getNewBookings,UpdateAdminRead,getSpecificBooking,UpdateConfirmBooking,UpdateCancelBooking,getAllBookings,getAllUserBookings,UpdateUserRead,completeBooking } = require('../controllers/bookevent');
+const { compact } = require('lodash');
 const Router = express.Router();
 
 Router.post('/bookingEventrequest', bookEvent);
@@ -12,4 +13,5 @@ Router.put('/cancelBooking/:id', UpdateCancelBooking);
 Router.get('/getAllBookings', getAllBookings);
 Router.get('/getAllUserBookings', getAllUserBookings);
 Router.put('/UpdateUserRead', UpdateUserRead);
+Router.post("/complete-booking",completeBooking);
 module.exports = Router;

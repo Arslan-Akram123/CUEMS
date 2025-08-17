@@ -184,7 +184,7 @@ const EventDetailPage = () => {
               <p className="text-md text-gray-500 mt-1">Created At: {event.createdAt ? new Date(event.createdAt).toLocaleDateString() : ''}</p>
             </div>
             <p className="text-4xl font-bold text-teal-600 mt-4 md:mt-0">
-              Rs.{event.price}
+              ${event.price}
             </p>
           </div>
 

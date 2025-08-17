@@ -147,7 +147,7 @@ const ShowBookingPage = () => {
                             <InfoField label="Category" value={booking?.event?.category} />
                             {/* <InfoField label="Sponsors" value={booking.event.sponsors} /> */}
                             <InfoField label="Location" value={booking?.event?.location} />
-                            <InfoField label="Price" value={`Rs.${booking?.event?.price}`} />
+                            <InfoField label="Price" value={`$${booking?.event?.price}`} />
                             <InfoField label="Total Subscribers" value={
                 [booking?.event?.totalSubscribers, booking?.event?.bookings, booking?.event?.reservedSeats]
                   .map(x => Number(x) || 0)

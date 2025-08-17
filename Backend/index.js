@@ -20,6 +20,7 @@ const dashboardRoutes = require('./routes/dashboard');
 const bookEventRoutes = require('./routes/bookevent');
 const scrapingRoutes = require('./routes/scraping');
 const contactusRoutes = require('./routes/contactus');
+const stripeRoutes = require('./routes/stripe');
 // Connect to the database
 connectDB();
 
@@ -48,7 +49,7 @@ app.use('/dashboard',auth, dashboardRoutes);
 app.use('/eventsbook',auth, bookEventRoutes);
 app.use('/scraping',auth, scrapingRoutes);
 app.use('/contactus', auth,contactusRoutes);
-
+app.use('/stripe', stripeRoutes);
 
 app.listen(PORT, (err) => {
     console.log(err ? `Error starting server: ${err}` : '');
