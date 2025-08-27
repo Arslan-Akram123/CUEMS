@@ -7,7 +7,17 @@ import { useState, useEffect } from 'react';
 const FormInput = ({ label, id, type = "text", placeholder, value, onChange }) => (
     <div>
         <label htmlFor={id} className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
-        <input type={type} id={id} name={id} placeholder={placeholder} value={value} onChange={onChange} required className="w-full border-teal-500 rounded-md shadow-sm focus:border-teal-500 py-2 px-2 border-1  focus:outline-teal-500 focus:ring-teal-500" />
+        <input
+            type={type}
+            id={id}
+            name={id}
+            placeholder={placeholder}
+            value={value}
+            onChange={onChange}
+            required
+            className="w-full border-teal-500 rounded-md shadow-sm focus:border-teal-500 py-2 px-2 border-1  focus:outline-teal-500 focus:ring-teal-500"
+            {...(type === "number" ? { min: 0 } : {})} // Add min=0 if type is number
+        />
     </div>
 );
 
@@ -25,6 +35,8 @@ const EditEventPage = () => {
         startTime: '',
         endTime: '',
         category: '',
+        reservedSeats: 0,
+        bookings: 0,
         description: '',
         image: null
     });
@@ -48,13 +60,15 @@ const EditEventPage = () => {
                 setEventData({
                     name: data.name || '',
                     location: data.location || '',
-                    totalSubscribers: data.totalSubscribers || '',
+                    totalSubscribers: data.totalSubscribers + data.reservedSeats + data.bookings || '',
                     price: data.price || '',
                     startDate: formatDate(data.startDate),
                     endDate: formatDate(data.endDate),
                     startTime: data.startTime || '',
                     endTime: data.endTime || '',
                     category: data.category || '',
+                    reservedSeats: data.reservedSeats || 0,
+                    bookings: data.bookings || 0,
                     description: data.description || '',
                     image: null
                 });
@@ -212,8 +226,8 @@ const EditEventPage = () => {
                     <div className="md:col-span-2 space-y-6">
                         <FormInput label="Name" id="name" value={eventData.name} onChange={handleInputChange} />
                         <FormInput label="Location" id="location" value={eventData.location} onChange={handleInputChange} />
-                        <FormInput label="Total Subscribers" id="totalSubscribers" type="number" value={eventData.totalSubscribers} onChange={handleInputChange} />
-                        <FormInput label="Price" id="price" type="number" value={eventData.price} onChange={handleInputChange} />
+                        <FormInput label="Total Subscribers" id="totalSubscribers" type="number" min="0" value={eventData.totalSubscribers} onChange={handleInputChange} />
+                        <FormInput label="Price" id="price" type="number" min="0" value={eventData.price} onChange={handleInputChange} />
                     </div>
                     <div className="md:col-span-1">
                         <label className="block text-sm font-medium text-gray-700 mb-1">Image</label>

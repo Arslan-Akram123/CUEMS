@@ -21,6 +21,7 @@ const bookEventRoutes = require('./routes/bookevent');
 const scrapingRoutes = require('./routes/scraping');
 const contactusRoutes = require('./routes/contactus');
 const stripeRoutes = require('./routes/stripe');
+const paymobRoutes = require('./routes/paymob');
 // Connect to the database
 connectDB();
 
@@ -50,6 +51,7 @@ app.use('/eventsbook',auth, bookEventRoutes);
 app.use('/scraping',auth, scrapingRoutes);
 app.use('/contactus', auth,contactusRoutes);
 app.use('/stripe', stripeRoutes);
+app.use('/paymob', paymobRoutes);
 
 app.listen(PORT, (err) => {
     console.log(err ? `Error starting server: ${err}` : '');

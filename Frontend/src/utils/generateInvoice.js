@@ -108,7 +108,7 @@ if (booking.event.endTime) {
                 styles: { valign: 'middle' }
             },
             { 
-                content: `$${booking.event.price.toFixed(2)}`,
+                content: `Rs.${booking.event.price.toFixed(2)}`,
                 styles: { halign: 'right' }
             }
         ]

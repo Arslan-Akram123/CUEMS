@@ -131,7 +131,7 @@ const EditUniversityPage = () => {
                       className="w-full px-2 py-2 border-1  focus:outline-teal-500 border-teal-500 rounded-md shadow-sm"/>
                 </div>
                  <div>
-                    <label htmlFor="shortName" className="block text-sm font-medium text-gray-700 mb-1">Short Name (e.g., 'mul', 'umt')</label>
+                    <label htmlFor="shortName" className="block text-sm font-medium text-gray-700 mb-1">Short Name (e.g., 'mul', 'ucp')</label>
                     <input type="text" id="shortName"
                     name='shortName'
                      value={universityToEdit.shortName}

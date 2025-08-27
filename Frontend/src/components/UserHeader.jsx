@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { FiSearch, FiUser, FiBell, FiBookOpen, FiLogOut  } from 'react-icons/fi';
 import { useProfile } from '../context/ProfileContext/ProfileContext';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 const UserHeader = () => {
     // Notification click handler
     const handleNotificationClick = async (notif_id) => {
@@ -39,7 +40,50 @@ const UserHeader = () => {
     const [categories, setCategories] = useState([]);
     const [notifications, setNotifications] = useState([]);
     const [loadingNotif, setLoadingNotif] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [searchResults, setSearchResults] = useState([]);
     const navigate=useNavigate();
+
+    // search functionality
+   useEffect(() => {
+  const controller = new AbortController();
+
+  const fetchSearchResults = async () => {
+    try {
+      const response = await axios.get(
+        'http://localhost:8001/scraping/globalSearchTitle',
+        {
+          params: { query: searchQuery },
+          signal: controller.signal,
+          withCredentials: true
+        }
+      );
+        console.log("Search results:", response.data);
+      setSearchResults(response.data);
+    } catch (error) {
+      if (error.code === "ERR_CANCELED") {
+        console.log("Search request cancelled");
+        return;
+      }
+      console.error(error);
+    }
+  };
+
+  let timeoutId;
+  if (searchQuery.trim() !== "") {
+    timeoutId = setTimeout(() => {
+      fetchSearchResults();
+    }, 1000); // debounce: wait 1s of inactivity
+  } else {
+    setSearchResults([]);
+  }
+
+  return () => {
+    controller.abort();
+    if (timeoutId) clearTimeout(timeoutId);
+  };
+}, [searchQuery]);
+
     useEffect(() => {
         fetchProfileData();
         const fetchNotifications = () => {
@@ -125,8 +169,29 @@ const UserHeader = () => {
                     {/* SEARCH BAR - This is the biggest change */}
                     {/* It's hidden on small screens in this row, but visible in the row below */}
                     <div className="relative w-full max-w-xl hidden md:block">
-                        <input type="text" placeholder="Search Here ..." className="w-full pl-4 pr-10 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-teal-500"/>
+                        <input type="text" placeholder="Search Here ..."
+                         value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                         className="w-full pl-4 pr-10 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-teal-500"/>
                         <FiSearch className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5" />
+                        {searchQuery && searchResults.length > 0 && (
+                            <div className="absolute left-0 top-full mt-2 w-full bg-white border border-gray-200 rounded-md shadow-lg z-50">
+                                <ul className="max-h-60 overflow-y-auto">
+                                    {searchResults.map(result => (
+                                        <li key={result._id} className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                                            onClick={() => {
+                                                setSearchQuery(''); // Clear the search query
+                                                setSearchResults([]); // Clear the search results
+                                            navigate(`/universities/${result.name.toUpperCase()}/events`, { state: {searchQuery: result._id } });
+
+                                            }}>
+                                           <b>"{searchQuery}"</b> events  is: {result.title}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+                               
                     </div>
 
                     {/* USER ICONS & DROPDOWN */}
@@ -208,8 +273,29 @@ const UserHeader = () => {
                 {/* This div is only visible on small screens (block) and hidden on medium and larger screens (md:hidden) */}
                 <div className="pb-4 md:hidden">
                     <div className="relative w-full">
-                         <input type="text" placeholder="Search Here ..." className="w-full pl-4 pr-10 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-teal-500"/>
+                         <input type="text" placeholder="Search Here ..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                          className="w-full pl-4 pr-10 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-teal-500"/>
                         <FiSearch className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5" />
+                          {searchQuery && searchResults.length > 0 && (
+                            <div className="absolute left-0 top-full mt-2 w-full bg-white border border-gray-200 rounded-md shadow-lg z-50">
+                                <ul className="max-h-60 overflow-y-auto">
+                                    {searchResults.map(result => (
+                                        <li key={result._id} className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                                            onClick={() => {
+                                                setSearchQuery(''); // Clear the search query
+                                                setSearchResults([]); // Clear the search results
+                                                // universities/FAST/events
+                                                navigate(`/universities/${result.name.toUpperCase()}/events`, { state: {searchQuery: result._id } });
+
+                                            }}>
+                                           <b>"{searchQuery}"</b>events is: {result.title}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
                     </div>
                 </div>
 

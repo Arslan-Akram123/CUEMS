@@ -151,8 +151,8 @@ const CreateEventPage = () => {
                     <div className="md:col-span-2 space-y-6">
                         <InputField label="Name" name="name" value={formData.name} onChange={handleChange} />
                         <InputField label="Location" name="location" value={formData.location} onChange={handleChange} />
-                        <InputField label="Total Subscribers" name="totalSubscribers" type="number" value={formData.totalSubscribers} onChange={handleChange} />
-                        <InputField label="Price" name="price" type="number" value={formData.price} onChange={handleChange} />
+                        <InputField label="Total Subscribers" name="totalSubscribers" type="number" min="0" value={formData.totalSubscribers} onChange={handleChange} />
+                        <InputField label="Price" name="price" type="number" min="0" value={formData.price} onChange={handleChange} />
                     </div>
                     <div className="md:col-span-1 space-y-2">
                         <label className="block text-sm font-medium text-gray-700 mb-1">Image</label>
@@ -232,6 +232,7 @@ const InputField = ({ label, name, type = "text", value, onChange }) => (
             required
             onChange={onChange}
             className="w-full border-teal-500 focus:outline-teal-500 px-2 py-2 border-1 rounded-md shadow-sm focus:border-teal-500 focus:ring-teal-500"
+            {...(type === "number" ? { min: 0 } : {})}
         />
     </div>
 );

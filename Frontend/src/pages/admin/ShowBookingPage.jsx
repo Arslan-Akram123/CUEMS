@@ -97,9 +97,12 @@ const ShowBookingPage = () => {
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-3xl font-bold text-gray-800">Show Booking</h1>
                 <div className="flex gap-4">
-                    <button onClick={() => handleConfirmBooking(bookingId)} className="flex items-center gap-2  bg-teal-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-teal-600"><FiCheck /> Confirm</button>
-                    <button onClick={() => handleCancelBooking(bookingId)} className="flex items-center gap-2 bg-red-700 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-800"><FiX /> Cancel</button>
-                    <Link to="/admin/dashboard" className="flex items-center gap-2 bg-yellow-400 text-yellow-900 font-bold py-2 px-4 rounded-lg hover:bg-yellow-500"><FiChevronLeft /> Back</Link>
+                    <button onClick={() => handleConfirmBooking(bookingId)} className="flex items-center gap-2  bg-teal-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-teal-600"
+                    {...booking?.status === 'paid' || booking?.status === 'confirmed' ? { disabled: true, className: 'flex items-center gap-2 bg-gray-400 text-white font-bold py-2 px-4 rounded-lg cursor-not-allowed' } : {} }
+                        ><FiCheck /> Confirm</button>
+                    <button onClick={() => handleCancelBooking(bookingId)} className="flex items-center gap-2 bg-red-700 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-800"
+                    {...booking?.status === 'cancelled' || booking?.status === 'paid' ? { disabled: true, className: 'flex items-center gap-2 bg-gray-400 text-white font-bold py-2 px-4 rounded-lg cursor-not-allowed' } : {} }><FiX /> Cancel</button>
+                    <Link to="/admin/bookings" className="flex items-center gap-2 bg-yellow-400 text-yellow-900 font-bold py-2 px-4 rounded-lg hover:bg-yellow-500"><FiChevronLeft /> Back</Link>
                 </div>
             </div>
 

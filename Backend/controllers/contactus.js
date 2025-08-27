@@ -1,6 +1,6 @@
 
 const Contactus = require('../models/contactus'); 
-
+const usersendEmail=require('../services/contactmail');
 async function createContactUs(req, res) {
     console.log('Received contact data:', req.user, req.body);
     const userId = req.user.id; 
@@ -10,8 +10,10 @@ async function createContactUs(req, res) {
     const {  message } = req.body;
     
     try {
-        const contactUs = await Contactus.create({userId, message });
-        res.status(201).json(contactUs);
+        // Send email to the user
+        await usersendEmail(req.user.email, message);
+        // const contactUs = await Contactus.create({userId, message });
+        res.status(201).json("your response has been recorded");
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

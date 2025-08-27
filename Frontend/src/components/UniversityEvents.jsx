@@ -1,16 +1,18 @@
 // src/components/UniversityEvents.jsx
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link,useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 
 
 const UniversityEvents = () => {
+    const location = useLocation();
+     const { searchQuery } = location.state || {};
     const { universityId } = useParams();
     console.log(universityId);
     const [events, setEvents] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     useEffect(() => {
-        fetch(`http://localhost:8001/scraping/getsepcificEvents/${universityId}`, { credentials: 'include' })
+        fetch(`http://localhost:8001/scraping/getsepcificEvents/${universityId}?search=${searchQuery}`, { credentials: 'include' })
             .then(res => res.json())
             .then(data => {
                 setEvents(data || []);

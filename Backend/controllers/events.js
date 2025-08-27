@@ -133,7 +133,7 @@ const getAllEvents = async (req, res) => {
             {
                 name,
                 location,
-                totalSubscribers,
+                totalSubscribers: totalSubscribers - (specificEvent.reservedSeats + specificEvent.bookings),
                 price,
                 startDate,
                 endDate,

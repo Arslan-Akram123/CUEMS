@@ -117,7 +117,7 @@ const MyBookingsPage = () => {
                                                                 endDate.setHours(Number(endHour), Number(endMinute), 0, 0);
                                                                 isPast = endDate.getTime() < Date.now();
                                                             }
-                                                            const disabled = booking.status === 'cancelled' || booking.status === 'pending' || booking.status === 'paid'|| isPast;
+                                                            const disabled = booking.status === 'cancelled' || booking.status === 'pending' || booking.status === 'paid'|| booking.event.price === 0 || isPast;
                                                             return (
                                                                 <Link
                                                                     to="/checkout"
@@ -135,7 +135,7 @@ const MyBookingsPage = () => {
                                                         })()}
                                                     </td>
                                                     <td className="py-4 px-4">
-                                                        {booking.status === 'paid' ? (
+                                                        {booking.status === 'paid' || booking.status === 'confirmed' && booking.event.price===0 ? (
                                                             <button
                                                                 className="px-2 py-2 inline-flex text-xs leading-5 font-semibold rounded-md bg-teal-500 text-white hover:bg-teal-600"
                                                                 onClick={() => handleDownloadInvoice(booking)}

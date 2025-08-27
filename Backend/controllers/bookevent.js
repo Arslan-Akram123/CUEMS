@@ -5,6 +5,10 @@ const bookEvent = async (req, res) => {
     console.log(req.body);
     const {notes, eventId} = req.body;
    const userId=req.user.id;
+   const availableSeats = await eventSchema.findById(eventId).select('totalSubscribers');
+   if (availableSeats.totalSubscribers <= 0) {
+        return res.status(400).json({ error: 'No more seats available' });
+    }
     const findusers = await bookingEventSchema.findOne({ user: userId, event: eventId });
     if (!findusers) {
         const newBooking = new bookingEventSchema({ user: userId, event: eventId, bookingNotes: notes });

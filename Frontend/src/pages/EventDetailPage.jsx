@@ -75,7 +75,7 @@ const EventDetailPage = () => {
       .then(async (response) => {
         const data = await response.json();
         if (response.ok) {
-          setBookingMsg({ type: 'success', text: 'Booking successful!' });
+          setBookingMsg({ type: 'success', text: 'Booking successfully. Please wait for admin approval!' });
           setTimeout(() => {
             setBookingMsg({ type: '', text: '' });
             setIsBookingModalOpen(false);
@@ -184,7 +184,7 @@ const EventDetailPage = () => {
               <p className="text-md text-gray-500 mt-1">Created At: {event.createdAt ? new Date(event.createdAt).toLocaleDateString() : ''}</p>
             </div>
             <p className="text-4xl font-bold text-teal-600 mt-4 md:mt-0">
-              ${event.price}
+              Rs.{event.price}
             </p>
           </div>
 

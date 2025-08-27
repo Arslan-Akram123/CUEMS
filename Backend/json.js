@@ -11,8 +11,8 @@ const allunverisities = [
     type: "fast", // new type for FAST university
     selectors: {
       container: ".card-body",  // each news/event card
-      title: "h5",
-      link: "h5 a",
+     title: "a.color-nu-dark h5",        // h5 inside the a tag
+     link: "a.color-nu-dark",
       description: "p",
       image: "img.newsImage",
       date: null // FAST doesn't show dates in the card view
@@ -29,6 +29,21 @@ const allunverisities = [
       dateTime: ".ucp-today-metas span",
       image: "img",
       description: "p" // optional, might be empty in some events
+    }
+  },
+  {
+    name: "iub",
+    url: "https://www.iub.edu.pk/events",
+    pagination: 28, // total pages available
+    type: "iub", // new type for IUB university
+    selectors: {
+      container: ".single-item-wrapper",  // each event card
+      title: "h3.item-title a",
+      link: "h3.item-title a",
+      date: "span:has(i.fa-calendar)", // contains date
+      category: "span.label a", // event category
+      description: "p.item-content",
+      image: ".courses-img-wrapper img"
     }
   }
 ];

@@ -100,7 +100,9 @@ async function ChangePassword(req, res) {
     console.log('Get all users request received');
     try {
         const users = await userModel.find();
-        res.status(200).json(users);
+        const filteredonlyUsers = users.filter(user => user.role === 'User');
+        console.log('Filtered Users:', filteredonlyUsers);
+        res.status(200).json(filteredonlyUsers);
     } catch (err) {
         console.error('Error fetching users:', err);
         res.status(500).json({ error: 'Internal server error' });
