@@ -1,5 +1,120 @@
 const userModel = require('../models/user');
 const bcrypt = require('bcrypt');
+const validatePakistanAddress = (req, res) => {
+    const { fullName, street, country, city, state, postalCode, phoneNumber } = req.body;
+    const errors = [];
+
+    // Full Name validation
+    if (!fullName || fullName.trim() === '') {
+        errors.push({ field: 'fullName', message: 'Full name is required' });
+    } else if (fullName.trim().length < 2 || fullName.trim().length > 100) {
+        errors.push({ field: 'fullName', message: 'Full name must be between 2 and 100 characters' });
+    } else if (!/^[a-zA-Z\s.'-]+$/.test(fullName)) {
+        errors.push({ field: 'fullName', message: 'Full name can only contain letters, spaces, apostrophes, periods, and hyphens' });
+    }
+  console.log("validation started");
+    // Street Address validation - FIXED THE REGEX
+    if (street || street.trim() !== '') {
+        console.log("street");
+         if (!street || street.trim() === '') {
+        errors.push({ field: 'street', message: 'Street address is required' });
+    } else if (street.trim().length < 5 || street.trim().length > 200) {
+        errors.push({ field: 'street', message: 'Street address must be between 5 and 200 characters' });
+    } else if (!/^[a-zA-Z0-9\s,.']+$/.test(street)) {
+        errors.push({ field: 'street', message: 'Street address contains invalid characters' });
+    }
+    }
+
+    // Country validation - Must be Pakistan
+   if(country || country.trim()!==''){
+    console.log("country");
+        if (!country || country.trim() === '') {
+        errors.push({ field: 'country', message: 'Country is required' });
+    } else {
+        const countryLower = country.toLowerCase();
+        const validPakistanNames = ['pakistan', 'pk', 'islamic republic of pakistan', 'پاکستان'];
+        
+        if (!validPakistanNames.includes(countryLower)) {
+            errors.push({ field: 'country', message: 'Country must be Pakistan' });
+        }
+    }
+   }
+
+    // City validation - Common Pakistani cities
+    const validPakistaniCities = [
+        'karachi', 'lahore', 'islamabad', 'rawalpindi', 'faisalabad', 'multan',
+        'peshawar', 'quetta', 'sialkot', 'gujranwala', 'hyderabad', 'sukkur',
+        'bahawalpur', 'sargodha', 'abbottabad', 'mardan', 'mirpur', 'jhelum'
+    ];
+
+    if(city || city.trim()!==''){
+        if (!city || city.trim() === '') {
+        errors.push({ field: 'city', message: 'City is required' });
+    } else if (!validPakistaniCities.includes(city.toLowerCase())) {
+        errors.push({ field: 'city', message: 'Please enter a valid Pakistani city' });
+    }
+    }
+
+    // State/Province validation - Pakistani provinces
+    const validPakistaniProvinces = [
+        'punjab', 'sindh', 'khyber pakhtunkhwa', 'balochistan', 
+        'islamabad capital territory', 'gilgit-baltistan', 'azad kashmir'
+    ];
+
+   if(state || state.trim()!==''){
+     if (!state || state.trim() === '') {
+        errors.push({ field: 'state', message: 'State/Province is required' });
+    } else if (!validPakistaniProvinces.includes(state.toLowerCase())) {
+        errors.push({ field: 'state', message: 'Please enter a valid Pakistani province' });
+    }
+   }
+
+    // Postal Code validation - Pakistan specific (5 digits)
+   if(postalCode || postalCode.trim()!==''){
+        if (!postalCode || postalCode.trim() === '') {
+        errors.push({ field: 'postalCode', message: 'Postal code is required' });
+    } else if (!/^\d{5}$/.test(postalCode)) {
+        errors.push({ field: 'postalCode', message: 'Pakistani postal code must be exactly 5 digits' });
+    } else {
+        const postalCodeNum = parseInt(postalCode);
+        if (postalCodeNum < 10000 || postalCodeNum > 99999) {
+            errors.push({ field: 'postalCode', message: 'Postal code must be between 10000 and 99999' });
+        }
+    }
+   }
+
+    // Phone Number validation - Pakistan specific
+    if (!phoneNumber || phoneNumber.trim() === '') {
+        errors.push({ field: 'phoneNumber', message: 'Phone number is required' });
+    } else {
+        const cleanedPhone = phoneNumber.replace(/\D/g, '');
+        
+        // Check if it's a valid Pakistani mobile number
+        const mobileRegex = /^((\+92)|(0092)|(92)|(0))?(3[0-9]{9})$/;
+        
+        // Check if it's a valid Pakistani landline number
+        const landlineRegex = /^((\+92)|(0092)|(92)|(0))?([1-9][0-9]{8})$/;
+        
+        if (!mobileRegex.test(cleanedPhone) && !landlineRegex.test(cleanedPhone)) {
+            errors.push({ 
+                field: 'phoneNumber', 
+                message: 'Please enter a valid Pakistani phone number. Mobile: 03XXXXXXXXX, Landline: 0XXYYYYYYY' 
+            });
+        } else if (cleanedPhone.length < 10 || cleanedPhone.length > 12) {
+            errors.push({ 
+                field: 'phoneNumber', 
+                message: 'Phone number must be 10-12 digits long' 
+            });
+        }
+    }
+
+    return errors;
+};
+
+
+
+
+
 
 async function addProfileData(req, res) {
     
@@ -12,6 +127,17 @@ async function addProfileData(req, res) {
     if (!finduser) {
         return res.status(404).json({ error: 'User not found' });
     }
+    const validationErrors = validatePakistanAddress(req, res);
+    
+    if (validationErrors.length > 0) {
+        return res.status(400).json({
+            error: validationErrors[0].message
+        });
+    }
+
+
+
+
     const profileImage = req.file ? req.file.filename : finduser.profileImageURL;
     
     finduser.fullName = fullName;
@@ -62,6 +188,12 @@ async function ChangePassword(req, res) {
             });
         }
         const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/;
+        if(newPassword.includes(' ')){
+            return res.status(400).json({
+                fieldErrors: { newPassword: 'Password should not contain spaces.' },
+                error: 'Password should not contain spaces.'
+            });
+        }
         if (!passwordRegex.test(newPassword)) {
             return res.status(400).json({
                 fieldErrors: { newPassword: 'Password must be at least 8 characters long and include an uppercase letter, a number, and a special character.' },
@@ -100,7 +232,7 @@ async function ChangePassword(req, res) {
     console.log('Get all users request received');
     try {
         const users = await userModel.find();
-        const filteredonlyUsers = users.filter(user => user.role === 'User');
+        const filteredonlyUsers = users.filter(user => user.email !=='arslanakramsoftwareengineer@gmail.com');
         console.log('Filtered Users:', filteredonlyUsers);
         res.status(200).json(filteredonlyUsers);
     } catch (err) {

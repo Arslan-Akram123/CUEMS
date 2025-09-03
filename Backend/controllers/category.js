@@ -1,15 +1,78 @@
 const { message } = require('statuses');
 const Category = require('../models/category');
 
+function validateNameAndDescription(req) {
+    const { name, description } = req.body;
+    const errors = [];
 
+    // Name validation
+    if (!name || name.trim() === '') {
+        errors.push({
+            field: 'name',
+            message: 'Name is required'
+        });
+    } else {
+        const trimmedName = name.trim();
+        
+        if (trimmedName.length < 2) {
+            errors.push({
+                field: 'name',
+                message: 'Name must be at least 2 characters long'
+            });
+        } else if (trimmedName.length > 25) {
+            errors.push({
+                field: 'name',
+                message: 'Name cannot exceed 25 characters'
+            });
+        } else if (!/^[a-zA-Z\s]+$/.test(trimmedName)) {
+            errors.push({
+                field: 'name',
+                message: 'Name can only contain letters and spaces'
+            });
+        }
+    }
+
+    // Description validation
+    if (!description || description.trim() === '') {
+        errors.push({
+            field: 'description',
+            message: 'Description is required'
+        });
+    } else {
+        const trimmedDescription = description.trim();
+        
+        if (trimmedDescription.length < 10) {
+            errors.push({
+                field: 'description',
+                message: 'Description must be at least 10 characters long'
+            });
+        } else if (trimmedDescription.length > 2000) {
+            errors.push({
+                field: 'description',
+                message: 'Description cannot exceed 2000 characters'
+            });
+        }
+    }
+
+    return errors;
+}
 async function addCategory(req, res) {
     const { name, description } = req.body;
-   
-    if (!name || !description) {
-        return res.status(400).json({success: false,
-             type: "error",
-             message: 'Name and description are required' });
-    }
+   const validationErrors = validateNameAndDescription(req);
+        
+        // Check if there are any validation errors
+        if (validationErrors.length > 0) {
+            return res.status(400).json({
+                success: false,
+                message: validationErrors[0].message,
+                errorField: validationErrors[0].field
+            });
+        }
+    // if (!name || !description) {
+    //     return res.status(400).json({success: false,
+    //          type: "error",
+    //          message: 'Name and description are required' });
+    // }
     const existingCategory = await Category.find();
     if (existingCategory.some(category => category.name.toLowerCase() === name.toLowerCase())) {
         return res.status(400).json({  success: false,
@@ -18,7 +81,9 @@ async function addCategory(req, res) {
     }
     
     try {
-        const category = new Category({ name, description });
+        const trimmedName = name.trim();
+        const trimmedDescription = description.trim();
+        const category = new Category({name: trimmedName, description:trimmedDescription });
         await category.save();
         res.status(201).json({success: true,
              type: "success",
@@ -44,10 +109,20 @@ async function getAllCategories(req, res) {
 
 async function updateCategory(req, res) {
     const { id } = req.params;
+    const validationErrors = validateNameAndDescription(req);
+        
+        // Check if there are any validation errors
+        if (validationErrors.length > 0) {
+            return res.status(400).json({
+                success: false,
+                message: validationErrors[0].message,
+                errorField: validationErrors[0].field
+            });
+        }
     const { name, description } = req.body;
 
     if (!name || !description) {
-        return res.status(400).json({ error: 'Name and description are required' });
+        return res.status(400).json({ message: 'Name and description are required' });
     }
 
     try {

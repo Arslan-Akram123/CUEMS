@@ -44,6 +44,22 @@ const AdminCommentsPage = () => {
         }
     }, [searchTerm, comments]);
 
+
+    const handleDeleteComment = (commentId) => {
+        if (window.confirm("Are you sure you want to delete this comment?")) {
+            fetch(`http://localhost:8001/comments/deleteComment/${commentId}`,
+                { method: 'DELETE',
+                 credentials: 'include' })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.message === "Comment deleted successfully") {
+                        setComments(prevComments => prevComments.filter(comment => comment._id !== commentId));
+                        setFilteredComments(prevComments => prevComments.filter(comment => comment._id !== commentId));
+                    }
+                })
+                .catch(err => console.error(err));
+        }
+    };
   return (
     <div>
         <h1 className="text-3xl font-bold text-gray-800 mb-6">New Comments</h1>
@@ -74,6 +90,7 @@ const AdminCommentsPage = () => {
                             <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase">Events</th>
                             <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase">Ratings-5/5</th>
                             <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                            <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase">Delete</th>
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200 text-sm">
@@ -86,6 +103,10 @@ const AdminCommentsPage = () => {
                                     <td className="py-4 px-4">{item.event?.name}</td>
                                     <td className="py-4 px-4">{renderStars(item?.rating)}</td>
                                     <td className="py-4 px-4">{item.createdAt ? new Date(item?.createdAt).toLocaleDateString() : ''}</td>
+                                    <td className="py-4 px-4">
+                                        <button 
+                                        onClick={() => handleDeleteComment(item?._id)} className="text-red-500 hover:text-red-700 font-semibold">Delete</button>
+                                    </td>
                                 </tr>
                             ))
                         ) : (

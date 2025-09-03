@@ -22,6 +22,7 @@ const AdminNoticesPage = () => {
             body: JSON.stringify(notice)
         }).then(response => {
             if (response.ok) {
+                console.log(response.json());
                 setMessage('Notice added successfully.');
                 setMessageType('success');
                 setNotice({ title: '', description: '' });
@@ -30,12 +31,16 @@ const AdminNoticesPage = () => {
                     setMessageType('');
                 }, 1200);
             } else {
-                setMessage('Failed to add notice.');
-                setMessageType('error');
+                const responseData = response.json();
+                responseData.then(data => {
+                     setMessage(data.message || 'Error adding notice.');
+                     setMessageType('error');
                 setTimeout(() => {
                     setMessage(null);
                     setMessageType('');
                 }, 1200);
+                });
+               
             }
         }).catch(() => {
             setMessage('Network error. Try again.');

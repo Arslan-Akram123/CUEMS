@@ -1,8 +1,9 @@
 // src/components/ReviewCard.jsx
-import { FiStar } from 'react-icons/fi';
+import { FiStar,FiTrash } from 'react-icons/fi';
 
 const ReviewCard = ({ review }) => {
   // Helper to render star ratings
+  console.log(review);
   const renderStars = (rating) => {
     return Array.from({ length: 5 }, (_, index) => (
       <FiStar
@@ -26,7 +27,13 @@ const ReviewCard = ({ review }) => {
       {/* Review Content */}
       <div className="flex-grow">
         <div className="flex items-center justify-between">
-          <p className="font-bold text-gray-800">{review.user}</p>
+          
+          <div className='flex gap-2 items-center'>
+            <p className="font-bold text-gray-800">{review.user}</p>
+             {/* <button className="text-sm text-red-500 flex"
+             onClick={() => {handleDeleteComment(review._id)}}
+             ><FiTrash/></button> */}
+          </div>
           <p className="text-sm text-gray-500">{review.time}</p>
         </div>
         <div className="my-1">{renderStars(review.rating)}</div>

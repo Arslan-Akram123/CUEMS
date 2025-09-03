@@ -1,7 +1,7 @@
 // src/components/admin/Sidebar.jsx
 import { Link, useLocation } from 'react-router-dom';
 // Import the X icon
-import { FiHome, FiCalendar, FiMessageSquare, FiUser, FiCheckSquare, FiGrid, FiUsers, FiAward , FiSettings, FiPlusCircle, FiX } from 'react-icons/fi';
+import { FiHome, FiCalendar, FiMessageSquare, FiUser, FiCheckSquare, FiGrid, FiUsers, FiAward , FiSettings, FiPlusCircle, FiX,FiDollarSign } from 'react-icons/fi';
 // import Logo from '../Logo';
 import { useProfile } from '../../context/ProfileContext/ProfileContext';
 // Accept a new prop to handle closing the sidebar
@@ -15,6 +15,7 @@ const Sidebar = ({ isSidebarOpen, onSidebarClose }) => {
         { icon: <FiMessageSquare />, text: 'Comments', path: '/admin/comments' },
         { icon: <FiUser />, text: 'Profile', path: '/admin/profile' },
         { icon: <FiCheckSquare />, text: 'Bookings', path: '/admin/bookings' },
+         { icon: <FiDollarSign />, text: 'Payments', path: '/admin/payments' },
         { icon: <FiGrid />, text: 'Categories', path: '/admin/categories' },
         { icon: <FiUsers />, text: 'Users', path: '/admin/users' },
         { icon: <FiPlusCircle />, text: 'Notices', path: '/admin/notices' },

@@ -38,6 +38,7 @@ const EditEventPage = () => {
         reservedSeats: 0,
         bookings: 0,
         description: '',
+        status: '',
         image: null
     });
     const [imagePreview, setImagePreview] = useState(null);
@@ -70,6 +71,7 @@ const EditEventPage = () => {
                     reservedSeats: data.reservedSeats || 0,
                     bookings: data.bookings || 0,
                     description: data.description || '',
+                    status: data.status || '',
                     image: null
                 });
                 if (data.image) {
@@ -113,9 +115,38 @@ const EditEventPage = () => {
         setMessage(null);
         setMessageType('');
 
-        // Validation: end date >= start date
+        // // Validation: end date >= start date
+        // const startDate = eventData.startDate ? new Date(eventData.startDate) : null;
+        // const endDate = eventData.endDate ? new Date(eventData.endDate) : null;
+        // if (startDate && endDate && endDate < startDate) {
+        //     setMessage('End date must be equal to or greater than start date.');
+        //     setMessageType('error');
+        //     setTimeout(() => {
+        //         setMessage(null);
+        //         setMessageType('');
+        //     }, 1500);
+        //     return;
+        // }
+        // Validation: start date >= current date AND end date >= start date
         const startDate = eventData.startDate ? new Date(eventData.startDate) : null;
         const endDate = eventData.endDate ? new Date(eventData.endDate) : null;
+        const currentDate = new Date();
+
+        // Reset time part for accurate date comparison (optional)
+        currentDate.setHours(0, 0, 0, 0);
+        if (startDate) startDate.setHours(0, 0, 0, 0);
+        if (endDate) endDate.setHours(0, 0, 0, 0);
+
+        if (startDate && startDate < currentDate) {
+            setMessage('Start date must be equal to or greater than today.');
+            setMessageType('error');
+            setTimeout(() => {
+                setMessage(null);
+                setMessageType('');
+            }, 1500);
+            return;
+        }
+
         if (startDate && endDate && endDate < startDate) {
             setMessage('End date must be equal to or greater than start date.');
             setMessageType('error');
@@ -125,7 +156,6 @@ const EditEventPage = () => {
             }, 1500);
             return;
         }
-
         // Validation: end time > start time (if same date)
         if (startDate && endDate && eventData.startTime && eventData.endTime && endDate.getTime() === startDate.getTime()) {
             // Parse times as minutes since midnight
@@ -166,7 +196,8 @@ const EditEventPage = () => {
                     navigate('/admin/events');
                 }, 1200);
             } else {
-                setMessage(result.message || 'Failed to update event.');
+                
+                setMessage(result.error || 'Failed to update event.');
                 setMessageType('error');
             }
         } catch (error) {
@@ -241,7 +272,7 @@ const EditEventPage = () => {
                                 {imagePreview && (
                                     <img src={imagePreview} alt="Preview" className="mt-2 mx-auto max-h-32 rounded" />
                                 )}
-                                <p className="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
+                                <p className="text-xs text-gray-500">PNG, JPG, GIF up to 5MB</p>
                             </div>
                         </div>
                     </div>
@@ -277,7 +308,9 @@ const EditEventPage = () => {
                     <button type="button" className="bg-red-500 text-white font-bold py-3 px-8 rounded-lg hover:bg-red-600" onClick={handleDelete}>
                         Delete Event
                     </button>
-                    <button type="submit" className="bg-teal-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-teal-700">
+                    <button type="submit" className={`bg-teal-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-teal-700 ${eventData.status === "completed" ? "opacity-50 cursor-not-allowed" : ""}`}
+
+                    >
                         Update Event
                     </button>
                 </div>

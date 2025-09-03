@@ -1,6 +1,172 @@
 
 const eventSchema = require('../models/events');
+function validateBusinessData(req, res) {
+    const {
+        name,
+        location,
+        totalSubscribers,
+        price,
+        category,
+        description,
+    } = req.body;
 
+    const errors = [];
+
+    // Name validation
+    if (!name || name.trim() === '') {
+        errors.push({
+            field: 'name',
+            message: 'Name is required'
+        });
+    } else {
+        const trimmedName = name.trim();
+        
+        if (trimmedName.length < 2) {
+            errors.push({
+                field: 'name',
+                message: 'Name must be at least 2 characters long'
+            });
+        } else if (trimmedName.length > 100) {
+            errors.push({
+                field: 'name',
+                message: 'Name cannot exceed 100 characters'
+            });
+        } else if (!/^[a-zA-Z0-9\s\-_&.,()!@#$%^*]+$/.test(trimmedName)) {
+            errors.push({
+                field: 'name',
+                message: 'Name contains invalid characters'
+            });
+        }
+    }
+
+    // Location validation
+    if (!location || location.trim() === '') {
+        errors.push({
+            field: 'location',
+            message: 'Location is required'
+        });
+    } else {
+        const trimmedLocation = location.trim();
+        
+        if (trimmedLocation.length < 3) {
+            errors.push({
+                field: 'location',
+                message: 'Location must be at least 3 characters long'
+            });
+        } else if (trimmedLocation.length > 200) {
+            errors.push({
+                field: 'location',
+                message: 'Location cannot exceed 200 characters'
+            });
+        } else if (!/^[a-zA-Z0-9\s\-_,.()#&/@]+$/.test(trimmedLocation)) {
+            errors.push({
+                field: 'location',
+                message: 'Location contains invalid characters'
+            });
+        }
+    }
+
+    // Total Subscribers validation
+    if (totalSubscribers !== undefined && totalSubscribers !== null) {
+        const subscribers = Number(totalSubscribers);
+        
+        if (isNaN(subscribers)) {
+            errors.push({
+                field: 'totalSubscribers',
+                message: 'Total subscribers must be a valid number'
+            });
+        } else if (subscribers < 0) {
+            errors.push({
+                field: 'totalSubscribers',
+                message: 'Total subscribers cannot be negative'
+            });
+        } else if (subscribers > 1000000000) {
+            errors.push({
+                field: 'totalSubscribers',
+                message: 'Total subscribers cannot exceed 1 billion'
+            });
+        } else if (!Number.isInteger(subscribers)) {
+            errors.push({
+                field: 'totalSubscribers',
+                message: 'Total subscribers must be a whole number'
+            });
+        }
+    }
+
+    // Price validation
+    if (price !== undefined && price !== null) {
+        const priceValue = Number(price);
+        
+        if (isNaN(priceValue)) {
+            errors.push({
+                field: 'price',
+                message: 'Price must be a valid number'
+            });
+        } else if (priceValue < 0) {
+            errors.push({
+                field: 'price',
+                message: 'Price cannot be negative'
+            });
+        } else if (priceValue > 1000000) {
+            errors.push({
+                field: 'price',
+                message: 'Price cannot exceed 1,000,000'
+            });
+        } else if (priceValue.toString().split('.')[1]?.length > 2) {
+            errors.push({
+                field: 'price',
+                message: 'Price can have maximum 2 decimal places'
+            });
+        }
+    }
+
+    // Category validation
+    if (!category || category.trim() === '') {
+        errors.push({
+            field: 'category',
+            message: 'Category is required'
+        });
+    } else {
+        const trimmedCategory = category.trim();
+        
+        if (trimmedCategory.length < 2) {
+            errors.push({
+                field: 'category',
+                message: 'Category must be at least 2 characters long'
+            });
+        } else if (trimmedCategory.length > 50) {
+            errors.push({
+                field: 'category',
+                message: 'Category cannot exceed 50 characters'
+            });
+        } else if (!/^[a-zA-Z0-9\s\-_&]+$/.test(trimmedCategory)) {
+            errors.push({
+                field: 'category',
+                message: 'Category contains invalid characters'
+            });
+        }
+    }
+
+    // Description validation
+    if (description && description.trim() !== '') {
+        const trimmedDescription = description.trim();
+        
+        if (trimmedDescription.length < 10) {
+            errors.push({
+                field: 'description',
+                message: 'Description must be at least 10 characters long'
+            });
+        } else if (trimmedDescription.length > 2000) {
+            errors.push({
+                field: 'description',
+                message: 'Description cannot exceed 2000 characters'
+            });
+        }
+    }
+
+    // Return errors array (don't send response here)
+    return errors;
+}
 const createEvent = async (req, res) => {
     try {
         const {
@@ -15,7 +181,16 @@ const createEvent = async (req, res) => {
             category,
             description,
         } = req.body;
-
+   const validationErrors = validateBusinessData(req, res);
+        
+        // Check if there are any validation errors
+        if (validationErrors.length > 0) {
+            return res.status(400).json({
+                success: false,
+                error: validationErrors[0].message,
+                errorField: validationErrors[0].field
+            });
+        }
         const image = req.file ? req.file.filename : null;
 
         const event = new eventSchema({
@@ -121,7 +296,16 @@ const getAllEvents = async (req, res) => {
         category,
         description
     } = req.body;
-
+     const validationErrors = validateBusinessData(req, res);
+        
+        // Check if there are any validation errors
+        if (validationErrors.length > 0) {
+            return res.status(400).json({
+                success: false,
+                error: validationErrors[0].message,
+                errorField: validationErrors[0].field
+            });
+        }
     try {
         const specificEvent = await eventSchema.findById(id);
         if (!specificEvent) {

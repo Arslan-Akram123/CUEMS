@@ -57,9 +57,38 @@ const CreateEventPage = () => {
         setMessage(null);
         setMessageType('');
 
-       
+
+        // const startDate = formData.startDate ? new Date(formData.startDate) : null;
+        // const endDate = formData.endDate ? new Date(formData.endDate) : null;
+        // if (startDate && endDate && endDate < startDate) {
+        //     setMessage('End date must be equal to or greater than start date.');
+        //     setMessageType('error');
+        //     setTimeout(() => {
+        //         setMessage(null);
+        //         setMessageType('');
+        //     }, 1500);
+        //     return;
+        // }
+        // Validation: start date >= current date AND end date >= start date
         const startDate = formData.startDate ? new Date(formData.startDate) : null;
         const endDate = formData.endDate ? new Date(formData.endDate) : null;
+        const currentDate = new Date();
+
+        // Reset time part for accurate date comparison (optional)
+        currentDate.setHours(0, 0, 0, 0);
+        if (startDate) startDate.setHours(0, 0, 0, 0);
+        if (endDate) endDate.setHours(0, 0, 0, 0);
+
+        if (startDate && startDate < currentDate) {
+            setMessage('Start date must be equal to or greater than today.');
+            setMessageType('error');
+            setTimeout(() => {
+                setMessage(null);
+                setMessageType('');
+            }, 1500);
+            return;
+        }
+
         if (startDate && endDate && endDate < startDate) {
             setMessage('End date must be equal to or greater than start date.');
             setMessageType('error');
@@ -70,9 +99,8 @@ const CreateEventPage = () => {
             return;
         }
 
-        
         if (startDate && endDate && formData.startTime && formData.endTime && endDate.getTime() === startDate.getTime()) {
-          
+
             const [sh, sm] = formData.startTime.split(':').map(Number);
             const [eh, em] = formData.endTime.split(':').map(Number);
             const startMinutes = sh * 60 + (sm || 0);
@@ -111,7 +139,7 @@ const CreateEventPage = () => {
             } else {
                 const errorData = await response.json();
                 console.error('Error response:', errorData);
-                setMessage('Event creation failed!');
+                setMessage(errorData.error || 'Failed to create event.');
                 setMessageType('error');
                 setTimeout(() => {
                     setMessage(null);
@@ -161,12 +189,12 @@ const CreateEventPage = () => {
                                 <FiUpload className="mx-auto h-12 w-12 text-gray-400" />
                                 <label htmlFor="file-upload" className="relative cursor-pointer bg-white rounded-md font-medium text-teal-600 hover:text-teal-500">
                                     <span>Upload an image</span>
-                                    <input id="file-upload" type="file" accept="image/*" className="sr-only" onChange={handleImageChange} />
+                                    <input id="file-upload" type="file" required accept="image/*" className="sr-only" onChange={handleImageChange} />
                                 </label>
                                 {imagePreview && (
                                     <img src={imagePreview} alt="Preview" className="mt-2 mx-auto max-h-32 rounded" />
                                 )}
-                                <p className="text-xs text-gray-500">PNG, JPG up to 10MB</p>
+                                <p className="text-xs text-gray-500">PNG, JPG up to 5MB</p>
                             </div>
                         </div>
                     </div>
@@ -188,6 +216,7 @@ const CreateEventPage = () => {
                         id="category"
                         name="category"
                         value={formData.category}
+                        required
                         onChange={handleChange}
                         className="w-full border-teal-500 py-2 px-2 rounded-md shadow-sm border-1 focus:outline-teal-500 focus:border-teal-500 focus:ring-teal-500"
                     >
@@ -205,6 +234,7 @@ const CreateEventPage = () => {
                         name="description"
                         rows={4}
                         value={formData.description}
+                        required
                         onChange={handleChange}
                         className="w-full border-1 py-2 px-2 border-teal-500 rounded-md shadow-sm focus:border-teal-500 focus:outline-teal-500 focus:ring-teal-500"
                         placeholder="Write a brief description..."

@@ -21,14 +21,14 @@ const TestimonialCard = ({ testimonial }) => {
 
             {/* Card content */}
             <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200 ml-4">
-                <h3 className="font-bold text-lg">{testimonial.user.fullName}</h3>
-                <div className="my-2">{renderStars(testimonial.rating)}</div>
-                <p className="text-gray-600 italic">"{testimonial.comment}"</p>
+                <h3 className="font-bold text-lg">{testimonial.user?.fullName}</h3>
+                <div className="my-2">{renderStars(testimonial?.rating)}</div>
+                <p className="text-gray-600 italic break-words">"{testimonial?.comment}"</p>
                 <div className="mt-4 flex items-center gap-2 text-sm text-gray-800">
                     <FiCalendar />
                     <span>Event: </span>
-                    <Link to={`/events/${testimonial.event._id}`} className="text-teal-600 hover:underline font-semibold">
-                        {testimonial.event.name}
+                    <Link to={`/events/${testimonial.event?._id}`} className="text-teal-600 hover:underline font-semibold">
+                        {testimonial.event?.name}
                     </Link>
                 </div>
             </div>

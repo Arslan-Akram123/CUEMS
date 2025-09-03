@@ -30,7 +30,7 @@ const EventDetailPage = () => {
       .then(data => {
         setEvent({
           title: data.name || '',
-          price: data.price || '',
+          price: data.price || '0',
           category: data.category || '',
           startDate: formatDate(data.startDate),
           endDate: formatDate(data.endDate),
@@ -62,7 +62,7 @@ const EventDetailPage = () => {
 
 
   const handleBookingSubmit = async (bookingData) => {
-    const { notes } = bookingData;
+    const { notes,setNotes } = bookingData;
     const payload = { notes, eventId };
     fetch('http://localhost:8001/eventsbook/bookingEventrequest', {
       method: 'POST',
@@ -76,16 +76,18 @@ const EventDetailPage = () => {
         const data = await response.json();
         if (response.ok) {
           setBookingMsg({ type: 'success', text: 'Booking successfully. Please wait for admin approval!' });
+          setNotes('');
           setTimeout(() => {
             setBookingMsg({ type: '', text: '' });
             setIsBookingModalOpen(false);
           }, 2500);
         } else {
           // Show specific error if already booked
+
           if (data && data.error === 'You have already booked this event') {
             setBookingMsg({ type: 'error', text: 'You have already booked this event.' });
           } else {
-            setBookingMsg({ type: 'error', text: 'Booking failed.' });
+            setBookingMsg({ type: 'error', text: data.error });
           }
         }
       })
@@ -123,7 +125,9 @@ const EventDetailPage = () => {
           })
           .catch(() => setComments([]));
       } else {
-        setCommentMsg({ type: 'error', text: 'Failed to post comment.' });
+        const data = await response.json();
+        setCommentMsg({ type: 'error', text: data.error });
+         setTimeout(()=> setCommentMsg({ type: '', text: '' }),2500)
       }
     } catch (err) {
       setCommentMsg({ type: 'error', text: 'Network error.' });
@@ -184,7 +188,7 @@ const EventDetailPage = () => {
               <p className="text-md text-gray-500 mt-1">Created At: {event.createdAt ? new Date(event.createdAt).toLocaleDateString() : ''}</p>
             </div>
             <p className="text-4xl font-bold text-teal-600 mt-4 md:mt-0">
-              Rs.{event.price}
+              ${event.price}
             </p>
           </div>
 
@@ -302,7 +306,8 @@ const EventDetailPage = () => {
                       user: review.user?.fullName || review.user || 'Anonymous',
                       time: review.createdAt ? new Date(review.createdAt).toLocaleString() : '',
                       rating: review.rating,
-                      comment: review.comment
+                      comment: review.comment,
+                      userId: review.user?._id 
                     }}
                   />
                 ))}

@@ -94,7 +94,7 @@ const AdminSettingsPage = () => {
                 setTimeout(() => {
                     setMessage(null);
                     setMessageType('');
-                }, 1200);
+                }, 2200);
             }
         } catch (error) {
             setMessage('Network error. Try again.');
@@ -133,15 +133,15 @@ const AdminSettingsPage = () => {
                     <div className="grid md:grid-cols-2 gap-6">
                         <div>
                             <label htmlFor="siteEmail" className="block text-sm font-medium text-gray-700">Site Email</label>
-                            <input type="text" name="siteEmail" id="siteEmail" value={siteSetting.siteEmail} onChange={handleInputChange} className="mt-1 w-full border-teal-500 px-2 py-2 border-1 focus:outline-teal-500 rounded-md shadow-sm focus:border-teal-500 focus:ring-teal-500" />
+                            <input type="text" name="siteEmail" required id="siteEmail" value={siteSetting.siteEmail} onChange={handleInputChange} className="mt-1 w-full border-teal-500 px-2 py-2 border-1 focus:outline-teal-500 rounded-md shadow-sm focus:border-teal-500 focus:ring-teal-500" />
                         </div>
                         <div>
                             <label htmlFor="sitePhone" className="block text-sm font-medium text-gray-700">Site Phone</label>
-                            <input type="text" name="sitePhone" id="sitePhone" value={siteSetting.sitePhone} onChange={handleInputChange} className="mt-1 w-full border-teal-500 px-2 py-2 border-1 focus:outline-teal-500 rounded-md shadow-sm focus:border-teal-500 focus:ring-teal-500" />
+                            <input type="text" name="sitePhone" required id="sitePhone" value={siteSetting.sitePhone} onChange={handleInputChange} className="mt-1 w-full border-teal-500 px-2 py-2 border-1 focus:outline-teal-500 rounded-md shadow-sm focus:border-teal-500 focus:ring-teal-500" />
                         </div>
                         <div>
                             <label htmlFor="siteAddress" className="block text-sm font-medium text-gray-700">Site Address</label>
-                            <input type="text" name="siteAddress" id="siteAddress" value={siteSetting.siteAddress} onChange={handleInputChange} className="mt-1 w-full border-teal-500 px-2 py-2 border-1 focus:outline-teal-500 rounded-md shadow-sm focus:border-teal-500 focus:ring-teal-500" />
+                            <input type="text" name="siteAddress" required id="siteAddress" value={siteSetting.siteAddress} onChange={handleInputChange} className="mt-1 w-full border-teal-500 px-2 py-2 border-1 focus:outline-teal-500 rounded-md shadow-sm focus:border-teal-500 focus:ring-teal-500" />
                         </div>
                     </div>
                 </div>
@@ -152,15 +152,15 @@ const AdminSettingsPage = () => {
                     <div className="grid md:grid-cols-2 gap-6">
                         <div>
                             <label htmlFor="tiwitterLink" className="block text-sm font-medium text-gray-700">Twitter</label>
-                            <input type="text" name="tiwitterLink" id="tiwitterLink" value={siteSetting.tiwitterLink} onChange={handleInputChange} className="mt-1 w-full border-teal-500 px-2 py-2 border-1 focus:outline-teal-500 rounded-md shadow-sm focus:border-teal-500 focus:ring-teal-500" />
+                            <input type="text" name="tiwitterLink" required id="tiwitterLink" value={siteSetting.tiwitterLink} onChange={handleInputChange} className="mt-1 w-full border-teal-500 px-2 py-2 border-1 focus:outline-teal-500 rounded-md shadow-sm focus:border-teal-500 focus:ring-teal-500" />
                         </div>
                         <div>
                             <label htmlFor="facebookLink" className="block text-sm font-medium text-gray-700">Facebook</label>
-                            <input type="text" name="facebookLink" id="facebookLink" value={siteSetting.facebookLink} onChange={handleInputChange} className="mt-1 w-full border-teal-500 px-2 py-2 border-1 focus:outline-teal-500 rounded-md shadow-sm focus:border-teal-500 focus:ring-teal-500" />
+                            <input type="text" name="facebookLink" required id="facebookLink" value={siteSetting.facebookLink} onChange={handleInputChange} className="mt-1 w-full border-teal-500 px-2 py-2 border-1 focus:outline-teal-500 rounded-md shadow-sm focus:border-teal-500 focus:ring-teal-500" />
                         </div>
                         <div>
                             <label htmlFor="instagramLink" className="block text-sm font-medium text-gray-700">Instagram</label>
-                            <input type="text" name="instagramLink" id="instagramLink" value={siteSetting.instagramLink} onChange={handleInputChange} className="mt-1 w-full border-teal-500 px-2 py-2 border-1 focus:outline-teal-500 rounded-md shadow-sm focus:border-teal-500 focus:ring-teal-500" />
+                            <input type="text" name="instagramLink" required id="instagramLink" value={siteSetting.instagramLink} onChange={handleInputChange} className="mt-1 w-full border-teal-500 px-2 py-2 border-1 focus:outline-teal-500 rounded-md shadow-sm focus:border-teal-500 focus:ring-teal-500" />
                         </div>
                     </div>
                 </div>
@@ -180,7 +180,7 @@ const AdminSettingsPage = () => {
                                     <span className="text-gray-400">No image</span>
                                 )}
                             </div>
-                            <input type="file" className="mt-2 text-sm font-medium text-teal-600 px-2 py-2 border-1 border-teal-500 rounded-md w-full" onChange={handleMainImageChange} />
+                            <input type="file" accept="image/*" className="mt-2 text-sm font-medium text-teal-600 px-2 py-2 border-1 border-teal-500 rounded-md w-full" onChange={handleMainImageChange} />
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Site Logo</label>
@@ -194,7 +194,7 @@ const AdminSettingsPage = () => {
                                     <span className="text-gray-400">No image</span>
                                 )}
                             </div>
-                            <input type="file" className="mt-2 text-sm font-medium text-teal-600 px-2 py-2 border-1 border-teal-500 rounded-md w-full" onChange={handleLogoChange} />
+                            <input type="file" accept="image/*" className="mt-2 text-sm font-medium text-teal-600 px-2 py-2 border-1 border-teal-500 rounded-md w-full" onChange={handleLogoChange} />
                         </div>
                     </div>
                 </div>
@@ -216,11 +216,11 @@ const AdminSettingsPage = () => {
                         </div>
                         <div className="md:col-span-2 mt-4">
                             <label htmlFor="description" className="block text-sm font-medium text-gray-700">Site Description</label>
-                            <textarea name="description" id="description" rows={3} className="mt-1 w-full border-teal-500 focus:outline-teal-500 rounded-md px-2 py-2 border-1" value={siteSetting.description} onChange={handleInputChange}></textarea>
+                            <textarea name="description" id="description" required rows={3} className="mt-1 w-full border-teal-500 focus:outline-teal-500 rounded-md px-2 py-2 border-1" value={siteSetting.description} onChange={handleInputChange}></textarea>
                         </div>
                         <div className="md:col-span-2 mt-4">
                             <label htmlFor="footerText" className="block text-sm font-medium text-gray-700">Footer Text</label>
-                            <input type="text" name="footerText" id="footerText" value={siteSetting.footerText} onChange={handleInputChange} className="mt-1 w-full border-teal-500 px-2 py-2 border-1 focus:outline-teal-500 rounded-md shadow-sm focus:border-teal-500 focus:ring-teal-500" />
+                            <input type="text" name="footerText" required id="footerText" value={siteSetting.footerText} onChange={handleInputChange} className="mt-1 w-full border-teal-500 px-2 py-2 border-1 focus:outline-teal-500 rounded-md shadow-sm focus:border-teal-500 focus:ring-teal-500" />
                         </div>
                     </div>
                 </div>

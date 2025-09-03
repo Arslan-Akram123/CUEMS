@@ -2,8 +2,8 @@
 const cron = require("node-cron");
 const {generalScraping}=require('./controllers/scraping');
 
-// Run every 2 minutes
-// cron.schedule("*/10 * * * *", () => {
+// Run every 5 minutes
+// cron.schedule("*/12 * * * *", () => {
 //     generalScraping();
 //     console.log("Hello World! The time is:", new Date().toLocaleTimeString());
 // });

@@ -49,7 +49,7 @@ import EditEventPage from './pages/admin/EditEventPage';
 import EditCategoryPage from './pages/admin/EditCategoryPage';
 import EditUniversityPage from './pages/admin/EditUniversityPage';
 import ShowBookingPage from './pages/admin/ShowBookingPage';
-
+import AdminPaymentsPage from './pages/admin/AdminPaymentsPage';
 // --- Layout & Component Imports ---
 // User-Facing Components
 import UniversityEvents from './components/UniversityEvents';
@@ -141,6 +141,7 @@ console.log(siteSetting);
             <Route path="bookings" element={<AdminBookingsPage />} />
             <Route path="bookings/confirmed" element={<ConfirmBookingsPage />} />
             <Route path="bookings/show/:bookingId" element={<ShowBookingPage />} />
+            <Route path="payments" element={<AdminPaymentsPage />} />
             <Route path="categories" element={<AdminCategoriesPage />} />
             <Route path="categories/create" element={<CreateCategoryPage />} />
             <Route path="categories/edit/:categoryId" element={<EditCategoryPage />} />

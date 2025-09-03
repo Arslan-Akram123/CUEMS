@@ -61,7 +61,7 @@ const LatestEventsPage = () => {
                 </div>
 
                 <div className="space-y-8">
-                    {events.map(event => (
+                    {events.length === 0 ? <p className="text-gray-500 text-center py-4">No events found.</p> : events.map(event => (
                         <LatestEventCard key={event._id} event={{
                             ...event,
                             id: event._id,

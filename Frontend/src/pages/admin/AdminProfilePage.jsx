@@ -111,7 +111,7 @@ const AdminProfilePage = () => {
       if (response.ok) {
         setStatusMessage({ type: 'success', text: result.message || 'Profile updated successfully!' });
       } else {
-        setStatusMessage({ type: 'error', text: result.message || 'Update failed.' });
+        setStatusMessage({ type: 'error', text: result.error || 'Update failed.' });
       }
       setTimeout(() => setStatusMessage({ type: '', text: '' }), 2500);
     } catch (error) {
@@ -158,6 +158,8 @@ const AdminProfilePage = () => {
                 <input
                   type="text"
                   id="fullName"
+                  name='fullName'
+                  required
                   value={formData.fullName}
                   onChange={handleChange}
                   className="mt-1 block w-full py-2 px-3 border border-teal-500 rounded-md shadow-sm focus:ring-teal-600 focus:border-teal-600 sm:text-sm focus:outline-teal-500"
@@ -169,6 +171,7 @@ const AdminProfilePage = () => {
                 <input
                   type="text"
                   id="street"
+                  required
                   value={formData.street}
                   onChange={handleChange}
                   className="mt-1 block w-full py-2 px-3 border border-teal-500 rounded-md shadow-sm sm:text-sm focus:outline-teal-500 focus:border-teal-600 focus:ring-1 focus:ring-teal-600"
@@ -181,6 +184,7 @@ const AdminProfilePage = () => {
                   <input
                     type="text"
                     id="country"
+                    required
                     value={formData.country}
                     onChange={handleChange}
                     className="mt-1 block w-full py-2 px-3 border border-teal-500 rounded-md shadow-sm sm:text-sm focus:outline-teal-500 focus:border-teal-600 focus:ring-1 focus:ring-teal-600"
@@ -192,6 +196,7 @@ const AdminProfilePage = () => {
                   <input
                     type="text"
                     id="city"
+                    required
                     value={formData.city}
                     onChange={handleChange}
                     className="mt-1 block w-full py-2 px-3 border border-teal-500 rounded-md shadow-sm sm:text-sm focus:outline-teal-500 focus:border-teal-600 focus:ring-1 focus:ring-teal-600"
@@ -203,6 +208,7 @@ const AdminProfilePage = () => {
                   <input
                     type="text"
                     id="state"
+                    required
                     value={formData.state}
                     onChange={handleChange}
                     className="mt-1 block w-full py-2 px-3 border border-teal-500 rounded-md shadow-sm sm:text-sm focus:outline-teal-500 focus:border-teal-600 focus:ring-1 focus:ring-teal-600"
@@ -214,6 +220,7 @@ const AdminProfilePage = () => {
                   <input
                     type="number"
                     id="postalCode"
+                    required
                     value={formData.postalCode}
                     onChange={handleChange}
                     className="mt-1 block w-full py-2 px-3 border border-teal-500 rounded-md shadow-sm sm:text-sm focus:outline-teal-500 focus:border-teal-600 focus:ring-1 focus:ring-teal-600"
@@ -253,6 +260,7 @@ const AdminProfilePage = () => {
               <input
                 type="text"
                 id="phoneNumber"
+                required
                 value={formData.phoneNumber}
                 onChange={handleChange}
                 className="mt-1 block w-full py-2 px-3 border border-teal-500 rounded-md shadow-sm sm:text-sm focus:outline-teal-500 focus:border-teal-600 focus:ring-1 focus:ring-teal-600"

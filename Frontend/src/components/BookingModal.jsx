@@ -15,7 +15,8 @@ const BookingModal = ({ eventName, isOpen, onClose, onSubmit, bookingMsg }) => {
     const handleSubmit = (e) => {
         e.preventDefault();
         // Pass the collected data up to the parent component
-        onSubmit({  notes });
+        
+        onSubmit({  notes,setNotes });
     };
 
     return (
@@ -26,7 +27,7 @@ const BookingModal = ({ eventName, isOpen, onClose, onSubmit, bookingMsg }) => {
         >
             {/* Modal Content */}
             <div 
-                className="bg-white p-8 rounded-lg shadow-xl w-full max-w-xl z-50"
+                className="bg-white p-8 in rounded-lg shadow-xl w-full max-w-xl z-50"
                 onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the form
             >
                 <div className="flex items-center gap-3 mb-8">

@@ -28,7 +28,7 @@ const TestimonialsPage = () => {
                 </div>
 
                 <div className="space-y-8">
-                    {testimonials.map(testimonial => (
+                    {testimonials.length === 0 ? <p className="text-gray-500 text-center py-4">No testimonials found.</p> : testimonials.map(testimonial => (
                         <TestimonialCard key={testimonial._id} testimonial={testimonial} />
                     ))}
                 </div>

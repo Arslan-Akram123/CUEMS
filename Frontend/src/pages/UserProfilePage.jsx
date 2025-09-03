@@ -64,7 +64,7 @@ const UserProfilePage = () => {
             if (response.ok) {
                 setStatusMessage({ type: 'success', text: result.message || 'Profile updated successfully!' });
             } else {
-                setStatusMessage({ type: 'error', text: result.message || 'Update failed.' });
+                setStatusMessage({ type: 'error', text: result.error || 'Update failed.' });
             }
             setTimeout(() => setStatusMessage({ type: '', text: '' }), 2500);
         } catch (error) {
@@ -147,7 +147,9 @@ const UserProfilePage = () => {
                                     <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2"><FiUser /> General Information</h3>
                                     <div>
                                         <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">Full Name</label>
-                                        <input type="text" id="fullName" value={formData.fullName} onChange={handleChange} className="mt-1 block w-full py-2 px-2 border-1 border-teal-500 rounded-md shadow-sm focus:ring-teal-600 focus:outline-teal-500 focus:border-teal-600 sm:text-sm" />
+                                        <input type="text"
+                                        required
+                                         id="fullName" value={formData.fullName} onChange={handleChange} className="mt-1 block w-full py-2 px-2 border-1 border-teal-500 rounded-md shadow-sm focus:ring-teal-600 focus:outline-teal-500 focus:border-teal-600 sm:text-sm" />
                                     </div>
                                     <div>
                                         <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email Address</label>
@@ -155,7 +157,9 @@ const UserProfilePage = () => {
                                     </div>
                                     <div>
                                         <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700">Mobile Number</label>
-                                        <input type="text" id="phoneNumber" value={formData.phoneNumber} onChange={handleChange} className="mt-1 block w-full py-2 px-2 border-1 border-teal-500 rounded-md shadow-sm focus:ring-teal-600 focus:outline-teal-500 focus:border-teal-600 sm:text-sm" />
+                                        <input type="text"
+                                        required
+                                         id="phoneNumber" value={formData.phoneNumber} onChange={handleChange} className="mt-1 block w-full py-2 px-2 border-1 border-teal-500 rounded-md shadow-sm focus:ring-teal-600 focus:outline-teal-500 focus:border-teal-600 sm:text-sm" />
                                     </div>
                                     <div>
                                          <label htmlFor='profileImage' className="block text-sm font-medium text-gray-700">Profile Image</label>

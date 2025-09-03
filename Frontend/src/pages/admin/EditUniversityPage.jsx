@@ -61,11 +61,17 @@ const EditUniversityPage = () => {
                 setMessage(result.message || 'University updated successfully!');
                 setMessageType('success');
                 setTimeout(() => {
+                        setMessage(null);
+                        setMessageType('');
                     navigate('/admin/universities');
                 }, 1200);
             } else {
-                setMessage(result.message || 'Failed to update university.');
+                setMessage(result.error || 'Failed to update university.');
                 setMessageType('error');
+                setTimeout(() => {
+                    setMessage(null);
+                    setMessageType('');
+                }, 1200);
             }
         } catch (error) {
             setMessage('Network error. Try again.');
@@ -147,7 +153,7 @@ const EditUniversityPage = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-1">Current Logo</label>
                     <img src={`/uploads/universities/${universityToEdit.logo}`} alt="Current Logo" className="h-20 w-20 object-contain rounded-md bg-gray-100 p-1"/>
                     <label htmlFor="logo" className="block text-sm font-medium text-gray-700 mt-4">Upload New Logo</label>
-                    <input type="file" id="logo" name='logo'
+                    <input type="file" accept="image/*" id="logo" name='logo'
                      onChange={handleLogoChange}
                      className="mt-1 border-1 border-teal-500 rounded-2xl block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-teal-50 file:text-teal-700  focus:outline-teal-500 hover:file:bg-teal-100"/>
                 </div>

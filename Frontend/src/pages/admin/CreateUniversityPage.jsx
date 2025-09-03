@@ -53,11 +53,17 @@ const CreateUniversityPage = () => {
                 setMessage(result.message || 'University created successfully!');
                 setMessageType('success');
                 setTimeout(() => {
+                    setMessage(null);
+                    setMessageType('');
                     navigate('/admin/universities');
                 }, 1200);
             } else {
-                setMessage(result.message || 'Failed to create university.');
+                setMessage(result.error || 'Failed to create university.');
                 setMessageType('error');
+                setTimeout(() => {
+                    setMessage(null);
+                    setMessageType('');
+                }, 1200);
             }
         } catch (error) {
             console.error('Error creating university:', error);
@@ -133,6 +139,7 @@ const CreateUniversityPage = () => {
                         id="logo"
                         name="logo"
                         accept="image/*"
+                        required
                         onChange={handleFileChange}
                         className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full border-1 border-teal-500 rounded-md file:border-1 file:border-teal-500 file:text-sm file:font-semibold file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100"
                     />
