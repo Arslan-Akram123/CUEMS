@@ -73,7 +73,7 @@ const UniversityComparativeDataPage = () => {
                 </div>
 
                 {/* Results Table */}
-                <div className="bg-white rounded-lg shadow-md border border-gray-200 overflow-x-auto">
+                <div className="bg-white rounded-lg shadow-md border border-gray-200 h-auto max-h-[400px] overflow-auto">
                     <table className="min-w-[900px] w-full text-sm">
                         <thead className="bg-gray-100 border-b-2 border-gray-200 sticky top-0 z-10">
                             <tr>

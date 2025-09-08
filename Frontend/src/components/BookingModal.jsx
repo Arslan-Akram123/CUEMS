@@ -21,13 +21,15 @@ const BookingModal = ({ eventName, isOpen, onClose, onSubmit, bookingMsg }) => {
 
     return (
         // Main overlay
+        <>
         <div 
-            className="fixed inset-0 bg-teal-100 opacity-90 flex items-center justify-center z-40"
+            className="fixed inset-0 bg-[#A9D6D5] opacity-90 flex items-center justify-center z-40"
             onClick={onClose} 
         >
+       </div>
             {/* Modal Content */}
             <div 
-                className="bg-white p-8 in rounded-lg shadow-xl w-full max-w-xl z-50"
+                className="bg-white p-8 in rounded-lg shadow-xl w-full max-w-xl z-50 fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
                 onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the form
             >
                 <div className="flex items-center gap-3 mb-8">
@@ -65,7 +67,8 @@ const BookingModal = ({ eventName, isOpen, onClose, onSubmit, bookingMsg }) => {
                     </div>
                 </form>
             </div>
-        </div>
+        {/* </div> */}
+        </>
     );
 };
 

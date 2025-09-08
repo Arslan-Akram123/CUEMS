@@ -192,7 +192,7 @@ const CheckoutPage = () => {
         <div className="max-w-2xl mx-auto">
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-3xl font-bold text-gray-800">Checkout</h1>
-            <Link to="/my-bookings" className="flex items-center gap-2 bg-gray-100 text-gray-800 font-bold py-2 px-4 rounded-lg hover:bg-gray-200">
+            <Link to="/my-bookings" className="flex items-center gap-2 bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded-lg hover:bg-gray-300">
               <FiChevronLeft /> Back to Bookings
             </Link>
           </div>

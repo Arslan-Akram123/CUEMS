@@ -281,7 +281,7 @@ const AdminProfilePage = () => {
 
           {/* Submit */}
           <div className="text-right space-x-4 mt-4">
-            <button type="button" className="bg-gray-200 text-gray-800 font-bold py-2 px-6 rounded-lg hover:bg-gray-300">Back</button>
+            {/* <button type="button" className="bg-gray-200 text-gray-800 font-bold py-2 px-6 rounded-lg hover:bg-gray-300">Back</button> */}
             <button type="submit" className="bg-teal-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-teal-700">Update</button>
           </div>
         </form>
