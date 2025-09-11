@@ -1,18 +1,17 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import AuthLayout from '../components/AuthLayout';
-
+import { useLoader } from '../context/LoaderContext';
+import { FaSpinner } from 'react-icons/fa';
+import {useToast} from '../context/ToastContext';
 const ResetPasswordPage = () => {
     const [email, setEmail] = useState('');
-    const [formMessage, setFormMessage] = useState(null);
-    const [fieldErrors, setFieldErrors] = useState({});
+      const {showToast} = useToast();
     const navigate = useNavigate();
-
+  const {showLoader, hideLoader,isLoading} = useLoader();
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setFormMessage(null);
-        setFieldErrors({});
-
+        showLoader();
         try {
             const res = await fetch('http://localhost:8001/auth/reset-password', {
                 method: 'POST',
@@ -24,58 +23,36 @@ const ResetPasswordPage = () => {
             const data = await res.json();
 
             if (!res.ok || data.error) {
-                setFieldErrors({ email: data.error });
-                setFormMessage({ type: 'error', text: data.error || 'Password reset failed' });
-
-                // Automatically clear error message after 1.5 seconds
-                setTimeout(() => setFormMessage(null), 2500);
+                showToast(data.error || 'Password reset failed', 'error');
                 return;
             }
 
-            setFormMessage({ type: 'success', text: data.message });
-
+            showToast(data.message, 'success');
             
             setTimeout(() => {
-                setFormMessage(null);
+            
                 navigate('/login');
-            }, 2500);
+            }, 1500);
 
         } catch (error) {
-            setFormMessage({ type: 'error', text: 'An error occurred' });
-            setTimeout(() => setFormMessage(null), 2500);
+           
+            showToast('An error occurred', 'error');
+           
+        }finally {
+            hideLoader();
         }
     };
 
     const handleEmailChange = (e) => {
         setEmail(e.target.value);
 
-        
-        if (fieldErrors.email) {
-            setFieldErrors((prev) => ({ ...prev, email: null }));
-        }
-
-        
-        if (formMessage) {
-            setFormMessage(null);
-        }
     };
 
     return (
         <AuthLayout title="Reset Your Password">
-            {formMessage && (
-                <div
-                    className={`text-center px-2 py-2 text-sm ${
-                        formMessage.type === 'error'
-                            ? 'text-red-500 bg-red-100 border border-red-300'
-                            : 'text-green-600 bg-green-100 border border-green-300'
-                    }`}
-                >
-                    {formMessage.text}
-                </div>
-            )}
 
             <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-                <div className="rounded-md shadow-sm">
+                <div className="rounded-md ">
                     <div className="flex flex-col gap-1">
                         <label htmlFor="email-address" className="sr-only">Email address</label>
                         <input
@@ -89,9 +66,7 @@ const ResetPasswordPage = () => {
                             className="w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500 sm:text-sm"
                             placeholder="example@gmail.com"
                         />
-                        {fieldErrors.email && (
-                            <p className="text-sm text-red-600">{fieldErrors.email}</p>
-                        )}
+                       
                     </div>
                 </div>
 
@@ -100,7 +75,7 @@ const ResetPasswordPage = () => {
                         type="submit"
                         className="group relative flex w-full justify-center rounded-md border border-transparent bg-teal-500 py-2 px-4 text-sm font-medium text-white hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
                     >
-                        Reset Password
+                        {isLoading?(<span className='flex items-center justify-center gap-3'><FaSpinner className="animate-spin h-5 w-5" />Reset Password... </span>):"Reset Password"}
                     </button>
                 </div>
 

@@ -1,26 +1,17 @@
 import { useState } from 'react';
 import UserLayout from '../components/UserLayout';
 import {Link} from 'react-router-dom'
-
-// Mock data for all universities combined
-const allEvents = [
-    { id: '66258a3e5a9282d6a6dd6ba5', campus: 'Iub', title: '3rd National Webinar under the Umbrella of "RAPID Technology Transfer Grant (RTTG)"', date: '2023-01-17', description: 'Another Webinar under the Umbrella of "RAPID Technology Transfer Grant (RTTG)"' },
-    { id: '66258a3f5a9282d6a6dd6ba8', campus: 'Iub', title: '2nd National Webinar under the Umbrella of "RAPID Technology Transfer Grant (RTTG)"', date: '2023-01-12', description: 'Another National Webinar was held today under the Umbrella of "RAPID Technology Transfer Grant (RTTG)"' },
-    { id: '66258938f320bfb55004294c', campus: 'Minhaj', title: 'Best sports Event Award 2020', date: 'December 3, 2020', description: 'Minhaj University Lahore wins BEST FINTECH EVENT Award, awarded by Fintech Community, Turkey. Deputy Chairman BOG, Dr. Hussain Mohi ud Din Qadri addressed the ceremony held virtually and received the award.' },
-    { id: '66258938f320bfb55004294c', campus: 'Minhaj', title: 'Best sports Event Award 2020', date: 'December 3, 2020', description: 'Minhaj University Lahore wins BEST FINTECH EVENT Award, awarded by Fintech Community, Turkey. Deputy Chairman BOG, Dr. Hussain Mohi ud Din Qadri addressed the ceremony held virtually and received the award.' },
-    { id: '66258f586e3c63dcdbfabd36c', campus: 'Lums', title: 'LUMS Live Session 61: Pakistani Music: Yesterday, Today and Tomorrow sports', date: 'April 08, 2021', description: '6:00 pm' },
-    { id: '66258f666e3c63dcdbfabd442', campus: 'Lums', title: 'LUMS Live Session 22: A Dive into the World of Pakistani Music sports', date: 'November 03, 2020', description: '4:00 pm' },
-];
-
+import { useLoader } from '../context/LoaderContext';
+import { FaSpinner } from 'react-icons/fa';
 const UniversityComparativeDataPage = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [results, setResults] = useState([]);
     const [hasSearched, setHasSearched] = useState(false);
-
+  const {showLoader, hideLoader,isLoading} = useLoader();
   const handleSearch = async (e) => {
     e.preventDefault();
     setHasSearched(true);
-
+    showLoader();
     if (searchTerm) {
         try {
             const response = await fetch(`http://localhost:8001/scraping/comparativeEventsSearch/${searchTerm}`, {
@@ -40,6 +31,8 @@ const UniversityComparativeDataPage = () => {
         } catch (error) {
             console.error('Error fetching search results:', error);
             setResults([]);
+        } finally {
+            hideLoader();
         }
     } else {
         setResults([]);
@@ -66,7 +59,7 @@ const UniversityComparativeDataPage = () => {
                                 className="flex-grow border-teal-500 px-2 py-2 rounded-md shadow-sm focus:border-teal-500 focus:ring-teal-500 focus:outline-teal-500 border-1"
                             />
                             <button type="submit" className="bg-teal-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-teal-600">
-                                Search
+                               {isLoading ?(<span className='flex items-center justify-center gap-3'><FaSpinner className="animate-spin h-5 w-5" />Searching... </span>):(<span>Search</span>)}
                             </button>
                         </form>
                     </div>

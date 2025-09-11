@@ -3,8 +3,9 @@ import { Link, useParams } from 'react-router-dom';
 import { FiChevronLeft, FiHome } from 'react-icons/fi';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-
+import { useLoader } from '../../context/LoaderContext';
+import { FaSpinner } from 'react-icons/fa';
+import { useToast } from '../../context/ToastContext';
 const EditUniversityPage = () => {
     const { universityId } = useParams();
     const [universityToEdit, setUniversityToEdit] = useState({
@@ -14,7 +15,9 @@ const EditUniversityPage = () => {
         logo: null
     });
     const navigate = useNavigate();
-    
+    const {showLoader, hideLoader,isLoading} = useLoader();
+    const {showToast} = useToast();
+    const [loading, setLoading] = useState(false);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -33,23 +36,14 @@ const EditUniversityPage = () => {
                 console.error('Error fetching university data:', error);
             });
     }, []);
-
-
-
-    const [message, setMessage] = useState(null);
-    const [messageType, setMessageType] = useState(''); // 'success' or 'error'
-
     const handleSubmit = async (e) => {
         e.preventDefault();
+        showLoader();
         const formData = new FormData();
         formData.append('name', universityToEdit.name);
         formData.append('shortName', universityToEdit.shortName);
         formData.append('description', universityToEdit.description);
         formData.append('logo', universityToEdit.logo);
-
-        setMessage(null);
-        setMessageType('');
-
         try {
             const response = await fetch(`http://localhost:8001/universities/updateUniversity/${universityId}`, {
                 method: 'PUT',
@@ -58,30 +52,24 @@ const EditUniversityPage = () => {
             });
             const result = await response.json();
             if (response.ok) {
-                setMessage(result.message || 'University updated successfully!');
-                setMessageType('success');
+
+                showToast(result.message || 'University updated successfully!', 'success');
+                
                 setTimeout(() => {
-                        setMessage(null);
-                        setMessageType('');
                     navigate('/admin/universities');
-                }, 1200);
+                }, 1500);
             } else {
-                setMessage(result.error || 'Failed to update university.');
-                setMessageType('error');
-                setTimeout(() => {
-                    setMessage(null);
-                    setMessageType('');
-                }, 1200);
+                showToast(result.error || 'Failed to update university.', 'error');
             }
         } catch (error) {
-            setMessage('Network error. Try again.');
-            setMessageType('error');
+            showToast('Network error. Try again.', 'error');
+        }finally{
+            hideLoader();
         }
     };
 
     const handleDelete = async () => {
-        setMessage(null);
-        setMessageType('');
+        setLoading(true);
         try {
             const response = await fetch(`http://localhost:8001/universities/deleteUniversity/${universityId}`, {
                 method: 'DELETE',
@@ -89,18 +77,17 @@ const EditUniversityPage = () => {
             });
             const result = await response.json();
             if (response.ok) {
-                setMessage(result.message || 'University deleted successfully!');
-                setMessageType('success');
+                showToast(result.message || 'University deleted successfully!', 'success');
                 setTimeout(() => {
                     navigate('/admin/universities');
-                }, 1200);
+                }, 1500);
             } else {
-                setMessage(result.message || 'Failed to delete university.');
-                setMessageType('error');
+                showToast(result.message || 'Failed to delete university.', 'error');
             }
         } catch (error) {
-            setMessage('Network error. Try again.');
-            setMessageType('error');
+            showToast('Network error. Try again.', 'error');
+        }finally{
+            setLoading(false);
         }
     };
 
@@ -121,11 +108,7 @@ const EditUniversityPage = () => {
                 </Link>
             </div>
 
-            {message && (
-                <div className={`mb-4 p-3 rounded text-center font-semibold ${messageType === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                    {message}
-                </div>
-            )}
+           
 
             <form className="bg-white p-8 rounded-lg shadow-md space-y-6" onSubmit={handleSubmit}>
                 <div>
@@ -159,10 +142,10 @@ const EditUniversityPage = () => {
                 </div>
                 <div className="flex justify-end gap-3">
                     <button type="submit" className="bg-teal-600 text-white font-bold py-2 px-8 rounded-lg hover:bg-teal-700">
-                        Update University
+                        {isLoading ?(<span className='flex items-center justify-center gap-3'><FaSpinner className="animate-spin h-5 w-5" />Updating... </span>):(<span>Update University</span>)}
                     </button>
                      <button type="button" onClick={handleDelete} className="bg-red-600 text-white font-bold py-2 px-8 rounded-lg hover:bg-red-700">
-                        Delete University
+                        {loading ?(<span className='flex items-center justify-center gap-3'><FaSpinner className="animate-spin h-5 w-5" />Deleting... </span>):(<span>Delete University</span>)}
                     </button>
                 </div>
             </form>

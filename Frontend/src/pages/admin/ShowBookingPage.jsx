@@ -3,6 +3,9 @@ import { Link, useParams } from 'react-router-dom';
 import { FiCheck, FiX, FiChevronLeft } from 'react-icons/fi';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useLoader } from '../../context/LoaderContext';
+import { FaSpinner } from 'react-icons/fa';
+import { useToast } from '../../context/ToastContext';
 // Reusable component for displaying a read-only field
 const InfoField = ({ label, value }) => (
     <div>
@@ -11,13 +14,13 @@ const InfoField = ({ label, value }) => (
     </div>
 );
 
-
-
 const ShowBookingPage = () => {
-    const { bookingId } = useParams();
-    const [booking, setBooking] = useState([]);
-    const [msg, setMsg] = useState({ type: '', text: '' });
+   const { bookingId } = useParams();
+   const [booking, setBooking] = useState([]);
    const navigate = useNavigate();
+   const {showToast} = useToast();
+   const {showLoader, hideLoader,isLoading} = useLoader();
+   const [loading, setLoading] = useState(false);
     useEffect(() => {
         fetch(`http://localhost:8001/eventsbook/getBooking/${bookingId}`,
              { credentials: 'include' }
@@ -27,6 +30,7 @@ const ShowBookingPage = () => {
     }, []);
 
     const handleConfirmBooking = (bookingId) => {
+        showLoader();
         fetch(`http://localhost:8001/eventsbook/confirmBooking/${bookingId}`, {
             method: 'PUT',
             headers: {
@@ -37,27 +41,23 @@ const ShowBookingPage = () => {
         .then(res => res.json())
         .then(data => {
             if (data.error) {
-                setMsg({ type: 'error', text: data.error });
-                setTimeout(() => {
-                    setMsg({ type: '', text: '' });
-                }, 2500);
+                showToast(data.error, 'error');
             } else {
-                setMsg({ type: 'success', text: 'Booking confirmed successfully.' });
+                showToast('Booking confirmed successfully.', 'success');
                 setTimeout(() => {
-                    setMsg({ type: '', text: '' });
-                    navigate('/admin/dashboard');
-                }, 2500);
+                    navigate('/admin/bookings');
+                }, 1500);
             }
         })
         .catch(err => {
-            setMsg({ type: 'error', text: 'Error confirming booking.' });
-            setTimeout(() => {
-                setMsg({ type: '', text: '' });
-            }, 2500);
+            showToast('Error confirming booking.', 'error');
+        }).finally(() => {
+            hideLoader();
         });
     }
 
     const handleCancelBooking = (bookingId) => {
+        setLoading(true);
         fetch(`http://localhost:8001/eventsbook/cancelBooking/${bookingId}`, {
             method: 'PUT',
             headers: {
@@ -68,40 +68,32 @@ const ShowBookingPage = () => {
         .then(res => res.json())
         .then(data => {
             if (data.error) {
-                setMsg({ type: 'error', text: data.error });
-                setTimeout(() => {
-                    setMsg({ type: '', text: '' });
-                }, 2500);
+                showToast(data.error, 'error');
             } else {
-                setMsg({ type: 'success', text: 'Booking cancelled successfully.' });
+                showToast('Booking cancelled successfully.', 'success');
                 setTimeout(() => {
-                    setMsg({ type: '', text: '' });
-                    navigate('/admin/dashboard');
-                }, 2500);
+                    navigate('/admin/bookings');
+                }, 1500);
             }
         })
         .catch(err => {
-            setMsg({ type: 'error', text: 'Error cancelling booking.' });
-            setTimeout(() => {
-                setMsg({ type: '', text: '' });
-            }, 2500);
+            showToast('Error cancelling booking.', 'error');
+        }).finally(() => {
+            setLoading(false);
         });
     }
     return (
         <div>
-            {msg.text && (
-                <div className={`mb-4 px-4 py-2 rounded text-center font-semibold ${msg.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                    {msg.text}
-                </div>
-            )}
+          
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-3xl font-bold text-gray-800">Show Booking</h1>
                 <div className="flex gap-4">
                     <button onClick={() => handleConfirmBooking(bookingId)} className="flex items-center gap-2  bg-teal-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-teal-600"
                     {...booking?.status === 'paid' || booking?.status === 'confirmed' ? { disabled: true, className: 'flex items-center gap-2 bg-gray-400 text-white font-bold py-2 px-4 rounded-lg cursor-not-allowed' } : {} }
-                        ><FiCheck /> Confirm</button>
+                        ><FiCheck /> {isLoading ?(<span className='flex items-center justify-center gap-3'><FaSpinner className="animate-spin h-5 w-5" />Confirming... </span>):(<span>Confirm Booking</span>)}
+                        </button>
                     <button onClick={() => handleCancelBooking(bookingId)} className="flex items-center gap-2 bg-red-700 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-800"
-                    {...booking?.status === 'cancelled' || booking?.status === 'paid' ? { disabled: true, className: 'flex items-center gap-2 bg-gray-400 text-white font-bold py-2 px-4 rounded-lg cursor-not-allowed' } : {} }><FiX /> Cancel</button>
+                    {...booking?.status === 'cancelled' || booking?.status === 'paid' ? { disabled: true, className: 'flex items-center gap-2 bg-gray-400 text-white font-bold py-2 px-4 rounded-lg cursor-not-allowed' } : {} }><FiX />{loading ?(<span className='flex items-center justify-center gap-3'><FaSpinner className="animate-spin h-5 w-5" />Cancelling... </span>):(<span> Cancel Booking</span>)}</button>
                     <Link to="/admin/bookings" className="flex items-center gap-2 bg-yellow-400 text-yellow-900 font-bold py-2 px-4 rounded-lg hover:bg-yellow-500"><FiChevronLeft /> Back</Link>
                 </div>
             </div>

@@ -5,7 +5,7 @@ const sendEmail = require('../services/sendEmail');
 const validator = require('deep-email-validator');
 
 async function registerUser(req, res) {
-
+   console.log('Registration attempt:');
     const { fullName, email, password } = req.body;
 
     // Full name validation: required, at least 3 chars, only letters and spaces
@@ -47,9 +47,6 @@ async function registerUser(req, res) {
             });
         }
     }
-
-
-
     const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/;
     if (password.includes(' ')) {
         return res.status(400).json({
@@ -66,6 +63,11 @@ async function registerUser(req, res) {
     if (!passwordRegex.test(password)) {
         return res.status(400).json({
             error: 'Password must be at least 8 characters long and include an uppercase letter, a number, and a special character.'
+        });
+    }
+    if(password.length<8 || password.length>15){
+        return res.status(400).json({
+            error: 'Password must be between 8 and 15 characters long.'
         });
     }
 

@@ -5,17 +5,20 @@ import { FiChevronLeft, FiSettings } from 'react-icons/fi';
 // import Logo from '../../components/Logo';
 import { useState, useEffect } from 'react';
 import { useProfile } from '../../context/ProfileContext/ProfileContext';
-
+import { useLoader } from '../../context/LoaderContext';
+import { FaSpinner } from 'react-icons/fa';
+import { useToast } from '../../context/ToastContext';
 const AdminSettingsPage = () => {
     const { siteSetting, fetchSiteSettingData, setSiteSetting } = useProfile();
     const [siteCloseMessage, setSiteCloseMessage] = useState('');
-    const [message, setMessage] = useState(null);
-    const [messageType, setMessageType] = useState('');
+    // const [message, setMessage] = useState(null);
+    // const [messageType, setMessageType] = useState('');
     const [mainImageFile, setMainImageFile] = useState(null);
     const [mainImagePreview, setMainImagePreview] = useState(null);
     const [logoFile, setLogoFile] = useState(null);
     const [logoPreview, setLogoPreview] = useState(null);
-
+    const {showLoader, hideLoader,isLoading} = useLoader();
+    const {showToast} = useToast();
     useEffect(() => {
         fetchSiteSettingData();
     }, []);
@@ -58,8 +61,9 @@ const AdminSettingsPage = () => {
     // Handle form submit
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setMessage(null);
-        setMessageType('');
+        // setMessage(null);
+        // setMessageType('');
+        showLoader();
         const formData = new FormData();
         // Add all text fields
         Object.entries(siteSetting).forEach(([key, value]) => {
@@ -81,28 +85,33 @@ const AdminSettingsPage = () => {
             });
             const result = await response.json();
             if (response.ok) {
-                setMessage('Settings updated successfully!');
-                setMessageType('success');
+                // setMessage('Settings updated successfully!');
+                showToast('Settings updated successfully!', 'success');
+                // setMessageType('success');
                 setSiteSetting(result);
-                setTimeout(() => {
-                    setMessage(null);
-                    setMessageType('');
-                }, 1200);
+                // setTimeout(() => {
+                //     setMessage(null);
+                //     setMessageType('');
+                // }, 1200);
             } else {
-                setMessage(result.message || 'Failed to update settings.');
-                setMessageType('error');
-                setTimeout(() => {
-                    setMessage(null);
-                    setMessageType('');
-                }, 2200);
+                // setMessage(result.message || 'Failed to update settings.');
+                showToast(result.message || 'Failed to update settings.', 'error');
+                // setMessageType('error');
+                // setTimeout(() => {
+                //     setMessage(null);
+                //     setMessageType('');
+                // }, 2200);
             }
         } catch (error) {
-            setMessage('Network error. Try again.');
-            setMessageType('error');
-            setTimeout(() => {
-                setMessage(null);
-                setMessageType('');
-            }, 1200);
+            // setMessage('Network error. Try again.');
+            showToast('Network error. Try again.', 'error');
+            // setMessageType('error');
+            // setTimeout(() => {
+            //     setMessage(null);
+            //     setMessageType('');
+            // }, 1200);
+        } finally {
+            hideLoader();
         }
     };
 
@@ -120,11 +129,11 @@ const AdminSettingsPage = () => {
                 </Link>
             </div>
 
-            {message && (
+            {/* {message && (
                 <div className={`mb-4 p-3 rounded text-center font-semibold ${messageType === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                     {message}
                 </div>
-            )}
+            )} */}
 
             <form className="space-y-8" onSubmit={handleSubmit}>
                 {/* Site Basic Details */}
@@ -227,7 +236,7 @@ const AdminSettingsPage = () => {
 
                 <div className="flex justify-end">
                     <button type="submit" className="bg-teal-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-teal-700">
-                        Update Setting
+                       {isLoading ?(<span className='flex items-center justify-center gap-3'><FaSpinner className="animate-spin h-5 w-5" />Updating... </span>):(<span> Update Setting</span>)}
                     </button>
                 </div>
             </form>

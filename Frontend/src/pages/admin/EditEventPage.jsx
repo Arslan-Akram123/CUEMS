@@ -3,7 +3,9 @@
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { FiChevronLeft, FiUpload, FiEdit } from 'react-icons/fi';
 import { useState, useEffect } from 'react';
-
+import { useLoader } from '../../context/LoaderContext';
+import { FaSpinner } from 'react-icons/fa';
+import { useToast } from '../../context/ToastContext';
 const FormInput = ({ label, id, type = "text", placeholder, value, onChange }) => (
     <div>
         <label htmlFor={id} className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
@@ -25,6 +27,7 @@ const EditEventPage = () => {
     const { eventId } = useParams();
     console.log(eventId);
     const navigate = useNavigate();
+    const {showToast} = useToast();
     const [eventData, setEventData] = useState({
         name: '',
         location: '',
@@ -42,10 +45,9 @@ const EditEventPage = () => {
         image: null
     });
     const [imagePreview, setImagePreview] = useState(null);
-    const [message, setMessage] = useState(null);
-    const [messageType, setMessageType] = useState('');
     const [categories, setCategories] = useState([]);
-
+    const {showLoader, hideLoader,isLoading} = useLoader();
+    const [loading, setLoading] = useState(false);
     useEffect(() => {
         // Helper to format date to YYYY-MM-DD
         const formatDate = (dateStr) => {
@@ -79,8 +81,7 @@ const EditEventPage = () => {
                 }
             })
             .catch(err => {
-                setMessage('Failed to fetch event data.');
-                setMessageType('error');
+                showToast('Failed to fetch event data.', 'error');
             });
     }, []);
 
@@ -112,22 +113,7 @@ const EditEventPage = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setMessage(null);
-        setMessageType('');
-
-        // // Validation: end date >= start date
-        // const startDate = eventData.startDate ? new Date(eventData.startDate) : null;
-        // const endDate = eventData.endDate ? new Date(eventData.endDate) : null;
-        // if (startDate && endDate && endDate < startDate) {
-        //     setMessage('End date must be equal to or greater than start date.');
-        //     setMessageType('error');
-        //     setTimeout(() => {
-        //         setMessage(null);
-        //         setMessageType('');
-        //     }, 1500);
-        //     return;
-        // }
-        // Validation: start date >= current date AND end date >= start date
+       showLoader();
         const startDate = eventData.startDate ? new Date(eventData.startDate) : null;
         const endDate = eventData.endDate ? new Date(eventData.endDate) : null;
         const currentDate = new Date();
@@ -138,22 +124,15 @@ const EditEventPage = () => {
         if (endDate) endDate.setHours(0, 0, 0, 0);
 
         if (startDate && startDate < currentDate) {
-            setMessage('Start date must be equal to or greater than today.');
-            setMessageType('error');
-            setTimeout(() => {
-                setMessage(null);
-                setMessageType('');
-            }, 1500);
+           
+            showToast('Start date must be equal to or greater than today.', 'error');
+            hideLoader();
             return;
         }
 
         if (startDate && endDate && endDate < startDate) {
-            setMessage('End date must be equal to or greater than start date.');
-            setMessageType('error');
-            setTimeout(() => {
-                setMessage(null);
-                setMessageType('');
-            }, 1500);
+            showToast('End date must be equal to or greater than start date.', 'error');
+            hideLoader();
             return;
         }
         // Validation: end time > start time (if same date)
@@ -164,12 +143,8 @@ const EditEventPage = () => {
             const startMinutes = sh * 60 + (sm || 0);
             const endMinutes = eh * 60 + (em || 0);
             if (endMinutes <= startMinutes) {
-                setMessage('End time must be greater than start time for the same date.');
-                setMessageType('error');
-                setTimeout(() => {
-                    setMessage(null);
-                    setMessageType('');
-                }, 1500);
+                showToast('End time must be greater than start time for the same date.', 'error');
+                hideLoader();
                 return;
             }
         }
@@ -190,25 +165,22 @@ const EditEventPage = () => {
             });
             const result = await response.json();
             if (response.ok) {
-                setMessage(result.message || 'Event updated successfully!');
-                setMessageType('success');
+                showToast('Event updated successfully!', 'success');
                 setTimeout(() => {
                     navigate('/admin/events');
-                }, 1200);
+                }, 1500);
             } else {
-                
-                setMessage(result.error || 'Failed to update event.');
-                setMessageType('error');
+                showToast('Failed to update event.', 'error');
             }
         } catch (error) {
-            setMessage('Network error. Try again.');
-            setMessageType('error');
+            showToast('Network error. Try again.', 'error');
+        }finally{
+            hideLoader();
         }
     };
 
     const handleDelete = async () => {
-        setMessage(null);
-        setMessageType('');
+        setLoading(true);
         try {
             const response = await fetch(`http://localhost:8001/events/deleteEvent/${eventId}`, {
                 method: 'DELETE',
@@ -216,18 +188,17 @@ const EditEventPage = () => {
             });
             const result = await response.json();
             if (response.ok) {
-                setMessage(result.message || 'Event deleted successfully!');
-                setMessageType('success');
+                showToast('Event deleted successfully!', 'success');
                 setTimeout(() => {
                     navigate('/admin/events');
-                }, 1200);
+                }, 1500);
             } else {
-                setMessage(result.message || 'Failed to delete event.');
-                setMessageType('error');
+                showToast(result.message || 'Failed to delete event.', 'error');
             }
         } catch (error) {
-            setMessage('Network error. Try again.');
-            setMessageType('error');
+            showToast('Network error. Try again.', 'error');
+        }finally{
+            setLoading(false);
         }
     };
 
@@ -245,11 +216,7 @@ const EditEventPage = () => {
                 </Link>
             </div>
 
-            {message && (
-                <div className={`mb-4 p-3 rounded text-center font-semibold ${messageType === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                    {message}
-                </div>
-            )}
+           
 
             <form className="bg-white p-8 rounded-lg shadow-md space-y-8" onSubmit={handleSubmit}>
                 {/* Basic Info & Image */}
@@ -306,12 +273,12 @@ const EditEventPage = () => {
 
                 <div className="flex justify-end gap-4">
                     <button type="button" className="bg-red-500 text-white font-bold py-3 px-8 rounded-lg hover:bg-red-600" onClick={handleDelete}>
-                        Delete Event
+                       {loading ?(<span className='flex items-center justify-center gap-3'><FaSpinner className="animate-spin h-5 w-5" />Deleting... </span>):(<span> Delete Event</span>)}
                     </button>
                     <button type="submit" className={`bg-teal-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-teal-700 ${eventData.status === "completed" ? "opacity-50 cursor-not-allowed" : ""}`}
 
                     >
-                        Update Event
+                        {isLoading ?(<span className='flex items-center justify-center gap-3'><FaSpinner className="animate-spin h-5 w-5" />Updating... </span>):(<span>Update Event</span>)}
                     </button>
                 </div>
             </form>

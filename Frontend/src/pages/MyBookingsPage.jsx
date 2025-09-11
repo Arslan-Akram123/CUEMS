@@ -4,14 +4,15 @@ import UserLayout from '../components/UserLayout';
 import { FiChevronLeft, FiSearch, FiBookOpen,FiDownload } from 'react-icons/fi';
 import { useState, useEffect } from 'react';
 import { generateInvoice } from '../utils/generateInvoice'; // Import the utility function
-
+import { useLoader } from '../context/LoaderContext';
+import Loader from '../components/Loader';
 const MyBookingsPage = () => {
     const [userBookings, setUserBookings] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
     const location = useLocation();
     const { bookingid } = location.state || {};
     const [highlightedId, setHighlightedId] = useState(bookingid || null);
-
+    const {showLoader, hideLoader,isLoading} = useLoader();
     const handleDownloadInvoice = (booking) => {
        generateInvoice(booking);
     };
@@ -26,10 +27,11 @@ const MyBookingsPage = () => {
     }, [highlightedId]);
 
     useEffect(() => {
+        showLoader();
         fetch('http://localhost:8001/eventsbook/getAllUserBookings', { credentials: 'include' })
             .then(res => res.json())
             .then(data => setUserBookings(data))
-            .catch(err => console.error(err));
+            .catch(err => console.error(err)).finally(hideLoader);
     }, [])
 
 
@@ -73,7 +75,8 @@ const MyBookingsPage = () => {
                                     .filter(b =>
                                         searchTerm === '' || b.event.name.toLowerCase().includes(searchTerm.toLowerCase())
                                     );
-                                return filtered.length > 0 ? (
+                                return  isLoading ? <div className='flex justify-center py-4'><Loader /></div> :
+                                 filtered.length > 0 ? (
                                     <table className="min-w-full">
                                         <thead className="bg-gray-50">
                                             <tr>

@@ -1,14 +1,16 @@
 // src/pages/admin/AdminPaymentsPage.jsx
 import { useState,useEffect } from 'react';
 import { FiDollarSign, FiSearch } from 'react-icons/fi';
-
-
+import { useLoader } from '../../context/LoaderContext';
+import Loader from '../../components/Loader';
 
 const AdminPaymentsPage = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [mockPayments, setMockPayments] = useState([]);
+    const {showLoader, hideLoader,isLoading} = useLoader();
 useEffect(()=>{
-     fetch('http://localhost:8001/stripe/getAllPayments', { credentials: 'include' }).then(res => res.json()).then(data => setMockPayments(data)).catch(err => console.error(err));
+    showLoader();
+     fetch('http://localhost:8001/stripe/getAllPayments', { credentials: 'include' }).then(res => res.json()).then(data => setMockPayments(data)).catch(err => console.error(err)).finally(hideLoader);
 },[])
     const filteredPayments = mockPayments.filter(payment =>
         payment.user.fullName.toLowerCase().includes(searchTerm?.toLowerCase()) ||
@@ -49,7 +51,9 @@ useEffect(()=>{
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200 text-sm">
-                            {filteredPayments.length>0?filteredPayments.map((payment) => (
+                            {
+                                isLoading? <tr><td colSpan="7" className="py-4 px-4 text-center text-gray-500"><Loader /></td></tr>:
+                            filteredPayments.length>0?filteredPayments.map((payment) => (
                                 <tr key={payment?._id}>
                                     <td className="py-4 px-4 font-semibold">{payment?.user?.fullName}</td>
                                     <td className="py-4 px-4">{payment?.user?.email}</td>

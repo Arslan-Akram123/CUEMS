@@ -2,6 +2,8 @@
 import { Link } from 'react-router-dom';
 import { FiUsers, FiCalendar, FiBook ,FiBookmark, FiMessageCircle, FiGrid, FiEye,FiAward  } from 'react-icons/fi';
 import { useState, useEffect } from 'react';
+import {useProgressBar} from '../../context/ProgressBarContext';
+import TopProgressBar from '../../components/TopProgressBar';
 // Helper component for the statistic cards
 const StatCard = ({ icon, title, value, color }) => {
     const colorClasses = {
@@ -29,24 +31,29 @@ const StatCard = ({ icon, title, value, color }) => {
 
 
 const DashboardPage = () => {
+    const {start,finish,isActive}=useProgressBar();
     const [newBookings, setNewBookings] = useState([]);
    const [dashboardData, setDashboardData] = useState([]);
     useEffect(() => {
-        fetch('http://localhost:8001/dashboard/getDashboardData', { credentials: 'include' }).then(res => res.json()).then(data => setDashboardData(data)).catch(err => console.error(err));
+        start();
+        fetch('http://localhost:8001/dashboard/getDashboardData', { credentials: 'include' }).then(res => res.json()).then(data => setDashboardData(data)).catch(err => console.error(err)).finally(finish);
         fetch('http://localhost:8001/eventsbook/getNewBookings', { credentials: 'include' }).then(res => res.json()).then(data => setNewBookings(data)).catch(err => console.error(err));
     }, []);
 
     const stats = [
-        { icon: <FiUsers size={32}/>, title: 'Total Users', value:  dashboardData.totalUsers , color: 'orange' },
-        { icon: <FiCalendar size={32}/>, title: 'Total Events', value: dashboardData.totalEvents, color: 'blue' },
-        { icon: <FiBookmark size={32}/>, title: 'Total Bookings', value: dashboardData.totalBookEvents, color: 'red' },
-        { icon: <FiMessageCircle size={32}/>, title: 'Total Comments', value: dashboardData.totalComments, color: 'teal' },
-        { icon: <FiGrid size={32}/>, title: 'Total Categories', value: dashboardData.totalCategories, color: 'indigo' },
-        { icon: <FiAward  size={32}/>, title: 'Total Universities', value: dashboardData.totalUniversities, color: 'purple' },
+        { icon: <FiUsers size={32}/>, title: 'Total Users', value:  dashboardData.totalUsers||0 , color: 'orange' },
+        { icon: <FiCalendar size={32}/>, title: 'Total Events', value: dashboardData.totalEvents || 0, color: 'blue' },
+        { icon: <FiBookmark size={32}/>, title: 'Total Bookings', value: dashboardData.totalBookEvents || 0, color: 'red' },
+        { icon: <FiMessageCircle size={32}/>, title: 'Total Comments', value: dashboardData.totalComments || 0, color: 'teal' },
+        { icon: <FiGrid size={32}/>, title: 'Total Categories', value: dashboardData.totalCategories || 0, color: 'indigo' },
+        { icon: <FiAward  size={32}/>, title: 'Total Universities', value: dashboardData.totalUniversities || 0, color: 'purple' },
     ];
 
     return (
+        <>
+         <div className='w-full '> <TopProgressBar isActive={isActive} /></div>
         <div>
+           
             <h1 className="text-3xl font-bold text-gray-800 mb-6">Dashboard</h1>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {stats.map(stat => (
@@ -101,6 +108,7 @@ const DashboardPage = () => {
             )}
             
         </div>
+        </>
     );
 };
 

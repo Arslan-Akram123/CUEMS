@@ -6,8 +6,11 @@ import { FiSearch, FiUser, FiBell, FiBookOpen, FiLogOut  } from 'react-icons/fi'
 import { useProfile } from '../context/ProfileContext/ProfileContext';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useToast } from '../context/ToastContext';
+
 const UserHeader = () => {
     // Notification click handler
+    const {showToast} = useToast();
     const handleNotificationClick = async (notif_id) => {
         setLoadingNotif(true);
         try {
@@ -132,6 +135,7 @@ const UserHeader = () => {
         .then(response => response.json())
         .then(data => {
             console.log('Logout successful:', data);
+            // showToast('Logout successful', 'success');
              localStorage.clear();
         setFormData({
             fullName: '',
@@ -144,10 +148,13 @@ const UserHeader = () => {
             email: '',
             profileImage: ''
         });
-            navigate('/login');
+        setTimeout(() => {
+                navigate('/login');
+            }, 1500);
         })
         .catch(error => {
             console.error('Error logging out:', error);
+            showToast('Error logging out', 'error');
         })
     };
 

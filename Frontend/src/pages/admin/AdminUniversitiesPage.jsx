@@ -2,15 +2,17 @@
 import { Link } from 'react-router-dom';
 import { FiPlus, FiEdit } from 'react-icons/fi';
 import { useState, useEffect } from 'react';
-
+import { useLoader } from '../../context/LoaderContext';
+import Loader from '../../components/Loader';
 const AdminUniversitiesPage = () => {
     const [mockUniversities, setMockUniversities] = useState([]);
-
+    const {showLoader, hideLoader,isLoading} = useLoader();
     useEffect(() => {
+        showLoader();
         fetch('http://localhost:8001/universities/getUniversities',{credentials: 'include'})
             .then(response => response.json())
             .then(data => setMockUniversities(data))
-            .catch(error => console.error('Error fetching universities:', error));
+            .catch(error => console.error('Error fetching universities:', error)).finally(hideLoader);
     }, []);
     return (
         <div>
@@ -39,7 +41,8 @@ const AdminUniversitiesPage = () => {
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200 text-sm">
-                            {mockUniversities.length > 0 ? mockUniversities.map((uni, index) => (
+                            {isLoading ? <tr><td colSpan="6" className="py-4 px-4 text-center"><Loader /></td></tr>:
+                            mockUniversities.length > 0 ? mockUniversities.map((uni, index) => (
                                 <tr key={uni._id}>
                                     <td className="py-4 px-4">{index + 1}</td>
                                     <td className="py-4 px-4 font-semibold">{uni.name}</td>

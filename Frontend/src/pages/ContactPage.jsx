@@ -1,17 +1,18 @@
 import UserLayout from '../components/UserLayout';
 import { useState } from 'react';
-
+import { useLoader } from '../context/LoaderContext';
+import { FaSpinner } from 'react-icons/fa';
+import {useToast} from '../context/ToastContext';
 const ContactPage = () => {
+    const {showLoader, hideLoader,isLoading} = useLoader();
+      const {showToast} = useToast();
     const [contactData, setContactData] = useState({  
         message: ''
     });
-    const [message, setMessage] = useState(null);
-    const [messageType, setMessageType] = useState(''); // 'success' or 'error'
 
     const handleContactSubmit = async (e) => {
         e.preventDefault();
-        setMessage(null);
-        setMessageType('');
+        showLoader();
         try {
             const response = await fetch('http://localhost:8001/contactus/createContactUs', {
                 method: 'POST',
@@ -23,28 +24,15 @@ const ContactPage = () => {
             });
             const result = await response.json();
             if (response.ok) {
-                setMessage('Message sent successfully!');
-                setMessageType('success');
-                setTimeout(() => {
-                    setMessage(null);
-                    setContactData({ message: '' });
-                    setMessageType('');
-                }, 2500);
+                showToast('Message sent successfully!', 'success');
+                setContactData({ message: '' });
             } else {
-                setMessage(result.message || 'Failed to send message.');
-                setMessageType('error');
-                setTimeout(() => {
-                    setMessage(null);
-                    setMessageType('');
-                }, 1500);
+                showToast(result.message || 'Failed to send message.', 'error');
             }
         } catch (error) {
-            setMessage('Network error. Try again.');
-            setMessageType('error');
-            setTimeout(() => {
-                setMessage(null);
-                setMessageType('');
-            }, 1500);
+            showToast('Network error. Try again.', 'error');
+        } finally {
+            hideLoader();
         }
     }
 
@@ -58,11 +46,6 @@ const ContactPage = () => {
                     </p>
                 </div>
                 <form className="mt-12 max-w-xl mx-auto bg-white p-8 rounded-lg shadow-md space-y-6" onSubmit={handleContactSubmit}>
-                     {message && (
-                        <div className={`mt-4 p-3 rounded ${messageType === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                            {message}
-                        </div>
-                    )}
                     <div>
                         <label htmlFor="message" className="block text-sm font-medium text-gray-700">Message</label>
                         <textarea
@@ -78,7 +61,7 @@ const ContactPage = () => {
                     </div>
                     <div className="text-right">
                         <button type="submit" className="bg-teal-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-teal-700">
-                            Send Message
+                           {isLoading ?(<span className='flex items-center justify-center gap-3'><FaSpinner className="animate-spin h-5 w-5" /> Sending... </span>):(<span> Send Message</span>)}
                         </button>
                     </div>
                    

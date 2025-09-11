@@ -1,18 +1,19 @@
 // src/pages/admin/AdminNoticesPage.jsx
 import { FiBell } from 'react-icons/fi';
 import { useState } from 'react';
+import { useLoader } from '../../context/LoaderContext';
+import { FaSpinner } from 'react-icons/fa';
+import { useToast } from '../../context/ToastContext';
 const AdminNoticesPage = () => {
     const [notice, setNotice] = useState({
         title: '',
         description: ''
     });
-    const [message, setMessage] = useState(null);
-    const [messageType, setMessageType] = useState(''); // 'success' or 'error'
-
+    const {showToast} = useToast();
+    const {showLoader, hideLoader,isLoading} = useLoader();
     const handleNoticeSubmit = (e) => {
         e.preventDefault();
-        setMessage(null);
-        setMessageType('');
+        showLoader();
         fetch('http://localhost:8001/notices/addNotice', {
             method: 'POST',
             headers: {
@@ -23,32 +24,19 @@ const AdminNoticesPage = () => {
         }).then(response => {
             if (response.ok) {
                 console.log(response.json());
-                setMessage('Notice added successfully.');
-                setMessageType('success');
+                showToast('Notice added successfully.', 'success');
                 setNotice({ title: '', description: '' });
-                setTimeout(() => {
-                    setMessage(null);
-                    setMessageType('');
-                }, 1200);
             } else {
                 const responseData = response.json();
                 responseData.then(data => {
-                     setMessage(data.message || 'Error adding notice.');
-                     setMessageType('error');
-                setTimeout(() => {
-                    setMessage(null);
-                    setMessageType('');
-                }, 1200);
+                     showToast(data.message || 'Error adding notice.', 'error');
                 });
                
             }
         }).catch(() => {
-            setMessage('Network error. Try again.');
-            setMessageType('error');
-            setTimeout(() => {
-                setMessage(null);
-                setMessageType('');
-            }, 1200);
+            showToast('Network error. Try again.', 'error');
+        }).finally(() => {
+            hideLoader();
         });
     };
    
@@ -60,13 +48,6 @@ const AdminNoticesPage = () => {
                 </h1>
                 
             </div>
-
-            {message && (
-                <div className={`mb-4 p-3 rounded text-center font-semibold ${messageType === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                    {message}
-                </div>
-            )}
-
             <form className="bg-white p-8 rounded-lg shadow-md max-w-2xl mx-auto" onSubmit={handleNoticeSubmit}>
                 <div className="space-y-6">
                     <h2 className="text-xl font-semibold text-gray-700 border-b pb-3">Enter Information</h2>
@@ -88,7 +69,7 @@ const AdminNoticesPage = () => {
                     </div>
                     <div className="text-right">
                         <button type="submit" className="bg-teal-600 text-white font-bold py-2 px-8 rounded-lg hover:bg-teal-700">
-                            Send Notice
+                           {isLoading ?(<span className='flex items-center justify-center gap-3'><FaSpinner className="animate-spin h-5 w-5" />Sending... </span>):(<span> Send Notice</span>)}
                         </button>
                     </div>
                 </div>

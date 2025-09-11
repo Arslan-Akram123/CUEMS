@@ -1,17 +1,22 @@
 import { useState, useEffect } from 'react';
 import { useProfile } from '../../context/ProfileContext/ProfileContext';
 import { FiUser, FiMapPin, FiPhone, FiEye, FiEyeOff, FiLock, FiUpload, FiCloudLightning } from 'react-icons/fi';
-
+import { useLoader } from '../../context/LoaderContext';
+import { FaSpinner } from 'react-icons/fa';
+import { useToast } from '../../context/ToastContext';
 const AdminProfilePage = () => {
+  const {showToast} = useToast();
+  const {showLoader, hideLoader,isLoading} = useLoader();
+  const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('general');
-  const [statusMessage, setStatusMessage] = useState({ type: '', text: '' });
+  // const [statusMessage, setStatusMessage] = useState({ type: '', text: '' });
   const [previewImage, setPreviewImage] = useState(null);
   const [securityData, setSecurityData] = useState({
     currentPassword: '',
     newPassword: '',
     confirmPassword: ''
   });
-  const [securityFieldErrors, setSecurityFieldErrors] = useState({});
+  // const [securityFieldErrors, setSecurityFieldErrors] = useState({});
   const { formData, setFormData } = useProfile();
   const [showPassword, setShowPassword] = useState({
     current: false,
@@ -30,14 +35,14 @@ const AdminProfilePage = () => {
   const handleSecurityChange = (e) => {
     const { id, value } = e.target;
     setSecurityData(prev => ({ ...prev, [id]: value }));
-    setSecurityFieldErrors(prev => ({ ...prev, [id]: '' }));
+    // setSecurityFieldErrors(prev => ({ ...prev, [id]: '' }));
   };
 
   const handleSecuritySubmit = async (e) => {
     e.preventDefault();
-    setSecurityFieldErrors({});
-    setStatusMessage({ type: '', text: '' });
-
+    // setSecurityFieldErrors({});
+    // setStatusMessage({ type: '', text: '' });
+    showLoader();
     const { currentPassword, newPassword, confirmPassword } = securityData;
     let errors = {};
     if (!currentPassword) errors.currentPassword = 'Current password is required';
@@ -46,7 +51,10 @@ const AdminProfilePage = () => {
     if (newPassword && confirmPassword && newPassword !== confirmPassword) errors.confirmPassword = 'Passwords do not match';
     if (currentPassword && newPassword && currentPassword === newPassword) errors.newPassword = 'New password must be different from current password';
     if (Object.keys(errors).length > 0) {
-      setSecurityFieldErrors(errors);
+      // setSecurityFieldErrors(errors);
+      // setStatusMessage({ type: 'error', text: Object.values(errors)[0] });
+      showToast(Object.values(errors)[0], 'error');
+      hideLoader();
       return;
     }
 
@@ -59,16 +67,24 @@ const AdminProfilePage = () => {
       });
       const data = await res.json();
       if (!res.ok) {
-        if (data.fieldErrors) setSecurityFieldErrors(data.fieldErrors);
-        setStatusMessage({ type: 'error', text: data.error || 'Password change failed' });
+        if (data.fieldErrors) {
+          // setSecurityFieldErrors(data.fieldErrors);
+          showToast(Object.values(data.fieldErrors)[0], 'error');
+        }
+        // setStatusMessage({ type: 'error', text: data.error || 'Password change failed' });
+        showToast(data.error || 'Password change failed', 'error');
       } else {
-        setStatusMessage({ type: 'success', text: data.message || 'Password changed successfully!' });
+        // setStatusMessage({ type: 'success', text: data.message || 'Password changed successfully!' });
+        showToast(data.message || 'Password changed successfully!', 'success');
         setSecurityData({ currentPassword: '', newPassword: '', confirmPassword: '' });
       }
-      setTimeout(() => setStatusMessage({ type: '', text: '' }), 2500);
+      // setTimeout(() => setStatusMessage({ type: '', text: '' }), 2500);
     } catch (err) {
-      setStatusMessage({ type: 'error', text: 'Network error. Try again.' });
-      setTimeout(() => setStatusMessage({ type: '', text: '' }), 2500);
+      // setStatusMessage({ type: 'error', text: 'Network error. Try again.' });
+      showToast('Network error. Try again.', 'error');
+      // setTimeout(() => setStatusMessage({ type: '', text: '' }), 2500);
+    }finally{
+      hideLoader();
     }
   };
 
@@ -89,7 +105,7 @@ const AdminProfilePage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    setLoading(true);
     const data = new FormData();
     Object.entries(formData).forEach(([key, value]) => {
       if (key === 'profileImage' && value) {
@@ -109,25 +125,30 @@ const AdminProfilePage = () => {
 
       const result = await response.json();
       if (response.ok) {
-        setStatusMessage({ type: 'success', text: result.message || 'Profile updated successfully!' });
+        // setStatusMessage({ type: 'success', text: result.message || 'Profile updated successfully!' });
+        showToast(result.message || 'Profile updated successfully!', 'success');
       } else {
-        setStatusMessage({ type: 'error', text: result.error || 'Update failed.' });
+        // setStatusMessage({ type: 'error', text: result.error || 'Update failed.' });
+        showToast(result.error || 'Update failed.', 'error');
       }
-      setTimeout(() => setStatusMessage({ type: '', text: '' }), 2500);
+      // setTimeout(() => setStatusMessage({ type: '', text: '' }), 2500);
     } catch (error) {
-      setStatusMessage({ type: 'error', text: 'Network error. Try again.' });
-      setTimeout(() => setStatusMessage({ type: '', text: '' }), 2500);
+      // setStatusMessage({ type: 'error', text: 'Network error. Try again.' });
+      showToast('Network error. Try again.', 'error');
+      // setTimeout(() => setStatusMessage({ type: '', text: '' }), 2500);
+    }finally{
+      setLoading(false);
     }
   };
 
 
   return (
     <div>
-      {statusMessage.text && (
+      {/* {statusMessage.text && (
         <div className={`mb-6 p-4 rounded-md text-sm font-medium ${statusMessage.type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
           {statusMessage.text}
         </div>
-      )}
+      )} */}
 
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-xl sm:text-3xl font-bold text-gray-800 flex items-center gap-3">
@@ -282,7 +303,9 @@ const AdminProfilePage = () => {
           {/* Submit */}
           <div className="text-right space-x-4 mt-4">
             {/* <button type="button" className="bg-gray-200 text-gray-800 font-bold py-2 px-6 rounded-lg hover:bg-gray-300">Back</button> */}
-            <button type="submit" className="bg-teal-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-teal-700">Update</button>
+            <button type="submit" className="bg-teal-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-teal-700">
+              {loading ?(<span className='flex items-center justify-center gap-3'><FaSpinner className="animate-spin h-5 w-5" />Updating... </span>):(<span>Update Profile</span>)}
+            </button>
           </div>
         </form>
       )}
@@ -313,9 +336,9 @@ const AdminProfilePage = () => {
                   {showPassword.current ? <FiEyeOff /> : <FiEye />}
                 </button>
               </div>
-              {securityFieldErrors.currentPassword && (
+              {/* {securityFieldErrors.currentPassword && (
                 <p className="mt-1 text-sm text-red-600">{securityFieldErrors.currentPassword}</p>
-              )}
+              )} */}
             </div>
 
             {/* New Password */}
@@ -338,9 +361,9 @@ const AdminProfilePage = () => {
                   {showPassword.new ? <FiEyeOff /> : <FiEye />}
                 </button>
               </div>
-              {securityFieldErrors.newPassword && (
+              {/* {securityFieldErrors.newPassword && (
                 <p className="mt-1 text-sm text-red-600">{securityFieldErrors.newPassword}</p>
-              )}
+              )} */}
             </div>
 
             {/* Confirm Password */}
@@ -363,14 +386,14 @@ const AdminProfilePage = () => {
                   {showPassword.confirm ? <FiEyeOff /> : <FiEye />}
                 </button>
               </div>
-              {securityFieldErrors.confirmPassword && (
+              {/* {securityFieldErrors.confirmPassword && (
                 <p className="mt-1 text-sm text-red-600">{securityFieldErrors.confirmPassword}</p>
-              )}
+              )} */}
             </div>
 
             <div className="text-right pt-4">
               <button type="submit" className="bg-teal-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-teal-700">
-                Update Password
+               {isLoading ?(<span className='flex items-center justify-center gap-3'><FaSpinner className="animate-spin h-5 w-5" />Updating... </span>):(<span> Update Password</span>)}
               </button>
             </div>
           </div>

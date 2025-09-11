@@ -2,7 +2,8 @@
 import { FiEye, FiSearch } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
-const BookingsTable = ({ bookings, showSearch = true }) => {
+import Loader from '../Loader';
+const BookingsTable = ({ bookings, isloading,showSearch = true }) => {
     const [searchTerm, setSearchTerm] = useState("");
     const getStatusClass = (status) => {
         switch (status.toLowerCase()) {
@@ -44,7 +45,9 @@ const BookingsTable = ({ bookings, showSearch = true }) => {
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200 text-sm">
-                        {
+                        { isloading ? (<tr>
+                            <td colSpan="7" className="py-4 px-4 text-center"><Loader /></td>
+                            </tr>) :
                             (() => {
                                 const filtered = bookings
                                     .filter(b => b.status !== 'pending')

@@ -1,8 +1,8 @@
 // src/components/BookingModal.jsx
 import { useState } from 'react';
 import { FiCheckCircle } from 'react-icons/fi';
-
-const BookingModal = ({ eventName, isOpen, onClose, onSubmit, bookingMsg }) => {
+import { FaSpinner } from 'react-icons/fa';
+const BookingModal = ({ eventName, isOpen, onClose, onSubmit,isloading }) => {
     // State for the form inputs, internal to this component
     // const [subscribers, setSubscribers] = useState(1);
     const [notes, setNotes] = useState('');
@@ -36,12 +36,7 @@ const BookingModal = ({ eventName, isOpen, onClose, onSubmit, bookingMsg }) => {
                     <FiCheckCircle className="text-teal-500 h-10 w-10" />
                     <h2 className="text-3xl font-bold text-gray-800">Event Booking</h2>
                 </div>
-                {/* Show booking error/success message */}
-                {bookingMsg && bookingMsg.text && (
-                  <div className={`mb-4 px-4 py-2 rounded text-center font-semibold ${bookingMsg.type === 'success' ? 'bg-green-100 text-green-700 border border-green-300' : 'bg-red-100 text-red-700 border border-red-300'}`}>
-                    {bookingMsg.text}
-                  </div>
-                )}
+               
                 <p className="mb-6 text-gray-600">You are booking for: <span className="font-semibold">{eventName}</span></p>
                 <form onSubmit={handleSubmit}>
                         <div>
@@ -62,7 +57,7 @@ const BookingModal = ({ eventName, isOpen, onClose, onSubmit, bookingMsg }) => {
                             Close
                         </button>
                         <button type="submit" className="bg-teal-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-teal-600">
-                            Book Now
+                            {isloading ?(<span className='flex items-center justify-center gap-3'><FaSpinner className="animate-spin h-5 w-5" />Booking... </span>):(<span>Book Now</span>)}
                         </button>
                     </div>
                 </form>

@@ -2,16 +2,19 @@
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { FiChevronLeft, FiTag } from 'react-icons/fi';
 import { useState, useEffect } from 'react';
-
-
+import { useLoader } from '../../context/LoaderContext';
+import { FaSpinner } from 'react-icons/fa';
+import { useToast } from '../../context/ToastContext';
 const EditCategoryPage = () => {
     const { categoryId } = useParams();
     const navigate = useNavigate();
+    const {showLoader, hideLoader,isLoading} = useLoader();
+    const {showToast} = useToast();
+    const [loading, setLoading] = useState(false);
     const [categoryToEdit, setCategoryToEdit] = useState({
         name: '',
         description: ''
     });
-    const [statusMessage, setStatusMessage] = useState({ type: '', text: '' });
 
    useEffect(() => {
         fetch(`http://localhost:8001/category/getCategory/${categoryId}`, { credentials: 'include' })
@@ -26,7 +29,7 @@ const EditCategoryPage = () => {
 
     const HandleSubmit = (e) => {
         e.preventDefault();
-        setStatusMessage({ type: '', text: '' });
+        showLoader();
         fetch(`http://localhost:8001/category/updateCategory/${categoryId}`, {
             method: 'PUT',
             headers: {
@@ -38,23 +41,23 @@ const EditCategoryPage = () => {
         .then(async response => {
             const data = await response.json();
             if (response.ok) {
-                setStatusMessage({ type: 'success', text: data.message || 'Category updated successfully!' });
+                showToast(data.message || 'Category updated successfully!', 'success');
                 setTimeout(() => {
-                    setStatusMessage({ type: '', text: '' });
                     navigate('/admin/categories');
                 }, 1500);
             } else {
-                setStatusMessage({ type: 'error', text: data.message || 'Failed to update category.' });
-                setTimeout(() => setStatusMessage({ type: '', text: '' }), 2500);
+                showToast(data.message || 'Failed to update category.', 'error');
             }
         })
         .catch(error => {
-            setStatusMessage({ type: 'error', text: 'Network error. Try again.' });
-            setTimeout(() => setStatusMessage({ type: '', text: '' }), 2500);
-        });
+            showToast('Network error. Try again.', 'error');
+        }).finally(() => {
+            hideLoader();
+        })
     }
     
     async function deleteCategory(id) {
+    setLoading(true);
     try {
         const response = await fetch(`http://localhost:8001/category/deleteCategory/${id}`, { 
             method: 'DELETE', 
@@ -64,28 +67,17 @@ const EditCategoryPage = () => {
         const data = await response.json();
         
         if (response.ok) {
-            setStatusMessage({ 
-                type: 'success', 
-                text: data.message || 'Category deleted successfully!' 
-            });
-            
+            showToast(data.message || 'Category deleted successfully!', 'success');
             setTimeout(() => {
-                setStatusMessage({ type: '', text: '' });
                 navigate('/admin/categories');
             }, 1500);
         } else {
-            setStatusMessage({ 
-                type: 'error', 
-                text: data.message || 'Failed to delete category.' 
-            });
-            setTimeout(() => setStatusMessage({ type: '', text: '' }), 2500);
+            showToast(data.message || 'Failed to delete category.', 'error');
         }
     } catch (error) {
-        setStatusMessage({ 
-            type: 'error', 
-            text: `Network error. Try again. ${error.message}` 
-        });
-        setTimeout(() => setStatusMessage({ type: '', text: '' }), 2500);
+        showToast(`Network error. Try again. ${error.message}`, 'error');
+    }finally {
+        setLoading(false);
     }
 }
     
@@ -105,11 +97,6 @@ const EditCategoryPage = () => {
             </div>
             
             <form className="bg-white p-8 rounded-lg shadow-md max-w-2xl mx-auto" onSubmit={HandleSubmit}>
-                {statusMessage.text && (
-                    <div className={`mb-6 p-4 rounded-md text-sm font-medium ${statusMessage.type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                        {statusMessage.text}
-                    </div>
-                )}
                 <div className="space-y-6">
                     <h2 className="text-xl font-semibold text-gray-700 border-b pb-3">Edit Information</h2>
                     <div>
@@ -130,10 +117,10 @@ const EditCategoryPage = () => {
                     </div>
                     <div className=" flex justify-end gap-3">
                         <button type="submit" className="bg-teal-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-teal-700">
-                            Update Category
+                            {isLoading ?(<span className='flex items-center justify-center gap-3'><FaSpinner className="animate-spin h-5 w-5" />Updating... </span>):(<span>Update Category</span>)}
                         </button>
                         <button type="button" onClick={() => deleteCategory(categoryId)} className="bg-red-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-700">
-                            Delete Category
+                            {loading ?(<span className='flex items-center justify-center gap-3'><FaSpinner className="animate-spin h-5 w-5" />Deleting... </span>):(<span>Delete Category</span>)}
                         </button>
                     </div>
                 </div>

@@ -3,7 +3,9 @@ import { Link } from 'react-router-dom';
 import { FiChevronLeft, FiHome } from 'react-icons/fi';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import { useLoader } from '../../context/LoaderContext';
+import { FaSpinner } from 'react-icons/fa';
+import { useToast } from '../../context/ToastContext';
 const CreateUniversityPage = () => {
     const [universityData, setUniversityData] = useState({
         name: '',
@@ -11,7 +13,8 @@ const CreateUniversityPage = () => {
         shortName: '',
         logo: null,
     });
-
+   const {showLoader, hideLoader,isLoading} = useLoader();
+   const {showToast} = useToast();
     const navigate = useNavigate();
 
 
@@ -25,21 +28,14 @@ const CreateUniversityPage = () => {
         setUniversityData({ ...universityData, logo: e.target.files[0] });
     };
 
-
-    const [message, setMessage] = useState(null);
-    const [messageType, setMessageType] = useState(''); // 'success' or 'error'
-
     const handleFormSubmit = async (e) => {
         e.preventDefault();
-
+       showLoader();
         const formData = new FormData();
         formData.append('name', universityData.name);
         formData.append('description', universityData.description);
         formData.append('shortName', universityData.shortName);
         formData.append('logo', universityData.logo);
-
-        setMessage(null);
-        setMessageType('');
 
         try {
             const response = await fetch('http://localhost:8001/universities/addUniversity', {
@@ -50,25 +46,18 @@ const CreateUniversityPage = () => {
 
             const result = await response.json();
             if (response.ok) {
-                setMessage(result.message || 'University created successfully!');
-                setMessageType('success');
+                showToast('University created successfully!', 'success');
                 setTimeout(() => {
-                    setMessage(null);
-                    setMessageType('');
                     navigate('/admin/universities');
-                }, 1200);
+                }, 1500);
             } else {
-                setMessage(result.error || 'Failed to create university.');
-                setMessageType('error');
-                setTimeout(() => {
-                    setMessage(null);
-                    setMessageType('');
-                }, 1200);
+                showToast(result.error || 'Failed to create university.', 'error');
             }
         } catch (error) {
             console.error('Error creating university:', error);
-            setMessage('Network error. Try again.');
-            setMessageType('error');
+            showToast('Network error. Try again.', 'error');
+        }finally{
+            hideLoader();
         }
     };
 
@@ -86,12 +75,6 @@ const CreateUniversityPage = () => {
                     <FiChevronLeft /> Back
                 </Link>
             </div>
-
-            {message && (
-                <div className={`mb-4 p-3 rounded text-center font-semibold ${messageType === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                    {message}
-                </div>
-            )}
             <form className="bg-white p-8 rounded-lg shadow-md space-y-6" onSubmit={handleFormSubmit}>
                 <div>
                     <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">University Name</label>
@@ -146,7 +129,7 @@ const CreateUniversityPage = () => {
                 </div>
                 <div className="text-right">
                     <button type="submit" className="bg-teal-600 text-white font-bold py-2 px-8 rounded-lg hover:bg-teal-700">
-                        Add University
+                       {isLoading ?(<span className='flex items-center justify-center gap-3'><FaSpinner className="animate-spin h-5 w-5" />Adding... </span>):(<span> Add University</span>)}
                     </button>
                 </div>
             </form>

@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FiChevronLeft, FiUpload, FiPlus } from 'react-icons/fi';
-
+import { useLoader } from '../../context/LoaderContext';
+import { FaSpinner } from 'react-icons/fa';
+import { useToast } from '../../context/ToastContext';
 const CreateEventPage = () => {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
@@ -16,12 +18,11 @@ const CreateEventPage = () => {
         category: '',
         description: '',
     });
-
+   const {showLoader, hideLoader,isLoading} = useLoader();
+   const {showToast} = useToast();
     const [imageFile, setImageFile] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
     const [mockCategories, setmockCategories] = useState([]);
-    const [message, setMessage] = useState(null);
-    const [messageType, setMessageType] = useState('');
 
     useEffect(() => {
         fetch('http://localhost:8001/category/getCategories', {
@@ -54,21 +55,8 @@ const CreateEventPage = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setMessage(null);
-        setMessageType('');
+        showLoader();
 
-
-        // const startDate = formData.startDate ? new Date(formData.startDate) : null;
-        // const endDate = formData.endDate ? new Date(formData.endDate) : null;
-        // if (startDate && endDate && endDate < startDate) {
-        //     setMessage('End date must be equal to or greater than start date.');
-        //     setMessageType('error');
-        //     setTimeout(() => {
-        //         setMessage(null);
-        //         setMessageType('');
-        //     }, 1500);
-        //     return;
-        // }
         // Validation: start date >= current date AND end date >= start date
         const startDate = formData.startDate ? new Date(formData.startDate) : null;
         const endDate = formData.endDate ? new Date(formData.endDate) : null;
@@ -80,22 +68,14 @@ const CreateEventPage = () => {
         if (endDate) endDate.setHours(0, 0, 0, 0);
 
         if (startDate && startDate < currentDate) {
-            setMessage('Start date must be equal to or greater than today.');
-            setMessageType('error');
-            setTimeout(() => {
-                setMessage(null);
-                setMessageType('');
-            }, 1500);
+            showToast('Start date must be equal to or greater than today.', 'error');
+            hideLoader();
             return;
         }
 
         if (startDate && endDate && endDate < startDate) {
-            setMessage('End date must be equal to or greater than start date.');
-            setMessageType('error');
-            setTimeout(() => {
-                setMessage(null);
-                setMessageType('');
-            }, 1500);
+            showToast('End date must be equal to or greater than start date.', 'error');
+            hideLoader();
             return;
         }
 
@@ -106,12 +86,8 @@ const CreateEventPage = () => {
             const startMinutes = sh * 60 + (sm || 0);
             const endMinutes = eh * 60 + (em || 0);
             if (endMinutes <= startMinutes) {
-                setMessage('End time must be greater than start time for the same date.');
-                setMessageType('error');
-                setTimeout(() => {
-                    setMessage(null);
-                    setMessageType('');
-                }, 1500);
+                showToast('End time must be greater than start time for the same date.', 'error');
+                hideLoader();
                 return;
             }
         }
@@ -131,29 +107,20 @@ const CreateEventPage = () => {
                 body: payload,
             });
             if (response.ok) {
-                setMessage('Event created successfully!');
-                setMessageType('success');
+                showToast('Event created successfully!', 'success');
                 setTimeout(() => {
                     navigate('/admin/events');
-                }, 1200);
+                }, 1500);
             } else {
                 const errorData = await response.json();
                 console.error('Error response:', errorData);
-                setMessage(errorData.error || 'Failed to create event.');
-                setMessageType('error');
-                setTimeout(() => {
-                    setMessage(null);
-                    setMessageType('');
-                }, 1200);
+                showToast(errorData.error || 'Failed to create event.', 'error');
             }
         } catch (error) {
             console.error('Submission error:', error);
-            setMessage('Something went wrong.');
-            setMessageType('error');
-            setTimeout(() => {
-                setMessage(null);
-                setMessageType('');
-            }, 1200);
+            showToast('Something went wrong.', 'error');
+        }finally{
+            hideLoader();
         }
     };
 
@@ -167,13 +134,6 @@ const CreateEventPage = () => {
                     <FiChevronLeft /> Back
                 </Link>
             </div>
-
-            {message && (
-                <div className={`mb-4 p-3 rounded text-center font-semibold ${messageType === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                    {message}
-                </div>
-            )}
-
             <form onSubmit={handleSubmit} className="bg-white p-8 rounded-lg shadow-md space-y-8">
                 <div className="grid md:grid-cols-3 gap-8">
                     <div className="md:col-span-2 space-y-6">
@@ -243,7 +203,7 @@ const CreateEventPage = () => {
 
                 <div className="text-right">
                     <button type="submit" className="bg-teal-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-teal-700 transition-colors">
-                        Save Event
+                       {isLoading ?(<span className='flex items-center justify-center gap-3'><FaSpinner className="animate-spin h-5 w-5" />Saving... </span>):(<span> Save Event</span>)}
                     </button>
                 </div>
             </form>

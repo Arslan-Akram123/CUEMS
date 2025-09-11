@@ -1,6 +1,9 @@
 // src/pages/admin/AdminCommentsPage.jsx
 import { FiSearch, FiStar } from 'react-icons/fi';
 import { useState, useEffect, use } from 'react';
+import { useLoader } from '../../context/LoaderContext';
+import Loader from '../../components/Loader';
+import { useToast } from '../../context/ToastContext';
 const renderStars = (rating) => {
     return Array.from({ length: 5 }, (_, index) => (
         <FiStar
@@ -13,11 +16,13 @@ const renderStars = (rating) => {
 };
 
 const AdminCommentsPage = () => {
+    const {showToast} = useToast();
     const [comments, setComments] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [filteredComments, setFilteredComments] = useState([]);
-
+    const {showLoader, hideLoader,isLoading} = useLoader();
     useEffect(() => {
+        showLoader();
         fetch('http://localhost:8001/comments/getAllComments', { credentials: 'include' })
           .then(res => res.json())
           .then(data => {
@@ -27,7 +32,8 @@ const AdminCommentsPage = () => {
           .catch(() => {
             setComments([]);
             setFilteredComments([]);
-          });
+          })
+          .finally(hideLoader);
     }, []);
 
     useEffect(() => {
@@ -53,11 +59,15 @@ const AdminCommentsPage = () => {
                 .then(res => res.json())
                 .then(data => {
                     if (data.message === "Comment deleted successfully") {
+                        showToast("Comment deleted successfully!", 'success');
                         setComments(prevComments => prevComments.filter(comment => comment._id !== commentId));
                         setFilteredComments(prevComments => prevComments.filter(comment => comment._id !== commentId));
                     }
                 })
-                .catch(err => console.error(err));
+                .catch(err => {
+                    showToast("Error deleting comment!", 'error');
+                    console.error(err)
+                });
         }
     };
   return (
@@ -94,7 +104,13 @@ const AdminCommentsPage = () => {
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200 text-sm">
-                        {filteredComments.length > 0 ? (
+                      {isLoading ?(
+                        <tr>
+                            <td colSpan="7" className="text-center py-6 text-gray-500"><Loader/></td>
+
+                        </tr>
+                            ):(
+                                  filteredComments.length > 0 ? (
                             filteredComments.map((item, index) => (
                                 <tr key={item?._id}>
                                     <td className="py-4 px-4">{index + 1}</td>
@@ -113,7 +129,8 @@ const AdminCommentsPage = () => {
                             <tr>
                                 <td colSpan="6" className="py-8 px-4 text-center text-red-500 font-semibold">No comment found</td>
                             </tr>
-                        )}
+                        )
+                            )}
                     </tbody>
                 </table>
             </div>

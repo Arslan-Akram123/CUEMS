@@ -1,13 +1,14 @@
 import { Link } from 'react-router-dom';
 import { FiPlus, FiEdit, FiTrash2, FiSearch } from 'react-icons/fi';
 import { useState, useEffect } from 'react';
-
+import { useLoader } from '../../context/LoaderContext';
+import Loader from '../../components/Loader';
 const AdminEventsPage = () => {
     const [events, setEvents] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
     const [filteredEvents, setFilteredEvents] = useState([]);
-
+    const {showLoader, hideLoader,isLoading} = useLoader();
     const getStatusClass = (status) => {
         switch (status) {
             case 'upcoming': return 'bg-green-100 text-green-800';
@@ -18,6 +19,7 @@ const AdminEventsPage = () => {
     };
 
     useEffect(() => {
+        showLoader();
         fetch('http://localhost:8001/events/getAllEvents', { credentials: 'include' })
             .then(res => res.json())
             .then(data => {
@@ -30,6 +32,8 @@ const AdminEventsPage = () => {
                 setEvents([]);
                 setFilteredEvents([]);
                 setLoading(false);
+            }).finally(() => {
+                hideLoader();
             });
     }, []);
 
@@ -83,9 +87,9 @@ const AdminEventsPage = () => {
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                        {loading ? (
+                        {isLoading? (
                             <tr>
-                                <td colSpan="6" className="text-center py-6 text-gray-500">Loading events...</td>
+                                <td colSpan="6" className="text-center py-6 text-gray-500"><Loader/></td>
                             </tr>
                         ) : events.length === 0 ? (
                             <tr>

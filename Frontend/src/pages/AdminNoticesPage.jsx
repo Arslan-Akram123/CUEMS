@@ -1,12 +1,14 @@
 import UserLayout from '../components/UserLayout';
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-
+import { useLoader } from '../context/LoaderContext';
+import Loader from '../components/Loader';
 const AdminNoticesPage = () => {
     const [notices, setNotices] = useState([]);
     const [activeTab, setActiveTab] = useState('all'); // 'all', 'unread', 'read'
-
+    const {showLoader, hideLoader,isLoading} = useLoader();
     useEffect(() => {
+        showLoader();
         fetch('http://localhost:8001/notices/getNotificationOfUSer', { credentials: 'include' })
             .then(response => response.json())
             .then(data => {
@@ -14,6 +16,8 @@ const AdminNoticesPage = () => {
             })
             .catch(error => {
                 console.error('Error fetching notices:', error);
+            }).finally(() => {
+                hideLoader();
             });
     }, []);
 
@@ -85,7 +89,8 @@ const AdminNoticesPage = () => {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200">
-                            {filteredNotices.length > 0 ? filteredNotices.map((notice) => {
+                            {isLoading ? <tr><td colSpan="3" className="py-4 px-6 text-center text-gray-500"><Loader /></td></tr>:
+                            filteredNotices.length > 0 ? filteredNotices.map((notice) => {
                                 return (
                                     <tr
                                         key={notice._id}

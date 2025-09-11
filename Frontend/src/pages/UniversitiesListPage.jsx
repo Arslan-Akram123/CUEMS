@@ -4,27 +4,7 @@ import UserLayout from '../components/UserLayout';
 import UniversityCard from '../components/UniversityCard';
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-// Mock data, as if from an API
-// const mockUniversities = [
-//   {
-//     pathId: 'iub',
-//     name: 'Islamiya University Bahawalpur',
-//     description: 'The university boasts a dedicated team of faculty members who are highly qualified and experienced in their respective fields.',
-//     logoUrl: 'https://via.placeholder.com/150/0284C7/FFFFFF?Text=IUB'
-//   },
-//   {
-//     pathId: 'lums',
-//     name: 'Lums University',
-//     description: 'LUMS is an extraordinary place for learning, discovery and transformation. Here, you have the freedom to ask questions, challenge the ordinary and spark innovation.',
-//     logoUrl: 'https://via.placeholder.com/150/166534/FFFFFF?Text=LUMS'
-//   },
-//   {
-//     pathId: 'bzu',
-//     name: 'Bahauddin Zakriya University',
-//     description: 'public university in Multan, Pakistan. Named after the famous Sufi saint Bahauddin Zakariya, it offers a wide range of undergraduate programs.',
-//     logoUrl: 'https://via.placeholder.com/150/7C3AED/FFFFFF?Text=BZU'
-//   }
-// ];
+
 
 const UniversitiesListPage = () => {
   const [universities, setUniversities] = useState([]);

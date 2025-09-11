@@ -3,12 +3,15 @@ import { Link } from 'react-router-dom';
 import BookingsTable from '../../components/admin/BookingsTable';
 import { FiCheckCircle } from 'react-icons/fi';
 import { useState, useEffect } from 'react';
+import { useLoader } from '../../context/LoaderContext';
 
 
 const AdminBookingsPage = () => {
     const [allBookings, setAllBookings] = useState([]);
+    const {showLoader, hideLoader,isLoading} = useLoader();
   useEffect(() => {
-        fetch('http://localhost:8001/eventsbook/getAllBookings', { credentials: 'include' }).then(res => res.json()).then(data => setAllBookings(data)).catch(err => console.error(err));
+        showLoader();
+        fetch('http://localhost:8001/eventsbook/getAllBookings', { credentials: 'include' }).then(res => res.json()).then(data => setAllBookings(data)).catch(err => console.error(err)).finally(hideLoader);
   },[]);
 
     return (
@@ -23,7 +26,7 @@ const AdminBookingsPage = () => {
                 </Link>
             </div>
             <h2 className="text-xl font-semibold text-gray-700 mb-4">Total Bookings</h2>
-            <BookingsTable bookings={allBookings} />
+            <BookingsTable bookings={allBookings} isloading={isLoading} />
         </div>
     );
 };

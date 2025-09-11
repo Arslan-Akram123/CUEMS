@@ -5,26 +5,28 @@ import { FiLock, FiCreditCard, FiCalendar, FiChevronLeft } from 'react-icons/fi'
 import { useState } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import { CardElement, useStripe, useElements, Elements } from '@stripe/react-stripe-js';
-
+import { useLoader } from '../context/LoaderContext';
+import { FaSpinner } from 'react-icons/fa';
+import {useToast} from '../context/ToastContext';
 // Initialize Stripe with your test publishable key
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
 const CheckoutForm = ({ booking, onSuccessfulPayment }) => {
   const stripe = useStripe();
   const elements = useElements();
-  const [error, setError] = useState(null);
+  const {showToast} = useToast();
   const [processing, setProcessing] = useState(false);
   const [nameOnCard, setNameOnCard] = useState('');
-
+  const {showLoader, hideLoader,isLoading} = useLoader();
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+    showLoader();
     if (!stripe || !elements) {
       return; // Stripe.js hasn't loaded yet
     }
 
     setProcessing(true);
-    setError(null);
+   
 
     try {
       // 1. Create payment intent on backend
@@ -44,6 +46,7 @@ const CheckoutForm = ({ booking, onSuccessfulPayment }) => {
       });
 
       if (!response.ok) {
+         showToast('Failed to create payment intent', 'error');
         throw new Error('Failed to create payment intent');
       }
 
@@ -60,7 +63,7 @@ const CheckoutForm = ({ booking, onSuccessfulPayment }) => {
       });
 
       if (stripeError) {
-        setError(stripeError.message);
+        showToast(stripeError.message, 'error');
         setProcessing(false);
         return;
       }
@@ -70,16 +73,17 @@ const CheckoutForm = ({ booking, onSuccessfulPayment }) => {
         onSuccessfulPayment();
       }
     } catch (err) {
-      setError(err.message);
+
+      showToast(err.message, 'error');
       setProcessing(false);
+    }finally{
+      hideLoader();
     }
   };
 
   return (
     <form onSubmit={handleSubmit}>
-        {error && (
-          <div className="mb-4 text-red-500">{error}</div>
-        )}
+       
       <h2 className="text-xl font-semibold mb-4">Payment Information</h2>
       <div className="space-y-4">
         <div>
@@ -131,7 +135,7 @@ const CheckoutForm = ({ booking, onSuccessfulPayment }) => {
           className={`w-full flex items-center justify-center gap-3 bg-teal-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-teal-700 ${(!stripe || processing) ? 'opacity-50 cursor-not-allowed' : ''}`}
         >
           <FiLock />
-          {processing ? 'Processing...' : `Pay $${booking.event.price}`}
+          {processing ? (<span className='flex items-center justify-center gap-3'><FaSpinner className="animate-spin h-5 w-5" /> Processing... </span>) : `Pay $${booking.event.price}`}
         </button>
       </div>
     </form>
@@ -143,10 +147,6 @@ const CheckoutPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { booking } = location.state || {};
-
-  // Success and error message state
-  const [successMsg, setSuccessMsg] = useState('');
-  const [errorMsg, setErrorMsg] = useState('');
 
   if (!booking) {
     return (
@@ -175,13 +175,11 @@ const CheckoutPage = () => {
     })
     .then(response => response.json())
     .then(data => {
-      setSuccessMsg(`Payment successful for "${booking.event.name}"!`);
-      setTimeout(() => setSuccessMsg(''), 2500);
-      setTimeout(() => navigate('/my-bookings'), 2500);
+      showToast(`Payment successful for "${booking.event.name}"!`, 'success');
+      setTimeout(() => navigate('/my-bookings'), 1500);
     })
     .catch(error => {
-      setErrorMsg('Payment failed. Please try again.');
-      setTimeout(() => setErrorMsg(''), 2500);
+      showToast('Payment failed. Please try again.', 'error');
       console.error(error);
     });
   }
@@ -196,18 +194,6 @@ const CheckoutPage = () => {
               <FiChevronLeft /> Back to Bookings
             </Link>
           </div>
-
-          {/* Success and Error Messages */}
-          {successMsg && (
-            <div className="mb-4 p-3 rounded bg-green-100 text-green-800 font-semibold text-center">
-              {successMsg}
-            </div>
-          )}
-          {errorMsg && (
-            <div className="mb-4 p-3 rounded bg-red-100 text-red-800 font-semibold text-center">
-              {errorMsg}
-            </div>
-          )}
 
           <div className="bg-white p-8 rounded-lg shadow-md">
             {/* Order Summary */}

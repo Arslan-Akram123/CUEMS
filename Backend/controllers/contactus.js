@@ -8,6 +8,10 @@ async function createContactUs(req, res) {
         return res.status(400).json({ message: 'Message is required' });
     }
     const {  message } = req.body;
+    // validation for message only contain alphanumeric characters and spaces and some special charactors and 3 to 100 words limit
+    if(!/^[a-zA-Z0-9\s!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]{3,100}$/.test(message)){
+        return res.status(400).json({ message: 'Message can only contain alphanumeric characters and spaces and some special charactors and 3 to 100 words limit' });
+    }
     
     try {
         // Send email to the user

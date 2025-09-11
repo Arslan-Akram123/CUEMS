@@ -3,13 +3,16 @@ import { Link } from 'react-router-dom';
 import { FiChevronLeft, FiTag } from 'react-icons/fi';
 import {useState} from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import { useLoader } from '../../context/LoaderContext';
+import { FaSpinner } from 'react-icons/fa';
+import { useToast } from '../../context/ToastContext';
 const CreateCategoryPage = () => {
     const [formData, setFormData] = useState({
         name: '',
         description: ''
     });
-    const [statusMessage, setStatusMessage] = useState({ type: '', text: '' });
+    const {showLoader, hideLoader,isLoading} = useLoader();
+    const {showToast} = useToast();
   const navigate = useNavigate();
     const handleChange = (e) => {
         setFormData({
@@ -20,7 +23,7 @@ const CreateCategoryPage = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        setStatusMessage({ type: '', text: '' });
+        showLoader();
         fetch('http://localhost:8001/category/addCategory', {
             method: 'POST',
             headers: {
@@ -32,20 +35,18 @@ const CreateCategoryPage = () => {
         .then(async response => {
             const data = await response.json();
             if (response.ok) {
-                setStatusMessage({ type: 'success', text: data.message || 'Category created successfully!' });
+                showToast(data.message || 'Category created successfully!', 'success');
                 setTimeout(() => {
-                    setStatusMessage({ type: '', text: '' });
                     navigate('/admin/categories');
-                    // window.location.href = '/admin/categories';
-                }, 2500);
+                }, 1500);
             } else {
-                setStatusMessage({ type: 'error', text: data.message || 'Failed to create category.' });
-                setTimeout(() => setStatusMessage({ type: '', text: '' }), 2500);
+                showToast(data.message || 'Failed to create category.', 'error');
             }
         })
         .catch(error => {
-            setStatusMessage({ type: 'error', text: 'Network error. Try again.' });
-            setTimeout(() => setStatusMessage({ type: '', text: '' }), 2500);
+            showToast(error ||'Network error. Try again.', 'error');
+        }).finally(() => {
+            hideLoader();
         });
     };
   return (
@@ -63,11 +64,6 @@ const CreateCategoryPage = () => {
         </div>
         
         <form className="bg-white p-8 rounded-lg shadow-md max-w-2xl mx-auto" onSubmit={handleSubmit}>
-            {statusMessage.text && (
-                <div className={`mb-6 p-4 rounded-md text-sm font-medium ${statusMessage.type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                    {statusMessage.text}
-                </div>
-            )}
             <div className="space-y-6">
                 <h2 className="text-xl font-semibold text-gray-700 border-b pb-3">Enter Information</h2>
                 <div>
@@ -88,7 +84,7 @@ const CreateCategoryPage = () => {
                 </div>
                 <div className="text-right">
                     <button type="submit" className="bg-teal-600 text-white font-bold py-2 px-8 rounded-lg hover:bg-teal-700">
-                        Add Category
+                        {isLoading ?(<span className='flex items-center justify-center gap-3'><FaSpinner className="animate-spin h-5 w-5" />Adding... </span>):(<span>Add Category</span>)}
                     </button>
                 </div>
             </div>

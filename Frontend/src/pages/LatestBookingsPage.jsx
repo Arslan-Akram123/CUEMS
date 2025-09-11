@@ -3,14 +3,7 @@ import { Link } from 'react-router-dom';
 import UserLayout from '../components/UserLayout';
 import { FiSearch, FiCalendar } from 'react-icons/fi';
 import { useState, useEffect } from 'react';
-// Mock data for recent bookings across the platform
-// const mockLatestBookings = [
-//     { id: 1, eventName: 'Become a Web Developer', eventId: 5, member: 'test', date: '1 days ago', status: 'confirmed' },
-//     { id: 2, eventName: 'International Workshop', eventId: 1, member: 'jane.d', date: '1 days ago', status: 'confirmed' },
-//     { id: 3, eventName: 'LUMS Live Session', eventId: 2, member: 'john.s', date: '2 days ago', status: 'confirmed' },
-//     { id: 4, eventName: 'Annual Sports Week', eventId: 4, member: 'sara.c', date: '3 days ago', status: 'confirmed' },
-//     { id: 5, eventName: 'CSS Mentorship', eventId: 3, member: 'mike.r', date: '4 days ago', status: 'confirmed' },
-// ];
+
 
 const LatestBookingsPage = () => {
     const [mockLatestBookings, setMockLatestBookings] = useState([]);

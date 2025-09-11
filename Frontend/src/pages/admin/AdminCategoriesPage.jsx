@@ -2,19 +2,13 @@
 import { Link } from 'react-router-dom';
 import { FiPlus, FiEdit, FiTrash2 } from 'react-icons/fi';
 import { useState, useEffect } from 'react';
-
-// const mockCategories = [
-//     { id: 1, name: "media", notes: "media is a powerful source" },
-//     { id: 2, name: "Music", notes: "this is music category" },
-//     { id: 3, name: "Health and Wellness", notes: "this is Health and Wellness category" },
-//     { id: 4, name: "Technology", notes: "this is technology category" },
-//     { id: 5, name: "Sports", notes: "All about sports events" },
-// ];
-
+import { useLoader } from '../../context/LoaderContext';
+import Loader from '../../components/Loader';
 const AdminCategoriesPage = () => {
     const [mockCategories, setmockCategories] = useState([]);
-
+    const {showLoader, hideLoader,isLoading} = useLoader();
     useEffect(() => {
+      showLoader();
         fetch('http://localhost:8001/category/getCategories',{ credentials: 'include',})
             .then(response => response.json())
             .then(data => {
@@ -22,7 +16,7 @@ const AdminCategoriesPage = () => {
             })
             .catch(error => {
                 console.error('Error fetching categories:', error);
-            });
+            }).finally(hideLoader);
     }, []);
 
     
@@ -51,7 +45,8 @@ const AdminCategoriesPage = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200 text-sm">
-              {mockCategories.length >0 ? mockCategories.map((cat, index) => (
+              {isLoading ?<tr><td colSpan="4" className="py-4 px-4 text-center"><Loader /></td></tr>:
+              mockCategories.length >0 ? mockCategories.map((cat, index) => (
                 <tr key={cat._id}>
                   <td className="py-4 px-4">{index + 1}</td>
                   <td className="py-4 px-4 font-semibold">{cat.name}</td>

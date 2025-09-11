@@ -5,19 +5,20 @@ import UserLayout from '../components/UserLayout';
 import ReviewCard from '../components/ReviewCard';
 import BookingModal from '../components/BookingModal';
 import { FiStar, FiCalendar, FiClock, FiMapPin, FiUsers, FiTag } from 'react-icons/fi';
-
+import { useLoader } from '../context/LoaderContext';
+import { FaSpinner } from 'react-icons/fa';
+import {useToast} from '../context/ToastContext';
 const EventDetailPage = () => {
   const { eventId } = useParams();
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [message, setMessage] = useState(null);
   const [newComment, setNewComment] = useState("");
   const [newRating, setNewRating] = useState(0);
   const [showCommentBox, setShowCommentBox] = useState(false);
   const [comments, setComments] = useState([]);
-  const [commentMsg, setCommentMsg] = useState({ type: '', text: '' });
-  const [bookingMsg, setBookingMsg] = useState({ type: '', text: '' });
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+  const {showLoader, hideLoader,isLoading} = useLoader();
+    const {showToast} = useToast();
   useEffect(() => {
     const formatDate = (dateStr) => {
       if (!dateStr) return '';
@@ -48,7 +49,7 @@ const EventDetailPage = () => {
         setLoading(false);
       })
       .catch(err => {
-        setMessage('Event not found!');
+        showToast('Event not found!', 'error');
         setLoading(false);
       });
     // Fetch comments for this event
@@ -64,6 +65,7 @@ const EventDetailPage = () => {
   const handleBookingSubmit = async (bookingData) => {
     const { notes,setNotes } = bookingData;
     const payload = { notes, eventId };
+    showLoader();
     fetch('http://localhost:8001/eventsbook/bookingEventrequest', {
       method: 'POST',
       credentials: 'include',
@@ -75,32 +77,38 @@ const EventDetailPage = () => {
       .then(async (response) => {
         const data = await response.json();
         if (response.ok) {
-          setBookingMsg({ type: 'success', text: 'Booking successfully. Please wait for admin approval!' });
+        
+          showToast('Booking successfully. Please wait for admin approval!', 'success');
           setNotes('');
           setTimeout(() => {
-            setBookingMsg({ type: '', text: '' });
+          
             setIsBookingModalOpen(false);
-          }, 2500);
+          }, 1500);
         } else {
           // Show specific error if already booked
 
           if (data && data.error === 'You have already booked this event') {
-            setBookingMsg({ type: 'error', text: 'You have already booked this event.' });
+           
+            showToast('You have already booked this event.', 'error');
           } else {
-            setBookingMsg({ type: 'error', text: data.error });
+           
+            showToast(data.error, 'error');
           }
         }
       })
       .catch((error) => {
-        setBookingMsg({ type: 'error', text: 'Error booking event.' });
-      });
-    setTimeout(() => setBookingMsg({ type: '', text: '' }), 2500);
+       
+        showToast('Error booking event.', 'error');
+      }).finally(hideLoader);
+    
   };
 
 
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
+    showLoader();
     try {
+
       const response = await fetch('http://localhost:8001/comments/addComment', {
         method: 'POST',
         credentials: 'include',
@@ -114,7 +122,7 @@ const EventDetailPage = () => {
         }),
       });
       if (response.ok) {
-        setCommentMsg({ type: 'success', text: 'Comment posted successfully!' });
+        showToast("Comment posted successfully!", 'success');
         setShowCommentBox(false);
         setNewComment("");
         setNewRating(0);
@@ -126,20 +134,20 @@ const EventDetailPage = () => {
           .catch(() => setComments([]));
       } else {
         const data = await response.json();
-        setCommentMsg({ type: 'error', text: data.error });
-         setTimeout(()=> setCommentMsg({ type: '', text: '' }),2500)
+        showToast(data.error, 'error');
       }
     } catch (err) {
-      setCommentMsg({ type: 'error', text: 'Network error.' });
+      showToast('Network error.', 'error');
+    } finally {
+      hideLoader();
     }
-    setTimeout(() => setCommentMsg({ type: '', text: '' }), 2500);
   };
 
   if (loading) {
     return (
       <UserLayout>
         <div className="text-center py-20">
-          <h1 className="text-3xl font-bold">Loading event...</h1>
+          <h1 className="text-3xl font-bold flex items-center justify-center">Loading event...<FaSpinner className="animate-spin"/></h1>
         </div>
       </UserLayout>
     );
@@ -164,21 +172,7 @@ const EventDetailPage = () => {
   return (
     <UserLayout>
       <div className="container mx-auto px-4 py-8">
-        {/* Success/Error Message at Top */}
-        {(bookingMsg.text || commentMsg.text) && (
-          <div className="mb-6">
-            {bookingMsg.text && (
-              <div className={`px-4 py-2 rounded text-center font-semibold ${bookingMsg.type === 'success' ? 'bg-green-100 text-green-700 border border-green-300' : 'bg-red-100 text-red-700 border border-red-300'}`}>
-                {bookingMsg.text}
-              </div>
-            )}
-            {commentMsg.text && (
-              <div className={`px-4 py-2 rounded text-center font-semibold ${commentMsg.type === 'success' ? 'bg-green-100 text-green-700 border border-green-300' : 'bg-red-100 text-red-700 border border-red-300'}`}>
-                {commentMsg.text}
-              </div>
-            )}
-          </div>
-        )}
+       
         <div className="bg-white p-6 rounded-lg shadow-md">
 
           {/* Top Section: Title and Price */}
@@ -281,15 +275,13 @@ const EventDetailPage = () => {
                     <span className="ml-2 text-teal-600 font-bold">{newRating > 0 ? `${newRating} Star${newRating > 1 ? 's' : ''}` : ''}</span>
                   </div>
                   <div className="flex gap-3 mt-4 self-end">
-                    <button type="submit" className="bg-gradient-to-r from-teal-500 to-teal-700 text-white font-bold py-2 px-6 rounded-lg shadow hover:scale-105 transition-transform">Post</button>
+                    <button type="submit" className="bg-teal-500 text-white font-bold py-2 px-6 rounded-lg shadow hover:scale-105 transition-transform">
+                      {isLoading ?(<span className='flex items-center justify-center gap-3'><FaSpinner className="animate-spin h-5 w-5" />Posting... </span>) :'Post'}
+                    </button>
                     <button type="button" className="bg-gray-200 text-gray-800 font-bold py-2 px-6 rounded-lg shadow hover:bg-gray-300 transition-colors" onClick={() => setShowCommentBox(false)}>Cancel</button>
                   </div>
                 </form>
-                {commentMsg.text && (
-                  <div className={`mt-4 px-4 py-2 rounded text-center font-semibold ${commentMsg.type === 'success' ? 'bg-green-100 text-green-700 border border-green-300' : 'bg-red-100 text-red-700 border border-red-300'}`}>
-                    {commentMsg.text}
-                  </div>
-                )}
+               
               </>
             )}
           </div>
@@ -323,8 +315,7 @@ const EventDetailPage = () => {
         isOpen={isBookingModalOpen}
         onClose={() => setIsBookingModalOpen(false)}
         onSubmit={handleBookingSubmit}
-        bookingMsg={bookingMsg}
-        setBookingMsg={setBookingMsg}
+        isloading={isLoading}
       />
     </UserLayout>
   );

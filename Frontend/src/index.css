@@ -1,3 +1,4 @@
+@import "tailwindcss";
 @keyframes warning-bounce {
   0%, 100% {
     transform: rotateX(0deg) rotateY(0deg);
@@ -14,4 +15,13 @@
 
 .animate-warning-bounce {
   animation: warning-bounce 2s infinite linear;
-}@import "tailwindcss";
+
+}
+@keyframes shrink-width {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}

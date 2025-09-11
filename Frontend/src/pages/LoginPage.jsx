@@ -3,30 +3,26 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import AuthLayout from '../components/AuthLayout';
-import { FiCloudLightning, FiEye, FiEyeOff } from 'react-icons/fi';
+import { FiEye, FiEyeOff } from 'react-icons/fi';
 import { jwtDecode } from 'jwt-decode';
-
-
+import { useLoader } from '../context/LoaderContext';
+import { FaSpinner } from 'react-icons/fa'
+import {useToast} from '../context/ToastContext';
 const LoginPage = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
-
+  const {showToast} = useToast();
+  const {showLoader, hideLoader,isLoading} = useLoader();
   const [showPassword, setShowPassword] = useState(false);
-  const [fieldErrors, setFieldErrors] = useState({});
-  const [formMessage, setFormMessage] = useState(null); 
+
   const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
-    }));
-
-    setFieldErrors((prev) => ({
-      ...prev,
-      [e.target.name]: '',
     }));
   };
 
@@ -36,9 +32,7 @@ const LoginPage = () => {
 
   const handleSubmit = async (e) => {
   e.preventDefault();
-  setFormMessage(null);
-  setFieldErrors({});
-
+showLoader();
   try {
     const res = await fetch('http://localhost:8001/auth/login', {
       method: 'POST',
@@ -53,21 +47,20 @@ const LoginPage = () => {
       const errorMsg = data.error?.toLowerCase() || '';
 
       if (errorMsg.includes('email') || errorMsg.includes('user')) {
-        setFieldErrors({ email: data.error });
+        showToast(data.error, 'error');
       } else if (errorMsg.includes('password')) {
-        setFieldErrors({ password: data.error });
+        showToast(data.error, 'error');
       } else if (errorMsg.includes('activate')) {
-        setFormMessage({ type: 'error', text: data.error });
+        showToast(data.error, 'error');
       } else {
-        setFormMessage({ type: 'error', text: data.error || 'Login failed' });
+        showToast(data.error || 'Login failed', 'error');
       }
       return;
     }
 
    
     localStorage.setItem('token', data.token);
-    setFormMessage({ type: 'success', text: data.message });
-
+    showToast(data.message, 'success');
     try {
       const localtoken = localStorage.getItem('token');
       const decoded = jwtDecode(localtoken);
@@ -76,25 +69,22 @@ const LoginPage = () => {
       setTimeout(() => navigate(redirectPath), 1500);
     } catch (decodeError) {
       console.error('Token decode error:', decodeError);
-      setFormMessage({
-        type: 'error',
-        text: 'Login succeeded but failed to redirect based on role.',
-      });
+      showToast(
+        'Login succeeded but failed to redirect based on role.',
+        'error'
+      );
     }
   } catch (err) {
     console.error('Client error:', err);
-    setFormMessage({ type: 'error', text: err.message });
+    showToast(err.message, 'error');
+  }finally{
+    hideLoader();
   }
 };
 
 
   return (
     <AuthLayout title="Login">
-      {formMessage && (
-        <p className={`text-center  text-sm px-2 py-2 mb-2 ${formMessage.type === 'error' ? 'text-red-500 bg-red-100 border border-red-300' : 'text-green-600 bg-green-100 border border-green-300'}`}>
-          {formMessage.text}
-        </p>
-      )}
 
       <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
         <div className="space-y-4 border-0">
@@ -110,9 +100,6 @@ const LoginPage = () => {
     className="w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500 sm:text-sm"
     placeholder="example@gmail.com"
   />
-  {fieldErrors.email && (
-    <p className="text-sm text-red-600">{fieldErrors.email}</p>
-  )}
 </div>
 
 
@@ -140,10 +127,6 @@ const LoginPage = () => {
   </button>
 </div>
 
-{fieldErrors.password && (
-  <p className="mt-1 text-sm text-red-600">{fieldErrors.password}</p>
-)}
-
         </div>
 
         <div className="flex items-center justify-end">
@@ -157,16 +140,9 @@ const LoginPage = () => {
             type="submit"
             className="group relative flex w-full justify-center rounded-md border border-transparent bg-teal-500 py-2 px-4 text-sm font-medium text-white hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
           >
-            Login
+            {isLoading ? (<span className='flex items-center justify-center gap-3'><FaSpinner className="animate-spin h-5 w-5" />Login... </span>) : 'Login'}
+           
           </button>
-          {/* <Link to="/home">
-            <button
-              type="button"
-              className="group relative flex w-full justify-center rounded-md border border-teal-500 py-2 px-4 text-sm font-medium text-teal-600 hover:bg-teal-50 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
-            >
-              Explore The App
-            </button>
-          </Link> */}
         </div>
 
         <p className="mt-2 text-center text-sm text-gray-600">

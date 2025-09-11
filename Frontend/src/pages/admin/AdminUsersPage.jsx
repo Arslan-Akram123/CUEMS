@@ -1,12 +1,13 @@
 // src/pages/admin/AdminUsersPage.jsx
 
 import { useState, useEffect } from 'react';
-
-
+import { useLoader } from '../../context/LoaderContext';
+import Loader from '../../components/Loader';
 const AdminUsersPage = () => {
     const [mockUsers, setMockUsers] = useState([]);
-
+    const {showLoader, hideLoader,isLoading} = useLoader();
     useEffect(() => {
+        showLoader();
         fetch('http://localhost:8001/settings/getAllUsers', { credentials: 'include' })
             .then(res => res.json())
             .then(data => {
@@ -20,7 +21,8 @@ const AdminUsersPage = () => {
             .catch(err => {
                 setMockUsers([]);
                 console.log(err);
-            });
+            })
+            .finally(hideLoader);
     }, []);
 
     const getStatusClass = (status) => {
@@ -31,6 +33,7 @@ const AdminUsersPage = () => {
     const handleToggleAdmin = async (userId, makeAdmin) => {
         try {
             console.log(userId, makeAdmin);
+            // showLoader();
             const response = await fetch('http://localhost:8001/settings/updateProfileData', {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
@@ -49,6 +52,9 @@ const AdminUsersPage = () => {
         } catch (error) {
             alert('Network error. Try again.');
         }
+        // finally{
+        //     hideLoader();
+        // }
     };
 
     return (
@@ -71,7 +77,8 @@ const AdminUsersPage = () => {
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200 text-sm">
-                            {mockUsers.length > 0 ? mockUsers.map((user, index) => {
+                            {isLoading ?<tr><td colSpan="7" className='py-4 px-4 text-center'><Loader /></td></tr>:
+                            mockUsers.length > 0 ? mockUsers.map((user, index) => {
                                 
                              return(   <tr key={user._id }>
                                     <td className="py-4 px-4">{index + 1}</td>
